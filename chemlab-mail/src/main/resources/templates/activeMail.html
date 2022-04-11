@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>注册激活邮件</title>
+</head>
+<body style="width: 600px;margin: 0 auto;text-align: center">
+<h1>激活您的账号，有效期为 <span style="color: red">24</span> 小时</h1>
+<p>这是一封来自<span style="font-weight: bold">chemlab</span>的邮件，如果不是您本人进行此操作，请忽略</p>
+<p>如果是您本人操作，请点击以下链接激活您的账号</p>
+<a style="color: red" th:href="|http://localhost:8081/index/confirm?email=${email}|">点击此链接</a>
+<p>激活后，您可以通过此账号和密码进行登录</p>
+<p>感谢您的使用</p>
+<p>祝您生活愉快！</p>
+</body>
+</html>

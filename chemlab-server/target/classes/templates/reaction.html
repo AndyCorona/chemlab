@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+    <div th:replace="~{template :: head(project)}"></div>
+    <link th:href="@{/chemlab/css/reaction.css}" rel="stylesheet">
+</head>
+
+<body class="container g-0 row" style="margin: 0 auto">
+<div th:replace="~{template :: common}"></div>
+<!--以上都为模板片段-->
+
+<div class="col-12 g-0" style="width: 83.33%!important;">
+
+    <!--导航栏开始-->
+    <nav class="nav-black-text g-0 col-12">
+        <ol class="breadcrumb" style="margin: 0">
+            <li class="breadcrumb-item">
+                <a class="userName" href="/user/">[[${session.user.username}]]'s EXPT</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a class="projectName" href="/user/project">[[${session.project.projectName}]]</a>
+            </li>
+            <li class="breadcrumb-item active">
+                <a class="reactionName" style="cursor: default" th:text="${session.reaction.reactionName}"></a>
+            </li>
+        </ol>
+    </nav>
+    <!--导航栏结束-->
+    <!--以上都为模板片段-->
+
+
+    <!--本页面最核心内容开始-->
+    <div class="col-12 d-flex align-items-start">
+        <section class="col-9">
+            <form style="padding: 3rem 3.5rem 0 3.5rem;">
+                <p id="reactionTitle" class="d-flex align-items-center">
+                    <input id="reactionName" style="width: 77%" placeholder="Reaction title"
+                           name="reactionName" autocomplete="off" autofocus="autofocus" maxlength="40">
+                    <img id="saveReaction" th:src="@{/chemlab/img/reaction/save.svg}">
+                    <img id="download" th:src="@{/boostrap/icons/cloud-download.svg}">
+                    <img id="saveTemplate" th:src="@{/chemlab/img/reaction/save-template.svg}">
+                    <img id="getTemplate" th:src="@{/chemlab/img/reaction/template.svg}" data-bs-toggle="modal"
+                         data-bs-target="#reactionTemplateModal">
+                </p>
+                <div class="col-12 d-flex align-items-center" style="padding: 0 1.8rem 1rem 1.8rem">
+                    <input type="text" name="reactionDate" id="reactionDate" placeholder="xxxx/xx/xx" autocomplete="off"
+                           maxlength="10"/>
+<!--                    <input class="tag" type="text" autocomplete="off" maxlength="10">-->
+                    <button id="addTag">+</button>
+                </div>
+                <div id="putTemplate" style="padding-bottom:70rem;margin: 0 1.8rem 0 1.8rem">
+                    <div th:if="${session.reaction.id == null}" class="picture" draggable="true"><input class="header"
+                                                                                                     type="text"
+                                                                                                     placeholder="Scheme"
+                                                                                                     name="pictureTitle32.19886346168048"><input
+                            class="deleteModule" type="button"><label for="pictureUpload32.19886346168048"
+                                                                      class="col-12 g-0">+&nbsp;NEW</label><input
+                            type="file" id="pictureUpload32.19886346168048" name="pictureUpload32.19886346168048"
+                            accept="image/jpeg,image/png" style="display: none;"></div>
+                    <div class="rText" th:if="${session.reaction.id == null}"  draggable="true"><input class="header"
+                                                                                                   type="text"
+                                                                                                   placeholder="Procedure"
+                                                                                                   name="textTitle44.77122103355289"><input
+                            class="deleteModule" type="button"><textarea class="col-12"
+                                                                         style="height: 6rem;"></textarea>
+                        <p>111</p></div>
+                    <div class="rData" th:if="${session.reaction.id == null}"  draggable="true"><input class="header"
+                                                                                                   type="text"
+                                                                                                   placeholder="This is data"><input
+                            class="deleteModule"
+                            type="button">
+                        <table th:if="${session.reaction.id == null}"  class="col-12" contenteditable="true">
+                            <thead>
+                            <tr>
+                                <th>Instrument</th>
+                                <th contenteditable="false"></th>
+                                <th>Test type</th>
+                                <th contenteditable="false"></th>
+                                <th>Test Date</th>
+                                <th contenteditable="false"></th>
+                                <th contenteditable="false">File</th>
+                                <th contenteditable="false" class="noAddColumn"></th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                            <tr>
+                                <td contenteditable="false" colspan="10000" class="addPadding"></td>
+                            </tr>
+                            <tr>
+                                <td contenteditable="false" colspan="10000" class="addDataRow">+&nbsp;NEW</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="rTable" th:if="${session.reaction.id == null}"  draggable="true"><input class="header"
+                                                                                                    type="text"
+                                                                                                    placeholder="This is table"><input
+                            type="button"
+                            class="deleteModule">
+                        <table class="col-12" contenteditable="false">
+                            <thead contenteditable="true">
+                            <tr>
+                                <th draggable="true"></th>
+                                <th class="resizeBar" contenteditable="false"></th>
+                                <th draggable="true"></th>
+                                <th class="resizeBar" contenteditable="false"></th>
+                                <th draggable="true"></th>
+                                <th class="addColumn" contenteditable="false"></th>
+                            </tr>
+                            </thead>
+                            <tbody contenteditable="true"></tbody>
+                            <tfoot>
+                            <tr>
+                                <td contenteditable="false" colspan="10000" class="addPadding"></td>
+                            </tr>
+                            <tr>
+                                <td contenteditable="false" colspan="10000" class="addRow">+&nbsp;NEW</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="rReference" th:if="${session.reaction.id == null}"  draggable="true"><input class="header"
+                                                                                                        type="text"
+                                                                                                        placeholder="This is reference"><input
+                            class="deleteModule" type="button">
+                        <table class="col-12" contenteditable="true">
+                            <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th contenteditable="false"></th>
+                                <th>Journal</th>
+                                <th contenteditable="false"></th>
+                                <th>Title</th>
+                                <th contenteditable="false"></th>
+                                <th contenteditable="false">Hyperlink</th>
+                                <th contenteditable="false" class="noAddColumn"></th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                            <tfoot>
+                            <tr>
+                                <td contenteditable="false" colspan="10000" class="addPadding"></td>
+                            </tr>
+                            <tr>
+                                <td contenteditable="false" colspan="10000" class="addReferenceRow">+&nbsp;NEW</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!--侧边栏开始-->
+        <div id="rightAside" class="col-3">
+            <!--history 部分开始-->
+
+            <p class="d-flex align-items-center">
+                History
+            </p>
+            <ul class="list-group" style="padding: 0;height: 33rem!important;max-height: 33rem!important;"></ul>
+            <!--history 部分结束-->
+
+            <!--Module 部分开始-->
+            <p class="d-flex align-items-center">Add Module</p>
+            <ul style="padding: 0 1rem 0 1rem;margin-bottom: 10.5rem">
+                <div draggable="true" id="pictureDrag"
+                     style="background:  #F1EDDF url('/chemlab/img/reaction/picture.svg')no-repeat 1.5rem 1.3rem">
+                    Picture
+                </div>
+                <div draggable="true" id="textDrag"
+                     style="background:#F1EDDF url('/chemlab/img/reaction/text.svg') no-repeat 1.5rem 1.3rem">
+                    Text
+                </div>
+                <div draggable="true" id="dataDrag"
+                     style="background:#F1EDDF url('/chemlab/img/reaction/data.svg') no-repeat 1.5rem 1.3rem">
+                    Data
+                </div>
+                <div draggable="true" id="tableDrag"
+                     style="background:#F1EDDF url('/chemlab/img/reaction/table.svg') no-repeat 1.5rem 1.3rem">
+                    Table
+                </div>
+                <div draggable="true" id="referenceDrag"
+                     style="background:#F1EDDF url('/chemlab/img/reaction/reference.svg') no-repeat 1.5rem 1.3rem">
+                    Reference
+                </div>
+            </ul>
+            <!--Module 部分结束-->
+
+        </div>
+        <!--侧边栏结束-->
+    </div>
+    <!--本页面最核心内容结束-->
+</div>
+</main>
+
+<!--本页最核心模态框开始-->
+<!-- 反应模板 Modal -->
+<div class="modal fade" id="reactionTemplateModal" tabindex="-1" aria-labelledby="reactionTemplateModal"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+                <h5 class="modal-title" id="reactionTemplateLabel">Template</h5>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 3.5rem;margin-top: 5.5rem">Built-in template</p>
+                <form>
+                    <button class="builtInTemplate" type="button" onclick="alert('打开失败')">
+                        Chemical Synthesis
+                    </button>
+                    <button class="builtInTemplate" type="button" onclick="alert('打开失败')">
+                        PCR
+                    </button>
+                </form>
+                <p style="margin-bottom: 3.5rem;margin-top: 3.5rem">User-defined</p>
+                <form class="overflow-hidden" action="把当前页面清空" style="margin-bottom: 1.3rem;max-height: 14.8rem">
+                    <button class="userDefined" type="button" onclick="alert('添加失败')">
+                        一栏只能放下5个模板sssssssssssssssssssss
+                    </button>
+                    <button class="userDefined" type="button" onclick="alert('添加失败')">
+                        我的颜色固定吗
+                    </button>
+                    <button class="userDefined" type="button" onclick="alert('添加失败')"
+                    >Templatdasdsadasdasdasdasdasdes1
+                    </button>
+                    <button class="userDefined" type="button" onclick="alert('添加失败')"
+                    >
+                        Templatdasdsadasdasdasdasdasdes1
+                    </button>
+                    <button class="userDefined" type="button" onclick="alert('添加失败')">
+                        一栏只能放下5个模板sssssssssssssssssssss
+                    </button>
+                    <button class="userDefined" type="button" onclick="alert('添加失败')">
+                        我的颜色固定吗
+                    </button>
+                    <button class="userDefined" type="button" onclick="alert('打开失败')"
+                            style="border: 0.1rem dashed #3B3737;box-shadow: none;background-color: #ffffff;">
+                        +&nbsp;&nbsp;&nbsp;New
+                    </button>
+                </form>
+            </div>
+            <div class="modal-footer row justify-content-between">
+                <button class="confirm" type="submit" data-bs-dismiss="modal" onclick="alert('添加失败')">Confirm
+                </button>
+                <button class="cancel" type="button" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--本页最核心模态框结束-->
+
+<!--以下都为模板片段-->
+<div th:replace="~{template :: modal}"></div>
+</body>
+<div th:replace="~{template :: script}"></div>
+<script th:src="@{/chemlab/js/reaction.js}" type="text/javascript"></script>
+</html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>重置密码邮件</title>
+</head>
+<body style="width: 600px;margin: 0 auto;text-align: center">
+<h1>重置密码，有效期为 <span style="color: red">5</span> 分钟</h1>
+<p>这是一封来自<span style="font-weight: bold">chemlab</span>的邮件，如果不是您本人进行此操作，请忽略</p>
+<p>如果是您本人操作，以下是您的验证码</p>
+<p style="color: red;font-size: 2.4rem"  th:text="${randomCode}"></p>
+<p>输入此验证码重置您的密码</p>
+<p>感谢您的使用</p>
+<p>祝您生活愉快！</p>
+</body>
+</html>

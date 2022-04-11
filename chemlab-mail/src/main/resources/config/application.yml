@@ -1,0 +1,51 @@
+server:
+  port: 8082
+spring:
+  #邮件配置
+  mail:
+    #邮件服服务器地址
+    host: smtp.qq.com
+    #邮件协议
+    protocol: smtp
+    #邮件编码格式
+    default-encoding: utf-8
+    #授权码
+    password: owuouhgvxvlwbfhi
+    #发送者邮箱
+    username: 812134763@qq.com
+    #端口号，qq 为 465 或 587，使用 465 protocol 改为 smtps
+    port: 587
+    #设置开启 ssl
+    properties:
+      mail:
+        stmp:
+          ssl:
+            enable: true
+  redis:
+    #超时时间
+    timeout: 10000ms
+    #服务器地址
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+    lettuce:
+      pool:
+        #最大连接数
+        max-active: 1024
+        #最大连接阻塞等待时间
+        max-wait: 10000ms
+        #最大空闲连接
+        max-idle: 200
+        #最小空闲连接数
+        min-idle: 5
+
+  #rabbitmq 配置
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+    listener:
+      simple:
+        #开启手动确认
+        acknowledge-mode: manual

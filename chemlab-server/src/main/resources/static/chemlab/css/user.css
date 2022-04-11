@@ -1,0 +1,274 @@
+/*头像框样式开始*/
+#userLogo {
+    width: 7rem;
+    height: 7rem;
+}
+
+#logoContainer {
+    background: #FFFFFF;
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.25);
+    width: 30rem;
+    height: 24rem;
+    top: 100%;
+    left: 0;
+    padding: 0.5rem;
+    font-size: 1.4rem;
+}
+
+#logoContainer > label {
+    width: 6.6rem;
+    height: 2.6rem;
+    padding: 0.3rem;
+    text-align: center;
+    font-weight: 700;
+    align-items: center;
+}
+
+#emoji, #upload {
+    display: none;
+}
+
+#logoContainer > label:hover {
+    cursor: pointer;
+}
+
+#logoContainer > div {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    height: 20rem;
+    padding: 1rem;
+}
+
+#recent, #recentContainer, #icon, .iconContainer {
+    align-items: center;
+    height: 3.5rem;
+    display: flex;
+}
+
+#recentContainer > img, .iconContainer > img {
+    width: 3rem;
+    height: 3rem;
+}
+
+#recentContainer > img:hover, .iconContainer > img:hover {
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.25);
+}
+
+/*头像框样式结束*/
+
+/*背景框开始*/
+img[id='userScheme'] {
+    width: 120rem;
+    height: 21rem;
+}
+
+#schemeContainer {
+    background: #FFFFFF;
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.25);
+    width: 58rem;
+    height: 31.5rem;
+    top: 100%;
+    right: 0;
+    padding: 0.5rem;
+    font-size: 1.4rem;
+}
+
+#schemeContainer > label {
+    width: 6.6rem;
+    height: 2.6rem;
+    padding: 0.3rem;
+    text-align: center;
+    font-weight: 700;
+    align-items: center;
+}
+
+#gallery, #upload {
+    display: none;
+}
+
+#schemeContainer > label:hover {
+    cursor: pointer;
+}
+
+#schemeContainer > div {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    height: 27.2rem;
+    padding: 1rem;
+}
+
+#schemeRecent, #cover {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+
+}
+
+#schemeRecentContainer, .coverContainer {
+    margin: 0.2rem 0;
+    height: 6.5rem;
+    display: flex;
+    align-items: center;
+}
+
+#schemeRecentContainer > img, .coverContainer > img {
+    width: 18rem;
+    height: 6rem;
+    margin: 0 0.1rem;
+}
+
+#schemeRecentContainer > img:hover, .coverContainer > img:hover {
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.25);
+}
+
+
+/*背景框结束*/
+#projectCard > div {
+    color: #FFFFFF;
+    font-size: 1.8rem;
+    font-weight: 600;
+    background: #638271;
+    width: 31.58%;
+    height: 16rem;
+    margin-right: 2.63%;
+    margin-bottom: 2.63%;
+    border-radius: 1.5rem 1.5rem 1.5rem 1.5rem;
+    border: 0.1rem solid #638271;
+}
+
+#projectCard img {
+    cursor: pointer;
+    height: 77.35%;
+    width: 100%;
+}
+
+#projectCard button {
+    border: none;
+    padding: 0;
+    width: 15%;
+    height: 2.4rem;
+    background: #638271 url("../img/shared/tridot.png") center center no-repeat;
+    background-size: 2.4rem 2.4rem;
+    border-bottom-right-radius: 1.5rem;
+}
+
+
+#projectCard button:hover ~ .dropdown-content:first-of-type {
+    display: block;
+}
+
+#projectCard .dropdown-content:hover {
+    display: block;
+}
+
+
+#projectCard > div:nth-of-type(3n) {
+    margin-right: 0;
+}
+
+#projectCard label {
+    cursor: pointer;
+    padding: 0.6rem 0 0 1.5rem;
+    width: 83%;
+}
+
+#projectCard .dropdown-content {
+    display: none;
+    width: 11.8rem;
+    font-size: 1.2rem;
+    color: black;
+    padding: 0.6rem;
+    line-height: 2rem;
+    font-weight: normal;
+    top: 81.25%;
+    left: 98%;
+    background-color: #FFFFFF;
+    box-shadow: 0 0.4rem 0.4rem rgba(0, 0, 0, 0.25);
+    border-radius: 0.5rem;
+}
+
+.deleteProject, .changeCover {
+    padding-left: 2rem;
+}
+
+.deleteProject {
+    background: url('../../chemlab/img/project/delete-.svg') no-repeat 0;
+    background-size: 1.6rem 1.6rem;
+
+}
+
+.changeCover {
+    background: url('../../chemlab/img/project/changecover.svg') no-repeat 0;
+    background-size: 1.6rem 1.6rem;
+}
+
+
+/*项目图片框开始*/
+#projectCard #projectCoverContainer {
+    top: -1%;
+    left: 100%;
+    width: 28rem;
+    height: 24rem;
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.25);
+}
+
+#projectCoverContainer {
+    background: #FFFFFF;
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.25);
+    width: 30rem;
+    height: 24rem;
+    top: 100%;
+    left: 0;
+    padding: 0.5rem;
+    font-size: 1.4rem;
+}
+
+#projectCoverContainer > label {
+    width: 6.6rem;
+    height: 2.6rem;
+    padding: 0.3rem;
+    text-align: center;
+    font-weight: 700;
+    align-items: center;
+    margin: 0;
+
+}
+
+#projectCoverGallery, #projectCoverUpload {
+    display: none;
+}
+
+#projectCoverContainer > label:hover {
+    cursor: pointer;
+}
+
+#projectCoverContainer > div {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    height: 19.6rem;
+    padding: 1rem;
+}
+
+#projectCoverRecentContainer, .projectCoverIconContainer {
+    margin: 0.2rem 0;
+    align-items: center;
+    height: 4.5rem;
+    display: flex;
+}
+
+#projectCoverRecent, #projectCoverIcon {
+    align-items: center;
+    display: flex;
+    height: 3rem;
+    margin: 0;
+}
+
+#projectCoverRecentContainer > img, .projectCoverIconContainer > img {
+    margin: 0 0.2rem;
+    width: 8rem !important;
+    height: 4.2rem !important;
+}
+
+#projectCoverRecentContainer > img:hover, .projectCoverIconContainer > img:hover {
+    box-shadow: 0 0 0.4rem rgba(0, 0, 0, 0.25);
+}
+
+
+/*项目图片框结束*/

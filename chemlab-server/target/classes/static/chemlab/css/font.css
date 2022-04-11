@@ -1,0 +1,30 @@
+/*使用字体*/
+@font-face {
+    font-family: 'montserrat';
+    src: url('../fonts/montserrat/Montserrat-Black.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-BlackItalic.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-Bold.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-BoldItalic.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-ExtraBold.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-ExtraBoldItalic.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-ExtraLight.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-ExtraLightItalic.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-Italic.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-Light.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-LightItalic.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-Medium.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-MediumItalic.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-Regular.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-SemiBold.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-SemiBoldItalic.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-Thin.otf') format('otf'),
+    url('../fonts/montserrat/Montserrat-ThinItalic.otf') format('otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*测试字体*/
+@font-face {
+    font-family: 'swordman';
+    src: url('../fonts/swordman/swordsman.ttf') format('truetype');
+}

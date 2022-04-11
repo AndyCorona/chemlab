@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.andy.server.mapper.ProjectMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.andy.server.pojo.Project">
+        <id column="id" property="id"/>
+        <result column="projectName" property="projectName"/>
+        <result column="coverId" property="coverId"/>
+        <result column="userId" property="userId"/>
+    </resultMap>
+
+    <resultMap id="pageProject" type="com.andy.server.pojo.Project" extends="BaseResultMap">
+        <result column="projectCoverUrl" property="projectCoverUrl"/>
+    </resultMap>
+
+    <resultMap id="ProjectAndReaction" type="com.andy.server.pojo.Project" extends="BaseResultMap">
+        <result column="projectCoverUrl" property="projectCoverUrl"/>
+        <collection property="reactions" ofType="com.andy.server.pojo.Reaction">
+            <id property="id" column="reactionId"/>
+            <result property="reactionName" column="reactionName"/>
+            <result property="reactionDate" column="reactionDate"/>
+            <result property="tag1" column="tag1"/>
+            <result property="tag2" column="tag2"/>
+            <result property="tag3" column="tag3"/>
+            <result property="reactionUrl" column="reactionUrl"/>
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , projectName, coverId,  userId
+    </sql>
+
+    <select id="getProjectByPage" resultMap="pageProject">
+        select tp.id          as id,
+               tp.projectName as projectName,
+               tp.coverId     as coverId,
+               tpc.url        as projectCoverUrl
+        from t_project tp
+                 left join t_project_cover tpc on tpc.id = tp.coverId
+        where userId = #{userId}
+    </select>
+
+    <select id="getProjectAndReaction" resultMap="ProjectAndReaction">
+        select tp.id           as id,
+               tp.coverId      as coverId,
+               tp.projectName  as projectName,
+               tp.userId       as userId,
+               tr.id           as reactionId,
+               tr.reactionDate as reactionDate,
+               tr.reactionName as reactionName,
+               tr.reactionUrl  as reactionUrl,
+               tr.tag1         as tag1,
+               tr.tag2         as tag2,
+               tr.tag3         as tag3,
+               tpc.url         as projectCoverUrl
+        from t_project tp
+                 left join t_reaction tr on tp.id = tr.projectId
+                 left join t_project_cover tpc on tpc.id = tp.coverId
+        where tp.id = #{projectId}
+          and tp.userId = #{userId}
+        order by tr.id limit 6
+    </select>
+
+</mapper>

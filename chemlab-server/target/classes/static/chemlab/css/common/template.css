@@ -37,12 +37,12 @@ aside header > div {
     cursor: pointer;
 }
 
-aside header:hover div{
+aside header:hover div {
     display: block;
 }
 
 /*在 todolist 上 hove 时显示打叉*/
-#todolistContainer > li:hover > .close{
+#todolistContainer > li:hover > .close {
     display: block;
 }
 
@@ -203,7 +203,7 @@ aside .role:hover .close {
 
 /*模态框开始*/
 .modal-backdrop.show {
-    opacity: 0.2;
+    opacity: 0.1;
 }
 
 .modal-content {
@@ -361,9 +361,25 @@ label[for='groupID'], label[for='mail'] {
 
 #reactionTemplateModal .userDefined {
     margin-bottom: 2.4rem;
-    background: url('../../img/reaction/close.svg') no-repeat right 0;
-    background-size: 1.4rem 1.4rem;
+    background-color: #f2e7c3;
+    position: relative
 }
+
+#reactionTemplateModal .userDefined > img {
+    position: absolute;
+    width: 1.4rem;
+    height: 1.4rem;
+    top: 0;
+    right: 0
+}
+
+
+#reactionTemplateModal .userDefined:last-of-type {
+    border: 0.1rem dashed #3B3737;
+    box-shadow: none;
+    background-color: #ffffff;
+}
+
 
 #shareReactionModal h5 {
     background: url("../../img/project/project-share.png") no-repeat 0 center;
@@ -400,6 +416,55 @@ label[for='groupID'], label[for='mail'] {
     margin-bottom: 10.5rem;
     margin-left: 7.5rem;
     padding: 0;
+}
+
+#addTemplateModal .modal-content {
+    width: 30rem;
+}
+
+#addTemplateModal .modal-header {
+    padding: 0.8rem;
+    height: 3.6rem;
+}
+
+#addTemplateModal .modal-header > h5 {
+    padding: 0;
+}
+
+#addTemplateModal .modal-body {
+    padding: 2rem;
+}
+
+#addTemplateModal p {
+    padding: unset;
+    margin: unset;
+    border-bottom: unset;
+    font-weight: normal;
+}
+
+#addTemplateModal input {
+    background-color: rgba(99, 130, 113, 0.2);
+    box-shadow: inset 0 0.2rem 0.4rem rgba(0, 0, 0, 0.25);
+    border-radius: 0.5rem;
+    border: none;
+    margin-top: 0.5rem;
+    height: 3.6rem;
+    width: 100%;
+}
+
+#addTemplateModal .modal-footer {
+    padding: 0 4rem 2rem 4rem;
+}
+
+#addTemplateModal .modal-footer button {
+    width: 8rem;
+    height: 3rem;
+    font-size: 1.6rem;
+}
+
+#addTemplateModal .modal-footer button:nth-of-type(2) {
+    background: #ffffff;
+    color: #638271;
 }
 
 

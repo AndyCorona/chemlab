@@ -862,7 +862,7 @@ window.onload = function () {
         }//增加一列
         else if (event.target.className === 'addColumn') {
 
-            nowEle = event.target;
+            let nowEle = event.target;
             while (nowEle.previousElementSibling !== null) {
                 nowEle = nowEle.previousElementSibling;
                 if (nowEle.className === 'resizeBar') {
@@ -1028,7 +1028,8 @@ window.onload = function () {
             return;
         }
         //获取文件后缀
-        let format = file.name.split(".")[1];
+        let formatArr = file.name.split(".");
+        let format = formatArr.pop();
 
         let fileReader = new FileReader();
         fileReader.readAsText(file);
@@ -1042,12 +1043,12 @@ window.onload = function () {
             return function (e) {
                 if (format.match(/bib/)) {
                     console.log(JSON.stringify(e.target.result))
-                    let temp = e.target.result.match(/,[\r\n\t]+[ ]*journal[ ]*=.*[\r\n\t]+/i)[0].match(/[{"]{1}.*[}"]{1}/)[0].trim();
+                    let temp = e.target.result.match(/,[\r\n\t]+[ ]*journal[ ]*=.*[\r\n\t]+/i)[0].match(/[{"].*[}"]/)[0].trim();
                     paperJournal = temp.slice(1, temp.length - 1)
-                    temp = e.target.result.match(/,[\r\n\t]+[ ]*title[ ]*=.*[\r\n\t]+/i)[0].match(/[{"]{1}.*[}"]{1}/)[0].trim();
+                    temp = e.target.result.match(/,[\r\n\t]+[ ]*title[ ]*=.*[\r\n\t]+/i)[0].match(/[{"}.*[}"]/)[0].trim();
                     paperTitle = temp.slice(1, temp.length - 1)
                     if (e.target.result.match(/,[\r\n\t]+[ ]*year[ ]*=.*[\r\n\t]+/i) !== null) {
-                        temp = e.target.result.match(/,[\r\n\t]+[ ]*year[ ]*=.*[\r\n\t]+/i)[0].match(/[{"]{1}.*[}"]{1}/)[0].trim()
+                        temp = e.target.result.match(/,[\r\n\t]+[ ]*year[ ]*=.*[\r\n\t]+/i)[0].match(/[{"].*[}"]/)[0].trim()
                         paperYear = temp.slice(1, temp.length - 1)
                     } else {
                         paperYear = 'xxxx'
@@ -1121,7 +1122,7 @@ window.onload = function () {
     function serializePicture(child) {
         const canvas = child.querySelector("canvas");
         if (canvas === null) {
-            return "";
+            return null;
         } else {
             return `width_${canvas.width}height_${canvas.height}` + canvas.toDataURL(canvas.getAttribute("type"), null)
         }
@@ -1135,7 +1136,7 @@ window.onload = function () {
             let pictureTitle = fragment.querySelector("input");
             pictureTitle.value = child.title;
         }
-        if (child.content !== "") {
+        if (child.content !== null) {
             let pictureLabel = fragment.querySelector("label");
             pictureLabel.innerText = null;
             pictureLabel.style.height = "unset";
@@ -1255,10 +1256,22 @@ window.onload = function () {
     //序列化表格模块
     function serializeTable(child) {
         let table = {thead: [], tbody: []}
-        const tHeadEle = child.querySelector("thead");
-        const tbodyEle = child.querySelector("tbody")
+        //序列化表头
+        table = serializeTableHead(table, child)
+        //序列化表体
+        table = serializeTableBody(table, child)
+        return table;
+    }
 
+    /**
+     * 序列化表格模块表头
+     * @param table
+     * @param child
+     * @return {DocumentFragment}
+     */
+    function serializeTableHead(table, child) {
         //收集表头信息
+        const tHeadEle = child.querySelector("thead");
         for (let index = 0; index < tHeadEle.firstElementChild.children.length; index++) {
             let element = tHeadEle.firstElementChild.children[index];
             //收集表头信息，排除分隔符的影响
@@ -1271,7 +1284,18 @@ window.onload = function () {
                 })
             }
         }
+        return table;
+    }
+
+    /**
+     * 序列化表格模块表体
+     * @param table
+     * @param child
+     * @return {DocumentFragment}
+     */
+    function serializeTableBody(table, child) {
         //收集表体信息
+        const tbodyEle = child.querySelector("tbody")
         for (let i = 0; i < tbodyEle.childElementCount; i++) {
             //收集表体信息，排除分隔符影响
             if ((i + 1) % 2 === 0) {
@@ -1290,16 +1314,28 @@ window.onload = function () {
                 table.tbody.push(arr)
             }
         }
-        return table;
+        return table
     }
-
 
     //序列化参考模块
     function serializeReference(child) {
         let table = {thead: [], tbody: []}
-        const tHeadEle = child.querySelector("thead");
-        const tbodyEle = child.querySelector("tbody")
+        //序列化表头
+        table = serializeReferenceHead(table, child)
+        //序列化表体
+        table = serializeReferenceBody(table, child);
+        return table;
+    }
+
+    /**
+     * 序列化参考模块表头
+     * @param table
+     * @param child
+     * @return {DocumentFragment}
+     */
+    function serializeReferenceHead(table, child) {
         //收集表头信息
+        const tHeadEle = child.querySelector("thead");
         for (let index = 0; index < tHeadEle.firstElementChild.children.length; index++) {
             let element = tHeadEle.firstElementChild.children[index];
             //收集表头信息，排除分隔符的影响
@@ -1307,8 +1343,18 @@ window.onload = function () {
                 table.thead.push(element.innerText)
             }
         }
+        return table;
+    }
 
+    /**
+     * 序列化参考模块表体
+     * @param table
+     * @param child
+     * @return {DocumentFragment}
+     */
+    function serializeReferenceBody(table, child) {
         //收集表体信息
+        const tbodyEle = child.querySelector("tbody")
         for (let i = 0; i < tbodyEle.childElementCount; i++) {
             //收集表体信息，排除分隔符影响
             if ((i + 1) % 2 === 0) {
@@ -1606,26 +1652,38 @@ window.onload = function () {
             if (JSON.stringify(reactionForm).length > 1024 * 1024) {
                 alert("总大小不能超过 1 M")
             } else {
-                console.log(reactionForm)
-                console.log(JSON.stringify(reactionForm))
                 axios.put(`/reaction/`, reactionForm).then(function (response) {
                     if (response.data.code === 200) {
-                        //保存成功则保存一份到 sessionStorage 中
-                        sessionStorage.setItem("reactionForm", JSON.stringify(response.data.object))
-                        popAutoCloseModal(response.data.message, 1000, "false")
-                        //更改导航栏标题
-                        document.querySelector(".reactionName").innerText = reactionTitle;
-                        axios.get(`/reaction/list`).then(function (response) {
-                            if (response.data.code === 200) {
-                                if (response.data.object.length > 0) {
-                                    //更新 sessionStorage
-                                    sessionStorage.setItem("versionControl", JSON.stringify(response.data.object));
-                                    let ulEle = document.querySelector("#rightAside").querySelector("ul");
-                                    ulEle.innerText = "";
-                                    drawRightAside(response.data.object, ulEle);
+                        if (response.data.object !== null) {
+                            //保存成功则保存一份到 sessionStorage 中
+                            sessionStorage.setItem("reactionForm", JSON.stringify(response.data.object))
+                            popAutoCloseModal(response.data.message, 1000, "false")
+                            //更改导航栏标题
+                            document.querySelector(".reactionName").innerText = reactionTitle;
+                            //更新 session
+                            let versionReaction = sessionStorage.getItem("versionControl");
+                            if (versionReaction !== null) {
+                                let arr = JSON.parse(versionReaction);
+                                if (arr.length > 9) {
+                                    arr.shift();
                                 }
+                                arr.push({
+                                    dateTime: response.data.object.createDateTime,
+                                    id: response.data.object.id
+                                })
+                                sessionStorage.setItem("versionControl", versionReaction = JSON.stringify(arr))
+                            } else {
+                                sessionStorage.setItem("versionControl", versionReaction = JSON.stringify([{
+                                    dateTime: response.data.object.createDateTime,
+                                    id: response.data.object.id
+                                }]))
                             }
-                        })
+                            let ulEle = document.querySelector("#rightAside").querySelector("ul");
+                            ulEle.innerText = "";
+                            drawRightAside(JSON.parse(versionReaction), ulEle);
+                        } else {
+                            popAutoCloseModal("保存失败", 1000)
+                        }
                     } else {
                         popAutoCloseModal(response.data.message, 1000)
                     }
@@ -1633,6 +1691,223 @@ window.onload = function () {
             }
         }
     )
+
+    //用户保存模板
+    document.querySelector("#saveAsTemplate").addEventListener("click", (event) => {
+        //获取弹出框的内容作为 template 标题，标题不能为空
+        let inputEle = document.querySelector("#addTemplateModal").querySelector("input");
+        if (/.{1,10}/.test(inputEle.value)) {
+            //序列化模板
+            let reactionForm = {
+                tags: null,
+                modules: [],
+                //借用 title 属性暂时保存模块名字
+                title: inputEle.value,
+                date: null
+            };
+            for (let i = 0; i < tempArea.childElementCount; i++) {
+                const child = tempArea.children.item(i);
+                if (child.className === "picture") {
+                    reactionForm.modules.push({
+                        index: i + 1,
+                        moduleName: "picture",
+                        title: child.firstElementChild.value,
+                        content: null
+                    })
+                } else if (child.className === 'rText') {
+                    reactionForm.modules.push({
+                        index: i + 1,
+                        moduleName: "text",
+                        title: child.firstElementChild.value,
+                        content: null
+                    })
+                } else if (child.className === "rTable") {
+                    reactionForm.modules.push({
+                        index: i + 1,
+                        moduleName: "table",
+                        title: child.firstElementChild.value,
+                        content: JSON.stringify(serializeTableHead({thead: [], tbody: []}, child))
+                    })
+                } else if (child.className === "rData") {
+                    reactionForm.modules.push({
+                        index: i + 1,
+                        moduleName: "data",
+                        title: child.firstElementChild.value,
+                        content: JSON.stringify(serializeReferenceHead({thead: [], tbody: []}, child))
+                    })
+                } else if (child.className === 'rReference') {
+                    reactionForm.modules.push({
+                        index: i + 1,
+                        moduleName: "reference",
+                        title: child.firstElementChild.value,
+                        content: JSON.stringify(serializeReferenceHead({thead: [], tbody: []}, child))
+                    })
+                }
+            }
+
+            if (JSON.stringify(reactionForm).length > 100 * 1024) {
+                alert("总大小不能超过 100 KB")
+            } else {
+                axios.put(`/template/`, reactionForm).then(function (response) {
+                    if (response.data.code === 200) {
+                        //清空 title 属性，因为这是之前用来暂时存放模块名字
+                        response.data.object.title = null;
+                        //保存成功则更新 sessionStorage
+                        sessionStorage.setItem("reactionForm", JSON.stringify(response.data.object))
+                        popAutoCloseModal(response.data.message, 1000, "false")
+                        //更改导航栏标题
+                        document.querySelector(".reactionName").innerText = inputEle.value;
+                        // location.reload()
+                        //保存一份模板到 sessionStorage 中
+                        if (sessionStorage.getItem("templates") !== null) {
+                            let arr = JSON.parse(sessionStorage.getItem("templates"));
+                            if (arr.length > 9) {
+                                arr.shift();
+                            }
+                            arr.push({
+                                title: inputEle.value,
+                                id: response.data.object.id,
+                                modules: response.data.object.modules
+                            })
+                            sessionStorage.setItem("versionControl", JSON.stringify(arr))
+                        } else {
+                            sessionStorage.setItem("templates", JSON.stringify([{
+                                title: inputEle.value,
+                                id: response.data.object.id,
+                                modules: response.data.object.modules
+                            }]));
+                        }
+                    } else {
+                        popAutoCloseModal(response.data.message, 1000)
+                    }
+                })
+            }
+        } else {
+            popAutoCloseModal("请输入有效的名称", 2000)
+        }
+    })
+
+    //用户更新模板
+    document.querySelector("#saveTemplate").addEventListener("click", (event) => {
+        //获取弹出框的内容作为 template 标题，标题不能为空
+        let inputEle = document.querySelector("#addTemplateModal").querySelector("input");
+        if (/.{1,10}/.test(inputEle.value)) {
+            //序列化模板
+        } else {
+            popAutoCloseModal("请输入有效的名称", 2000)
+        }
+    })
+
+    //渲染模板模态框
+    document.querySelector("#getTemplate").addEventListener("click", (event) => {
+        if (sessionStorage.getItem("templates") !== null) {
+            let templates = JSON.parse(sessionStorage.getItem("templates"));
+            drawTemplate(templates)
+        } else {
+            //向后端发送请求，请求用户的所有模板
+            axios.get("/template/list").then(function (response) {
+                if (response.data.code === 200) {
+                    if (response.data.object !== null) {
+                        drawTemplate(response.data.object);
+                        //保存一份到 sessionStorage 中
+                        sessionStorage.setItem("templates", JSON.stringify(response.data.object));
+                    }
+                }
+            })
+        }
+    })
+
+    //用户新建模板时
+    document.querySelector("#newTemplate").addEventListener("click", (event) => {
+        let tempArea = document.querySelector("#putTemplate");
+        tempArea.innerText = "";
+        let reactionForm = {
+            id: null,
+            modules: [],
+            date: null,
+            title: null,
+            tags: [],
+            projectId: null,
+            createDateTime: null,
+            reactionId: null,
+            collectionKey: null
+        }
+        drawTemplateArea(reactionForm, tempArea);
+    })
+
+    //用户删除和查看模板
+    const templateModal = document.querySelector("#reactionTemplateModal");
+    templateModal.querySelector(".modal-body").addEventListener("click", (event) => {
+        let objectId
+        //用户删除模板
+        if (event.target instanceof HTMLImageElement) {
+            objectId = event.target.parentNode.getAttribute("id")
+            popCloseModal(`确认删除模块${event.target.nextElementSibling.innerText}吗？`, "deleteTemplate", `${objectId}`)
+            //用户查看模板
+        } else if (event.target instanceof HTMLButtonElement) {
+            objectId = event.target.getAttribute("id");
+        } else if (event.target instanceof HTMLSpanElement) {
+            objectId = event.target.parentNode.getAttribute("id");
+        }
+        if (sessionStorage.getItem("templates") !== null) {
+            let arr = JSON.parse(sessionStorage.getItem("templates"));
+            arr.forEach((element) => {
+                if (element.id === objectId) {
+                    sessionStorage.setItem("reactionForm", JSON.stringify(element));
+                    location.reload()
+                }
+            })
+        } else {
+            axios.post(`/template/${objectId}`).then(function (response) {
+                if (response.data.code === 200) {
+                    sessionStorage.setItem("reactionForm", JSON.stringify(response.data.object));
+                    location.reload()
+                    location.reload()
+                } else {
+                    popAutoCloseModal("失败", 2000)
+                }
+            })
+        }
+    })
+
+    //用户点击模态框确认按钮时
+    const dialogCloseBtn = document.querySelector("#dialogClose button[type='submit']");
+    dialogCloseBtn.addEventListener("click", (event) => {
+        const name = event.target.getAttribute("name");
+        const value = event.target.getAttribute("value");
+        //用户确认删除反应
+        if (name === 'deleteTemplate') {
+            axios.delete(`/template/${value}`).then(function (response) {
+                if (response.data.code === 200) {
+                    //从页面中移除该模板
+                    let templateArea = document.querySelector("#templateArea");
+                    for (let i = 0; i < templateArea.childElementCount; i++) {
+                        if (templateArea.children[i].getAttribute("id") === value) {
+                            templateArea.removeChild(templateArea.children[i])
+                            break;
+                        }
+                    }
+                    //更新 session 中的 templates
+                    if (sessionStorage.getItem("templates") !== null) {
+                        let arr = JSON.parse(sessionStorage.getItem("templates"));
+                        arr = arr.filter((element) => {
+                            return element.id !== value;
+                        })
+                        sessionStorage.setItem("templates", JSON.stringify(arr));
+                    }
+                    if (sessionStorage.getItem("reactionForm") !== null) {
+                        if (JSON.parse(sessionStorage.getItem("reactionForm")).id === value) {
+                            sessionStorage.removeItem("reactionForm");
+                            // location.reload();
+                        }
+                    }
+                } else {
+                    //修改失败则弹窗提示
+                    popAutoCloseModal("删除失败", 1000);
+                }
+            })
+        }
+    })
 
     //用户输入日期时，自动添加 /
     document.querySelector("#reactionDate").addEventListener("keyup", (event) => {
@@ -1642,32 +1917,6 @@ window.onload = function () {
             event.target.value = event.target.value + "/"
         }
     });
-
-    /**
-     * dataurl 转为 blob
-     * @param dataURI
-     * @return {Blob}
-     */
-    function dataURItoBlob(dataURI) {
-        // convert base64/URLEncoded data component to raw binary data held in a string
-        let byteString;
-        if (dataURI.split(',')[0].indexOf('base64') >= 0) {
-            byteString = atob(dataURI.split(',')[1]);
-        } else byteString = unescape(dataURI.split(',')[1]);
-
-        // separate out the mime component
-        const mimeString = dataURI
-            .split(',')[0]
-            .split(':')[1]
-            .split(';')[0];
-
-        // write the bytes of the string to a typed array
-        const ia = new Uint8Array(byteString.length);
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i);
-        }
-        return new Blob([ia], {type: mimeString});
-    }
 
     //用户跳转到指定版本
     const ulEle = document.querySelector("#rightAside").querySelector("ul");
@@ -1701,6 +1950,32 @@ window.onload = function () {
             }, 500)
         }
     })
+
+    /**
+     * dataurl 转为 blob
+     * @param dataURI
+     * @return {Blob}
+     */
+    function dataURItoBlob(dataURI) {
+        // convert base64/URLEncoded data component to raw binary data held in a string
+        let byteString;
+        if (dataURI.split(',')[0].indexOf('base64') >= 0) {
+            byteString = atob(dataURI.split(',')[1]);
+        } else byteString = unescape(dataURI.split(',')[1]);
+
+        // separate out the mime component
+        const mimeString = dataURI
+            .split(',')[0]
+            .split(':')[1]
+            .split(';')[0];
+
+        // write the bytes of the string to a typed array
+        const ia = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ia], {type: mimeString});
+    }
 
     /**
      * 绘制右边的历史记录
@@ -1775,6 +2050,32 @@ window.onload = function () {
                     break;
             }
         }
+    }
+
+    /**
+     * 绘制模板页面
+     */
+    function drawTemplate(templates) {
+        let templateArea = document.querySelector("#templateArea");
+        //删除除了最后一个 button 的所有 button
+        for (let i = 0; i < templateArea.childElementCount - 1; i++) {
+            templateArea.removeChild(templateArea.children[i])
+        }
+        let fragment = document.createDocumentFragment();
+        templates.forEach((element) => {
+            let buttonEle = document.createElement("button");
+            let spanEle = document.createElement("span");
+            let imageEle = document.createElement("img");
+            imageEle.setAttribute("src", "/chemlab/img/reaction/close.svg");
+            buttonEle.classList.add("userDefined");
+            buttonEle.setAttribute("type", "button")
+            buttonEle.setAttribute("id", element.id)
+            spanEle.innerText = element.title;
+            buttonEle.appendChild(imageEle)
+            buttonEle.appendChild(spanEle);
+            fragment.appendChild(buttonEle)
+        })
+        templateArea.insertBefore(fragment, templateArea.lastElementChild);
     }
 }
 

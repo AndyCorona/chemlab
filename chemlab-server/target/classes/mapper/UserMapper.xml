@@ -11,6 +11,7 @@
         <result column="logo" property="logo"/>
         <result column="scheme" property="scheme"/>
         <result column="userDesc" property="userDesc"/>
+        <result column="templateUrl" property="templateUrl"/>
     </resultMap>
 
     <resultMap id="UserDetails" type="com.andy.server.pojo.User" extends="BaseResultMap">
@@ -27,7 +28,7 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , username, password, email, logo, scheme, userDesc
+        , username, password, email, logo, scheme, userDesc,templateUrl
     </sql>
     <select id="getUserDetailsByUsername" resultMap="UserDetails">
         select tu.*,

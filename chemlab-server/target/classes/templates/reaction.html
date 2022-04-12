@@ -38,38 +38,39 @@
                            name="reactionName" autocomplete="off" autofocus="autofocus" maxlength="40">
                     <img id="saveReaction" th:src="@{/chemlab/img/reaction/save.svg}">
                     <img id="download" th:src="@{/boostrap/icons/cloud-download.svg}">
-                    <img id="saveTemplate" th:src="@{/chemlab/img/reaction/save-template.svg}">
+                    <img th:src="@{/chemlab/img/reaction/save-template.svg}" data-bs-toggle="modal"
+                         data-bs-target="#addTemplateModal">
                     <img id="getTemplate" th:src="@{/chemlab/img/reaction/template.svg}" data-bs-toggle="modal"
                          data-bs-target="#reactionTemplateModal">
                 </p>
                 <div class="col-12 d-flex align-items-center" style="padding: 0 1.8rem 1rem 1.8rem">
                     <input type="text" name="reactionDate" id="reactionDate" placeholder="xxxx/xx/xx" autocomplete="off"
                            maxlength="10"/>
-<!--                    <input class="tag" type="text" autocomplete="off" maxlength="10">-->
+                    <!--                    <input class="tag" type="text" autocomplete="off" maxlength="10">-->
                     <button id="addTag">+</button>
                 </div>
                 <div id="putTemplate" style="padding-bottom:70rem;margin: 0 1.8rem 0 1.8rem">
                     <div th:if="${session.reaction.id == null}" class="picture" draggable="true"><input class="header"
-                                                                                                     type="text"
-                                                                                                     placeholder="Scheme"
-                                                                                                     name="pictureTitle32.19886346168048"><input
+                                                                                                        type="text"
+                                                                                                        placeholder="Scheme"
+                                                                                                        name="pictureTitle32.19886346168048"><input
                             class="deleteModule" type="button"><label for="pictureUpload32.19886346168048"
                                                                       class="col-12 g-0">+&nbsp;NEW</label><input
                             type="file" id="pictureUpload32.19886346168048" name="pictureUpload32.19886346168048"
                             accept="image/jpeg,image/png" style="display: none;"></div>
-                    <div class="rText" th:if="${session.reaction.id == null}"  draggable="true"><input class="header"
-                                                                                                   type="text"
-                                                                                                   placeholder="Procedure"
-                                                                                                   name="textTitle44.77122103355289"><input
+                    <div class="rText" th:if="${session.reaction.id == null}" draggable="true"><input class="header"
+                                                                                                      type="text"
+                                                                                                      placeholder="Procedure"
+                                                                                                      name="textTitle44.77122103355289"><input
                             class="deleteModule" type="button"><textarea class="col-12"
                                                                          style="height: 6rem;"></textarea>
                         <p>111</p></div>
-                    <div class="rData" th:if="${session.reaction.id == null}"  draggable="true"><input class="header"
-                                                                                                   type="text"
-                                                                                                   placeholder="This is data"><input
+                    <div class="rData" th:if="${session.reaction.id == null}" draggable="true"><input class="header"
+                                                                                                      type="text"
+                                                                                                      placeholder="This is data"><input
                             class="deleteModule"
                             type="button">
-                        <table th:if="${session.reaction.id == null}"  class="col-12" contenteditable="true">
+                        <table th:if="${session.reaction.id == null}" class="col-12" contenteditable="true">
                             <thead>
                             <tr>
                                 <th>Instrument</th>
@@ -93,9 +94,9 @@
                             </tfoot>
                         </table>
                     </div>
-                    <div class="rTable" th:if="${session.reaction.id == null}"  draggable="true"><input class="header"
-                                                                                                    type="text"
-                                                                                                    placeholder="This is table"><input
+                    <div class="rTable" th:if="${session.reaction.id == null}" draggable="true"><input class="header"
+                                                                                                       type="text"
+                                                                                                       placeholder="This is table"><input
                             type="button"
                             class="deleteModule">
                         <table class="col-12" contenteditable="false">
@@ -120,9 +121,10 @@
                             </tfoot>
                         </table>
                     </div>
-                    <div class="rReference" th:if="${session.reaction.id == null}"  draggable="true"><input class="header"
-                                                                                                        type="text"
-                                                                                                        placeholder="This is reference"><input
+                    <div class="rReference" th:if="${session.reaction.id == null}" draggable="true"><input
+                            class="header"
+                            type="text"
+                            placeholder="This is reference"><input
                             class="deleteModule" type="button">
                         <table class="col-12" contenteditable="true">
                             <thead>
@@ -207,44 +209,43 @@
             <div class="modal-body">
                 <p style="margin-bottom: 3.5rem;margin-top: 5.5rem">Built-in template</p>
                 <form>
-                    <button class="builtInTemplate" type="button" onclick="alert('打开失败')">
+                    <button class="builtInTemplate" type="button">
                         Chemical Synthesis
                     </button>
-                    <button class="builtInTemplate" type="button" onclick="alert('打开失败')">
+                    <button class="builtInTemplate" type="button">
                         PCR
                     </button>
                 </form>
                 <p style="margin-bottom: 3.5rem;margin-top: 3.5rem">User-defined</p>
-                <form class="overflow-hidden" action="把当前页面清空" style="margin-bottom: 1.3rem;max-height: 14.8rem">
-                    <button class="userDefined" type="button" onclick="alert('添加失败')">
-                        一栏只能放下5个模板sssssssssssssssssssss
-                    </button>
-                    <button class="userDefined" type="button" onclick="alert('添加失败')">
-                        我的颜色固定吗
-                    </button>
-                    <button class="userDefined" type="button" onclick="alert('添加失败')"
-                    >Templatdasdsadasdasdasdasdasdes1
-                    </button>
-                    <button class="userDefined" type="button" onclick="alert('添加失败')"
-                    >
-                        Templatdasdsadasdasdasdasdasdes1
-                    </button>
-                    <button class="userDefined" type="button" onclick="alert('添加失败')">
-                        一栏只能放下5个模板sssssssssssssssssssss
-                    </button>
-                    <button class="userDefined" type="button" onclick="alert('添加失败')">
-                        我的颜色固定吗
-                    </button>
-                    <button class="userDefined" type="button" onclick="alert('打开失败')"
-                            style="border: 0.1rem dashed #3B3737;box-shadow: none;background-color: #ffffff;">
+                <form id="templateArea" class="overflow-hidden" style="margin-bottom: 1.3rem;max-height: 14.8rem">
+                    <button class="userDefined" type="button" id="newTemplate"
+                            data-bs-dismiss="modal">
                         +&nbsp;&nbsp;&nbsp;New
                     </button>
                 </form>
             </div>
             <div class="modal-footer row justify-content-between">
-                <button class="confirm" type="submit" data-bs-dismiss="modal" onclick="alert('添加失败')">Confirm
+                <button class="confirm" type="submit" data-bs-dismiss="modal">Confirm
                 </button>
                 <button class="cancel" type="button" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--保存模板的模态框-->
+<div class="modal fade" id="addTemplateModal" tabindex="-1" aria-labelledby="addMemberModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+                <h5 class="modal-title" id="addTemplateLabel">Save Template</h5>
+            </div>
+            <div class="modal-body">
+                <p>Template title</p>
+                <input type="text" maxlength="10" autocomplete="off">
+            </div>
+            <div class="modal-footer row justify-content-between">
+                <button id="saveTemplate" class="save" type="submit" data-bs-dismiss="modal">Save</button>
+                <button id="saveAsTemplate" class="saveAs" type="submit" data-bs-dismiss="modal">Save as</button>
             </div>
         </div>
     </div>

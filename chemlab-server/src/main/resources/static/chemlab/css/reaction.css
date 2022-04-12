@@ -37,7 +37,7 @@ input::-webkit-input-placeholder {
 input[name="reactionDate"] {
     font-size: 1.8rem;
     color: #3B3737;
-    width: 10rem;
+    width: 11rem;
 }
 
 input[name="reactionDate"] ~ span {

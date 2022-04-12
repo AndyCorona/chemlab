@@ -389,6 +389,7 @@ window.onload = function () {
                         if (cardBody.getAttribute("id") === null) {
                             if (cardBody.firstElementChild.getAttribute("projectId") === value) {
                                 projectCard.removeChild(cardBody);
+                                break;
                             }
                         }
                     }

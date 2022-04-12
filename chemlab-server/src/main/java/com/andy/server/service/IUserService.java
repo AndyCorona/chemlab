@@ -1,5 +1,6 @@
 package com.andy.server.service;
 
+import com.andy.server.pojo.ReactionForm;
 import com.andy.server.pojo.RespBean;
 import com.andy.server.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -106,13 +107,46 @@ public interface IUserService extends IService<User> {
 
     /**
      * 从 redis 中移除重置密码邮箱
+     *
      * @param email
      */
     void removeResetFromRedis(String email);
 
     /**
      * 修改用户密码
+     *
      * @param email
      */
-    RespBean updatePassword(User user,String email,String username);
+    RespBean updatePassword(User user, String email, String username);
+
+    /**
+     * 获取一个用户的所有模板
+     *
+     * @return
+     */
+    RespBean getAllTemplates(String templateUrl);
+
+    /**
+     * 保存用户的模板
+     *
+     * @param session
+     * @return
+     */
+    RespBean saveTemplate(ReactionForm template, HttpSession session);
+
+    /**
+     * 删除用户模板
+     * @param id
+     * @param session
+     * @return
+     */
+    RespBean deleteTemplate(String id, HttpSession session);
+
+    /**
+     * 查看用户模板
+     * @param id
+     * @param session
+     * @return
+     */
+    RespBean getTemplate(String id, HttpSession session);
 }

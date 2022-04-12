@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginInterceptors implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        //会话域里没有用户信息
+        //会话域里没有用户信息，说明用户没有登录，转发到首页
         if (request.getSession().getAttribute("user") == null) {
             response.sendRedirect("/");
         }

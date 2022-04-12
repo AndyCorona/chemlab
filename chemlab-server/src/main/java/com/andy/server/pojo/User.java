@@ -59,6 +59,8 @@ public class User implements Serializable {
     @TableField(exist = false)
     private String schemeUrl;
 
+    @ApiModelProperty(value = "用户模板的 mongodb 集合名称")
+    private String templateUrl;
 
 //    @ApiModelProperty(value = "用户的群组列表")
 //    @TableField(exist = false)

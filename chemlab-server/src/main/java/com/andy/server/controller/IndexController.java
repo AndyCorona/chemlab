@@ -85,7 +85,7 @@ public class IndexController {
         return "active";
     }
 
-    @ApiOperation("登录时判断用户是否存在")
+    @ApiOperation("用户登录")
     @ResponseBody
     @PostMapping("/index/login")
     public RespBean login(User user, HttpServletRequest request) {

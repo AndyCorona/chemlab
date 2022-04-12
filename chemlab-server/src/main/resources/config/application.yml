@@ -56,7 +56,6 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/test
 
-
 mybatis-plus:
   mapper-locations: classpath*:/mapper/*Mapper.xml
   type-aliases-package: com.andy.server.pojo

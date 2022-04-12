@@ -47,5 +47,6 @@ public class Reaction implements Serializable {
     private String tag3;
     @ApiModelProperty(value = "反应所属的项目 id")
     private Integer projectId;
+    @ApiModelProperty(value = "当前反应保存在 mongodb 中的集合名称")
     private String reactionUrl;
 }

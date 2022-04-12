@@ -33,20 +33,12 @@ public class ReactionController {
         Project project = (Project) session.getAttribute("project");
         return reactionService.getReactionByPage(currentPage, size, project.getId(), user.getId());
     }
-    //更新反应
-//    @ResponseBody
-//    @PostMapping("/")
-//    public RespBean update(@RequestBody ReactionForm reactionForm, HttpSession session) {
-//        Integer projectId = ((Project) session.getAttribute("project")).getId();
-//        reactionService.saveReaction(projectId, reactionForm);
-//        return RespBean.success("成功");
-//    }
 
     @ApiOperation("保存反应")
     @ResponseBody
     @PutMapping("/")
     public RespBean add(@RequestBody ReactionForm reactionForm, HttpSession session) {
-        return reactionService.save(session, reactionForm);
+           return reactionService.save(session, reactionForm);
     }
 
     @ApiOperation("查询反应")

@@ -144,6 +144,7 @@ function popAutoCloseModal(message, millisecond, boolean = "true") {
         myModal.hide();
     }, millisecond)
 
+
 }
 
 

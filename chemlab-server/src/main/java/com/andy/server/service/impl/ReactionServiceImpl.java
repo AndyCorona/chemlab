@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.mongodb.client.MongoDatabase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
@@ -95,6 +95,7 @@ public class ReactionServiceImpl extends ServiceImpl<ReactionMapper, Reaction> i
      * @return
      */
     @Override
+    @Transactional(rollbackFor = IllegalArgumentException.class)
     public RespBean save(HttpSession session, ReactionForm reactionForm) {
         //校验标题和日期
         if (reactionForm.getTitle() == null || !reactionForm.getTitle().matches("^.{1,40}$") || reactionForm.getDate() == null || !reactionForm.getDate().toString().matches("^(?:(?!0000)[0-9]{4}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[0-9]{2}(?:0[48]|[2468][048]|[13579][26])|(?:0[48]|[2468][048]|[13579][26])00)-02-29)$")) {
@@ -105,7 +106,6 @@ public class ReactionServiceImpl extends ServiceImpl<ReactionMapper, Reaction> i
         if (project == null || sessionReaction == null) {
             return RespBean.error("保存失败");
         }
-        System.out.println("保存反应：" + sessionReaction);
         //保存新建的反应
         if (sessionReaction.getId() == null) {
             //创建 UUID 作为 capped collection 的集合名
@@ -274,11 +274,9 @@ public class ReactionServiceImpl extends ServiceImpl<ReactionMapper, Reaction> i
     /**
      * 返回文档对象时，敏感信息置空
      */
-    public void setNull(ReactionForm reactionForm) {
+    private void setNull(ReactionForm reactionForm) {
         reactionForm.setReactionId(null);
         reactionForm.setCollectionKey(null);
-        reactionForm.setId(null);
         reactionForm.setProjectId(null);
-        reactionForm.setCreateDateTime(null);
     }
 }

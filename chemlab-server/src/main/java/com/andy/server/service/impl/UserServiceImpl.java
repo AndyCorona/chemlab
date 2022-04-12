@@ -7,18 +7,23 @@ import com.andy.server.pojo.*;
 import com.andy.server.service.IUserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mongodb.client.result.DeleteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.CollectionOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -54,6 +59,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Autowired
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
     /**
      * 判断用户名是否在缓存中
@@ -289,9 +297,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setEmail(email);
         user.setUsername(username);
         if (validate(user)) {
-//            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//            String password = encoder.encode(user.getPassword());
-//            user.setPassword(password);
             //将用户信息保存至数据库中
             if (userMapper.update(user, new QueryWrapper<User>().eq("email", email).eq("username", username)) == 1) {
                 return RespBean.success("重置密码成功");
@@ -300,4 +305,95 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return RespBean.error("重置密码失败");
 
     }
+
+    /**
+     * 获取用户的所有模板
+     *
+     * @return
+     */
+    @Override
+    public RespBean getAllTemplates(String templateUrl) {
+        if (templateUrl == null) {
+            return RespBean.success("成功");
+        }
+        List<ReactionForm> all = mongoTemplate.findAll(ReactionForm.class, templateUrl);
+        return RespBean.success("成功 ", all);
+    }
+
+    /**
+     * 保存用户的模板
+     *
+     * @param session
+     * @return
+     */
+    @Override
+    public RespBean saveTemplate(ReactionForm template, HttpSession session) {
+        User user = ((User) session.getAttribute("user"));
+        //如果用户没有 template，创建一个新的集合保存 template
+        if (user.getTemplateUrl() == null) {
+            String collectionKey = UUID.randomUUID().toString();
+            user.setTemplateUrl(collectionKey);
+            if (userMapper.updateById(user) == 1) {
+                //集合最多存放 10 个，每个模板不超过 200 KB
+                mongoTemplate.createCollection(collectionKey, CollectionOptions.empty());
+                ReactionForm save = mongoTemplate.save(template, collectionKey);
+                session.setAttribute("user", user);
+                return RespBean.success("成功", save);
+            }
+            //如果用户有 template
+        } else {
+            String collectionKey = user.getTemplateUrl();
+            //如果集合中模板数量大于 10 个，删除首个模板，将最新的模板添加到末尾
+            List<ReactionForm> all = mongoTemplate.findAll(ReactionForm.class, collectionKey);
+            System.out.println(all);
+            if (all.size() >= 10) {
+                //删除成功
+                if (mongoTemplate.remove(all.get(0), collectionKey).getDeletedCount() == 1) {
+                    ReactionForm save = mongoTemplate.save(template, collectionKey);
+                    return RespBean.success("成功", save);
+                }
+            } else {
+                ReactionForm save = mongoTemplate.save(template, collectionKey);
+                return RespBean.success("成功", save);
+            }
+        }
+        return RespBean.error("保存失败");
+    }
+
+    /**
+     * 删除用户模板
+     *
+     * @param id
+     * @param session
+     * @return
+     */
+    @Override
+    public RespBean deleteTemplate(String id, HttpSession session) {
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser.getTemplateUrl() != null) {
+            DeleteResult deleteResult = mongoTemplate.remove(id, sessionUser.getTemplateUrl());
+            if (deleteResult.getDeletedCount() == 1) {
+                return RespBean.success("删除成功");
+            }
+        }
+        return RespBean.error("失败");
+    }
+
+    /**
+     * 查看用户模板
+     *
+     * @param id
+     * @param session
+     * @return
+     */
+    @Override
+    public RespBean getTemplate(String id, HttpSession session) {
+        User sessionUser = (User) session.getAttribute("user");
+        if (sessionUser.getTemplateUrl() != null) {
+            ReactionForm template = mongoTemplate.findById(id, ReactionForm.class, sessionUser.getTemplateUrl());
+            return RespBean.success("成功", template);
+        }
+        return RespBean.error("失败");
+    }
+
 }

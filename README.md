@@ -16,6 +16,6 @@
 
 - [x] 登录、注册、退出、注销
 - [x] project 相关增删改查
-- [ ] reaction 相关增删改查
-- [ ] template 相关增删改查
-- [ ] 群组功能
+- [x] reaction 相关增删改查
+- [x] template 相关增删改查
+- [x] 群组功能

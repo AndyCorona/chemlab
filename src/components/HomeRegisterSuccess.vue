@@ -2,7 +2,7 @@
   <div class="home-register-success">
     <p>注册成功！</p>
     <p>请前往邮箱激活账号！</p>
-    <home-button @click.prevent="ToLogin" buttonText="返回登录" buttonStyle="white"></home-button>
+    <home-button @click.prevent="ToLogin" buttonText="返回登录" buttonStyle="gray"></home-button>
   </div>
 </template>
 

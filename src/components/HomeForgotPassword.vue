@@ -2,9 +2,9 @@
   <div class="home-forgot-password">
     <home-input type="text" placeholder="请输入你的邮箱" label="邮箱" name="email"></home-input>
     <home-input type="code" placeholder="点击按钮获取验证码" label="验证码" name="code"></home-input>
-    <home-button @click="GetCode($event)" :style="'margin-top:20px'" buttonText="获取验证码" buttonStyle="pink"></home-button>
+    <home-button @click="GetCode($event)" :style="'margin-top:20px'" buttonText="获取验证码" buttonStyle="white"></home-button>
     <home-button @click.prevent="Next" buttonText="下一步" buttonStyle="green"></home-button>
-    <home-button @click.prevent="ToLogin" buttonText="返回登录" buttonStyle="white"></home-button>
+    <home-button @click.prevent="ToLogin" buttonText="返回登录" buttonStyle="gray"></home-button>
   </div>
 </template>
 

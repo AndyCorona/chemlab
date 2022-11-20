@@ -51,7 +51,7 @@ export default {
       color: #B3B3B3;
       padding: 6px 10px;
       box-sizing: border-box;
-      background-color: rgba(99, 130, 113, 0.2);
+      background-color: #E0E6E3;
       box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.25);
       border-radius: 5px;
       border: none;

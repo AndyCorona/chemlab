@@ -11,7 +11,7 @@
       <a href="/#/forgot-password">忘记密码</a>
     </div>
     <home-button @click="ToUserSpace($event)" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green"></home-button>
-    <home-button @click.prevent="ToSignup" buttonText="注册" buttonStyle="pink"></home-button>
+    <home-button @click.prevent="ToSignup" buttonText="注册" buttonStyle="white"></home-button>
   </div>
 </template>
 

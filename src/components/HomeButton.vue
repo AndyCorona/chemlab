@@ -48,14 +48,14 @@ export default {
       border: none;
     }
 
-    .pink {
-      background-color: #f7e5e5;
+    .white {
+      background-color: #FFFFFF;
       color: #638271;
       border: 2px solid #638271;
     }
 
-    .white {
-      background-color: #e2baba;
+    .gray {
+      background-color: #D7D7D7;
       color: #FFFFFF;
       border: none;
     }

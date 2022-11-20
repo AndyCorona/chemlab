@@ -4,8 +4,8 @@
     <home-input type="email" placeholder="请输入你的邮箱" label="邮箱" name="email"></home-input>
     <home-input type="password" placeholder="请输入6-20个字符的英文、数字或特殊字符" label="密码" name="password"></home-input>
     <home-input type="password" placeholder="请再次确认密码" label="二次确认" name="password-confirm"></home-input>
-    <home-button @click="Signup($event)" buttonText="注册" buttonStyle="pink"></home-button>
-    <home-button @click.prevent="ToLogin" buttonText="返回登录" buttonStyle="white"></home-button>
+    <home-button @click="Signup($event)" buttonText="注册" buttonStyle="white"></home-button>
+    <home-button @click.prevent="ToLogin" buttonText="返回登录" buttonStyle="gray"></home-button>
   </div>
 </template>
 

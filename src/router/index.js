@@ -1,13 +1,17 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import HomeLogin from '../components/HomeLogin.vue'
-import HomeProvacyPolicy from '../components/HomePrivacyPolicy.vue'
-import HomeUserAgreement from '../components/HomeUserAgreement.vue'
-import HomeForgotPassword from '../components/HomeForgotPassword.vue'
-import HomeRegisterSuccess from '../components/HomeRegisterSuccess.vue'
-import HomeActivateSuccess from '../components/HomeActivateSuccess.vue'
-import HomeUpdatepassword from '../components/HomeUpdatePassword.vue'
-import HomeSignup from '../components/HomeSignup.vue'
+import HomeLogin from '../components/compose/HomeLogin.vue'
+import HomeProvacyPolicy from '../components/compose/HomePrivacyPolicy.vue'
+import HomeUserAgreement from '../components/compose/HomeUserAgreement.vue'
+import HomeForgotPassword from '../components/compose/HomeForgotPassword.vue'
+import HomeRegisterSuccess from '../components/compose/HomeRegisterSuccess.vue'
+import HomeActivateSuccess from '../components/compose/HomeActivateSuccess.vue'
+import HomeUpdatepassword from '../components/compose/HomeUpdatePassword.vue'
+import HomeSignup from '../components/compose/HomeSignup.vue'
+import MainView from '../views/MainView.vue'
+import MainUser from '../components/compose/MainUser.vue'
+import MainGroup from '../components/compose/MainGroup.vue'
+import MainProject from '../components/compose/MainProject.vue'
 
 const routes = [
   {
@@ -65,6 +69,29 @@ const routes = [
     path: '/user-agreement',
     name: 'userAgreement',
     component: HomeUserAgreement
+  },
+  {
+    path: '/main',
+    name: 'main-view',
+    component: MainView,
+    redirect: '/main/user',
+    children: [
+      {
+        path: 'project',
+        name: 'MainProject',
+        component: MainProject
+      },
+      {
+        path: 'user',
+        name: 'MainUser',
+        component: MainUser
+      },
+      {
+        path: 'group',
+        name: 'MainGroup',
+        component: MainGroup
+      }
+    ]
   }
 ]
 

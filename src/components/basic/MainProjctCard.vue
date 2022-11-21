@@ -4,7 +4,7 @@
       <img class="project-img" src="/imgs/用户主页/项目图片3.png">
       <div class="project-text">
         <p class="project-title">{{ item.title }}</p>
-        <img @click.once="DeleteProject" class="delete-project" src="/imgs/用户主页/删除项目.svg">
+        <img @click.stop="DeleteProject" class="delete-project" src="/imgs/用户主页/删除项目.svg">
       </div>
     </div>
     <div @click="ToProject" class="wrapper" v-show="ProjectList.length < 8">

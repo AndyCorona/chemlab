@@ -1,7 +1,9 @@
 <template>
-  <div class="active">
-    <input type="checkbox" :id="`checkbox${RandomNum}`">
-    <label :for="`checkbox${RandomNum}`"></label>
+  <div class="main-check-box">
+    <div class="active">
+      <input type="checkbox" :id="`checkbox${RandomNum}`">
+      <label :for="`checkbox${RandomNum}`"></label>
+    </div>
   </div>
 </template>
 
@@ -20,31 +22,33 @@ export default {
 </script>
 
 <style lang="scss">
-.active {
-  margin: 0px;
-  padding: 0px;
-  width: 16px;
-  height: 16px;
-  border: 3px solid #000000;
-  border-radius: 1px;
-}
+.main-check-box {
+  .active {
+    margin: 0px;
+    padding: 0px;
+    width: 16px;
+    height: 16px;
+    border: 3px solid #000000;
+    border-radius: 1px;
+  }
 
-input {
-  display: none;
-}
+  input {
+    display: none;
+  }
 
-label {
-  display: block;
-  margin: 2px;
-  padding: 0px;
-  width: 12px;
-  height: 12px;
-  background-color: #19546f;
-  border-radius: 1px;
-  opacity: 0;
-}
+  label {
+    display: block;
+    margin: 2px;
+    padding: 0px;
+    width: 12px;
+    height: 12px;
+    background-color: #19546f;
+    border-radius: 1px;
+    opacity: 0;
+  }
 
-input:checked+label {
-  opacity: 1;
+  input:checked+label {
+    opacity: 1;
+  }
 }
 </style>

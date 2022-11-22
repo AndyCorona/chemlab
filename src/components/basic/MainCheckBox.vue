@@ -1,6 +1,7 @@
 <template>
   <div class="main-check-box">
-    <div class="active">
+    <!-- 防止点击复选框之后跳转页面 -->
+    <div class="active" @click.stop="">
       <input type="checkbox" :id="`checkbox${RandomNum}`">
       <label :for="`checkbox${RandomNum}`"></label>
     </div>

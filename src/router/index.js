@@ -12,7 +12,7 @@ import MainView from '../views/MainView.vue'
 import MainUser from '../components/compose/MainUser.vue'
 import MainGroup from '../components/compose/MainGroup.vue'
 import MainProject from '../components/compose/MainProject.vue'
-
+import ReactionView from '../views/ReactionView.vue'
 const routes = [
   {
     path: '/',
@@ -92,6 +92,11 @@ const routes = [
         component: MainGroup
       }
     ]
+  },
+  {
+    path: '/main/project/reaction',
+    name: 'ReactionView',
+    component: ReactionView
   }
 ]
 

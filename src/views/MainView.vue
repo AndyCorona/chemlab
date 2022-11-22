@@ -1,7 +1,9 @@
 <template>
   <div class="main-view">
-    <main-left-side-bar></main-left-side-bar>
-    <div class="container">
+    <div class="left-container">
+      <main-left-bar></main-left-bar>
+    </div>
+    <div class="right-container">
       <main-top-bar :TopBarLeftImg="TopBarLeftImg" :TopBarSettingImg="TopBarSettingImg"
         :TopBarLogoutImg="TopBarLogoutImg" :NavPath="NavPath"></main-top-bar>
       <main-background-and-profile :background="background" :logo="logo"></main-background-and-profile>
@@ -11,13 +13,13 @@
 </template>
 
 <script>
-import MainLeftSideBar from '../components/MainLeftSideBar.vue'
+import MainLeftBar from '../components/compose/MainLeftBar.vue'
 import MainTopBar from '../components/basic/MainTopBar.vue'
 import MainBackgroundAndProfile from '../components/basic/MainBackGroundAndProfile.vue'
 export default {
   name: 'MainView',
   components: {
-    MainLeftSideBar,
+    MainLeftBar,
     MainTopBar,
     MainBackgroundAndProfile
   },
@@ -60,12 +62,8 @@ export default {
 .main-view {
   width: $min-width;
   margin: 0 auto;
+  position: relative;
   display: flex;
   justify-content: space-around;
-
-  .container {
-    height: 1080px;
-    width: 1620px;
-  }
 }
 </style>

@@ -36,6 +36,7 @@ export default {
   position: sticky;
   top: 0;
   background-color: #FFFFFF;
+  height: 61px;
 
   .left {
     display: flex;

@@ -1,10 +1,10 @@
 <template>
   <div class="main-reaction">
-    <div class="wrapper" v-for="(item, i) in ReactionList" :key="i">
+    <div class="wrapper" v-for="(item, i) in ReactionList" :key="i" @click="this.$router.push('/main/project/reaction')">
       <p class="word-wrap">{{ item.name }}</p>
       <p>{{ item.date }}</p>
       <p>
-        <span class="word-wrap" v-for="(tag, j) in item.tags" :key="j">{{tag}}</span>
+        <span class="word-wrap" v-for="(tag, j) in item.tags" :key="j">{{  tag  }}</span>
       </p>
       <main-check-box></main-check-box>
     </div>
@@ -37,6 +37,7 @@ export default {
   margin-top: 20px;
 
   .wrapper {
+    cursor: pointer;
     margin: 0 140px 0 170px;
     display: flex;
     align-items: center;

@@ -13,6 +13,7 @@ import MainUser from '../components/compose/MainUser.vue'
 import MainGroup from '../components/compose/MainGroup.vue'
 import MainProject from '../components/compose/MainProject.vue'
 import ReactionView from '../views/ReactionView.vue'
+import ErrorView from '../views/ErrorView.vue'
 const routes = [
   {
     path: '/',
@@ -97,6 +98,11 @@ const routes = [
     path: '/main/project/reaction',
     name: 'ReactionView',
     component: ReactionView
+  },
+  {
+    path: '/error',
+    name: 'ErrorView',
+    component: ErrorView
   }
 ]
 

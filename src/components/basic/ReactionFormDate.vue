@@ -2,9 +2,11 @@
   <div class="reaction-form-date">
     <input type="date" name="date" v-model="date">
     <div class="tags">
-      <span class="word-wrap" contenteditable="true" id="tag1">{{ tags[0] }}</span>
-      <span class="word-wrap" contenteditable="true" id="tag2">{{ tags[1] }}</span>
-      <span class="word-wrap" contenteditable="true" id="tag3">{{ tags[2] }}</span>
+      <span v-for="(item, index) in tags" :key="index" class="word-wrap" contenteditable="true"
+        :id="`tag${index + 1}`">{{
+    item
+        }}</span>
+      <span id="addTag">+</span>
     </div>
   </div>
 </template>
@@ -12,10 +14,11 @@
 <script>
 export default {
   name: 'ReactionFormDate',
-  data () {
+  data() {
     return {
+      showAddTag: false,
       date: '2022-03-04',
-      tags: ['你好', 'ddddd', '到啥地方厚爱哈佛i会收到粉丝的红爱豆']
+      tags: ['你好', 'ddddd']
     }
   }
 }
@@ -34,6 +37,8 @@ export default {
   }
 
   .tags {
+    display: flex;
+
     span {
       padding: 4px;
       border-radius: 5px;
@@ -58,6 +63,14 @@ export default {
 
     #tag3 {
       background-color: #8080FF;
+    }
+
+    #addTag {
+      cursor: pointer;
+      border: 1px dashed #555555;
+      width: 80px;
+      text-align: center;
+      color: #000000;
     }
   }
 }

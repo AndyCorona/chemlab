@@ -1,5 +1,5 @@
 <template>
-  <div class="reaction-view">
+  <div class="reaction-view" ref="ReactionViewRef">
     <main-left-bar></main-left-bar>
     <div class="right-container">
       <main-top-bar :TopBarLeftImg="TopBarLeftImg" :TopBarSettingImg="TopBarSettingImg"
@@ -15,7 +15,7 @@
 <script>
 import MainLeftBar from '../components/compose/MainLeftBar.vue'
 import MainTopBar from '../components/basic/MainTopBar.vue'
-import ReactionForm from '../components/compose/ReactionFrom.vue'
+import ReactionForm from '../components/compose/ReactionForm.vue'
 import ReactionRightBar from '../components/compose/ReactionRightBar.vue'
 export default {
   name: 'ReactionView',

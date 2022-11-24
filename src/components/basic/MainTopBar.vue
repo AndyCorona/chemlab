@@ -5,15 +5,19 @@
       <a v-for="(item, index) in NavPath" :key="index" :href="item.path">{{ item.name }}</a>
     </div>
     <div class="right">
-      <img class="setting" :src="TopBarSettingImg">
+      <main-drop-list :src="TopBarSettingImg"></main-drop-list>
       <img class="logout" @click="logout" :src="TopBarLogoutImg">
     </div>
   </div>
 </template>
 
 <script>
+import MainDropList from './MainDropList.vue'
 export default {
   name: 'TopBar',
+  components: {
+    MainDropList
+  },
   props: {
     TopBarLeftImg: String,
     TopBarSettingImg: String,
@@ -21,7 +25,7 @@ export default {
     NavPath: Array
   },
   methods: {
-    logout () {
+    logout() {
       alert('确认退出吗')
     }
   }
@@ -65,6 +69,7 @@ export default {
   }
 
   .right {
+    display: flex;
     img {
       cursor: pointer;
       margin: 14px 10px;

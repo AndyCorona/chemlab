@@ -1,5 +1,7 @@
 <template>
   <div class="home-view">
+    <toast-props :show="this.ShowModal" text="登录成功" :state="1" :DurationTime="1000" @close="this.ShowModal = false">
+    </toast-props>
     <div class="container" :style="`background-image: url(${backgroundImage})`">
       <form>
         <home-header :welcomeText="welcomeText" :productIcon="productIcon"></home-header>
@@ -19,7 +21,7 @@ export default {
     HomeHeader,
     HomeFooter
   },
-  data () {
+  data() {
     return {
       productIcon: this.$config.productIcon,
       welcomeText: this.$config.welcomeText,

@@ -10,8 +10,10 @@
       </svg>
       <a href="/#/forgot-password">忘记密码</a>
     </div>
-    <home-button @click="ToUserSpace($event)" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green"></home-button>
+    <home-button @click="ToUserSpace($event)" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green">
+    </home-button>
     <home-button @click.prevent="ToSignup" buttonText="注册" buttonStyle="white"></home-button>
+    <home-button @click.prevent="this.$router.push('/error')" buttonText="出错了（测试）" buttonStyle="gray"></home-button>
   </div>
 </template>
 
@@ -25,10 +27,10 @@ export default {
     HomeButton
   },
   methods: {
-    ToSignup () {
+    ToSignup() {
       this.$router.push('/signup')
     },
-    ToUserSpace (event) {
+    ToUserSpace(event) {
       // TODO 根据校验情况决定是否提交
       // event.preventDefault()
       this.$router.push('/main')

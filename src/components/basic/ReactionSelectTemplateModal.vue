@@ -1,27 +1,27 @@
 <template>
   <div class="reation-select-template-modal">
     <div class="mask" :class="open" @click="closeAndEmit" :style="`height:${height}px;width:${width}px`">
-      <div class="modal">
-        <div class="modal-header">
-          实验模板
+    </div>
+    <div class="modal" :class="open">
+      <div class="modal-header">
+        实验模板
+      </div>
+      <div class="modal-body">
+        <div class="title">内置模板</div>
+        <div class="container">
+          <button class="builtin" @click.prevent="" v-for="(item, index) in templates.builtin" :key="index">{{ item
+          }}</button>
         </div>
-        <div class="modal-body">
-          <div class="title">内置模板</div>
-          <div class="container">
-            <button class="builtin" @click.prevent="" v-for="(item, index) in templates.builtin" :key="index">{{ item
-            }}</button>
-          </div>
-          <div class="title">自定义</div>
-          <div class="container">
-            <button class="define" @click.prevent="" v-for="(item, index) in templates.define" :key="index">{{ item
-            }}</button>
-            <button class="NewTemplate" @click.prevent="" v-show="this.templates.define.length < 5">+</button>
-          </div>
+        <div class="title">自定义</div>
+        <div class="container">
+          <button class="define" @click.prevent="" v-for="(item, index) in templates.define" :key="index">{{ item
+          }}</button>
+          <button class="NewTemplate" @click.prevent="" v-show="this.templates.define.length < 5">+</button>
         </div>
-        <div class="modal-footer">
-          <button @click.prevent="closeAndEmit" class="save">确认</button>
-          <button @click.prevent="closeAndEmit" class="cancle">取消</button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button @click.prevent="closeAndEmit" class="save">确认</button>
+        <button @click.prevent="closeAndEmit" class="cancle">取消</button>
       </div>
     </div>
   </div>
@@ -75,93 +75,94 @@ export default {
     position: absolute;
     top: -61px;
     left: -300px;
-    z-index: 9999999;
+    z-index: 100;
+  }
 
-    .modal {
-      font-size: 20px;
+  .modal {
+    z-index: 200;
+    font-size: 20px;
+    font-weight: bold;
+    width: 800px;
+    height: 450px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    translate: -50% -50%;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.35);
+
+    .modal-header {
+      box-sizing: border-box;
+      padding: 16px;
+      height: 60px;
+      line-height: 28px;
+      box-shadow: 0 0 5px 0 rgba(0,0,0,0.75);
+      margin-bottom: 30px;
+    }
+
+    .modal-body {
+      font-size: 18px;
       font-weight: bold;
-      width: 800px;
-      height: 450px;
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      translate: -50% -50%;
-      background-color: #FFFFFF;
-      border-radius: 5px;
-      box-shadow: 0 0 5px 0 #000000;
+      padding: 0 50px;
 
-      .modal-header {
-        box-sizing: border-box;
-        padding: 16px;
-        height: 60px;
-        line-height: 28px;
-        box-shadow: 0 0 5px 0 #000000;
-        margin-bottom: 30px;
+      .title {
+        padding-top: 30px 0 3px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.35);
       }
 
-      .modal-body {
-        font-size: 18px;
-        font-weight: bold;
-        padding: 0 50px;
-
-        .title {
-          padding-top: 30px 0 3px 0;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-        }
-
-        .container {
-          display: flex;
-          justify-content: space-between;
-          margin: 30px 20px;
-
-          button {
-            cursor: pointer;
-            width: 120px;
-            height: 50px;
-            border-radius: 5px;
-
-            border: 1px solid #7F7F7F;
-            box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.25);
-          }
-
-          .builtin {
-            background-color: #00BFBF;
-          }
-
-          .define {
-            background-color: #ede9ec;
-          }
-        }
-      }
-
-      .modal-footer {
+      .container {
         display: flex;
-        margin: 0 180px;
         justify-content: space-between;
+        margin: 30px 20px;
 
         button {
-          box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.25);
           cursor: pointer;
-          width: 160px;
-          height: 40px;
-          font-size: 20px;
-          font-weight: bold;
+          width: 120px;
+          height: 50px;
           border-radius: 5px;
+
+          border: 1px solid #7F7F7F;
+          box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.35);
         }
 
-        .cancle {
-          background-color: #FFFFFF;
-          border: 2px solid #638271;
-          color: #638271;
+        .builtin {
+          background-color: #00BFBF;
         }
 
-        .save {
-          background-color: #638271;
-          border: 2px solid #638271;
-          color: #FFFFFF;
+        .define {
+          background-color: #ede9ec;
         }
-
       }
+    }
+
+    .modal-footer {
+      display: flex;
+      margin: 0 180px;
+      justify-content: space-between;
+
+      button {
+        box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.35);
+        cursor: pointer;
+        width: 160px;
+        height: 40px;
+        font-size: 20px;
+        font-weight: bold;
+        border-radius: 5px;
+      }
+
+      .cancle {
+        background-color: #FFFFFF;
+        border: 2px solid #638271;
+        color: #638271;
+      }
+
+      .save {
+        background-color: #638271;
+        border: 2px solid #638271;
+        color: #FFFFFF;
+      }
+
     }
   }
 

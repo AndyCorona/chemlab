@@ -41,6 +41,7 @@ export default {
   top: 0;
   background-color: #FFFFFF;
   height: 61px;
+  border-bottom: 1px solid #D7D7D7;
 
   .left {
     display: flex;

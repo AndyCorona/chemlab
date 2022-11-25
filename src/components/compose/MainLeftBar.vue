@@ -28,5 +28,6 @@ export default {
   width: 300px;
   height: 1080px;
   background-color: rgb(255, 255, 255);
+  border-right: 1px solid #D7D7D7;
 }
 </style>

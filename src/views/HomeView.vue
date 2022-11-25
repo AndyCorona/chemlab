@@ -37,7 +37,6 @@ export default {
 .home-view {
   .container {
     // 放在页面的内联样式中，这样可以通过 js 动态替换背景图片
-    // background: url('/imgs/登录页-背景图片.png') no-repeat center;
     background-size: cover;
     height: 1080px;
     width: $min-width;

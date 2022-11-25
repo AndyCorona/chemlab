@@ -24,8 +24,9 @@ export default {
 <style lang="scss" >
 .reaction-right-bar {
   position: sticky;
-  top: 61px;
+  top: 62px;
   width: 300px;
-  height: 1080px;
+  height: 1019px;
+  border-left: 1px solid #D7D7D7;
 }
 </style>

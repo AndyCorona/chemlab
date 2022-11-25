@@ -1,18 +1,18 @@
 <template>
   <div class="reaction-save-template-modal">
     <div class="mask" :class="open" @click="closeAndEmit" :style="`height:${height}px;width:${width}px`">
-      <div class="modal" :class="open">
-        <div class="modal-header">
-          保存模板
-        </div>
-        <div class="modal-body">
-          <div>模版名称</div>
-          <input type="text" placeholder="请输入文本">
-        </div>
-        <div class="modal-footer">
-          <button @click.prevent="closeAndEmit" class="save">保存</button>
-          <button @click.prevent="closeAndEmit" class="cancle">取消</button>
-        </div>
+    </div>
+    <div class="modal" :class="open">
+      <div class="modal-header">
+        保存模板
+      </div>
+      <div class="modal-body">
+        <div>模版名称</div>
+        <input type="text" placeholder="请输入文本">
+      </div>
+      <div class="modal-footer">
+        <button @click.prevent="closeAndEmit" class="save">保存</button>
+        <button @click.prevent="closeAndEmit" class="cancle">取消</button>
       </div>
     </div>
   </div>
@@ -64,76 +64,78 @@ export default {
     position: absolute;
     top: -61px;
     left: -300px;
-    z-index: 9999999;
+    z-index: 100;
+  }
 
-    .modal {
-      font-size: 20px;
+  .modal {
+    z-index: 200;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 64px;
+    left: 1200px;
+    background-color: #FFFFFF;
+    width: 360px;
+    height: 230px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 0 rgba(0,0,0,0.35);
+
+    .modal-header {
+      padding: 6px 10px;
+      height: 30px;
+      line-height: 30px;
+      box-shadow: 0 0 5px 0 rgba(0,0,0,0.35);
+    }
+
+    .modal-body {
+      font-size: 18px;
       font-weight: bold;
-      position: absolute;
-      top: 64px;
-      left: 1200px;
-      background-color: #FFFFFF;
-      width: 360px;
-      height: 230px;
-      border-radius: 5px;
-      box-shadow: 0 0 5px 0 #000000;
+      padding: 24px 30px;
 
-      .modal-header {
-        padding: 6px 10px;
-        height: 30px;
-        line-height: 30px;
-        box-shadow: 0 0 5px 0 #000000;
+      div {
+        margin-bottom: 10px;
       }
 
-      .modal-body {
-        font-size: 18px;
+      input {
+        box-sizing: border-box;
+        border: none;
+        width: 300px;
+        height: 40px;
+        border-radius: 5px;
+        padding: 2px 10px;
+        border: 1px solid #797979;
+        background-color: #E0E6E3;
+        box-shadow: 0 0 5px 0 rgba(0,0,0,0.35);
+      }
+    }
+
+    .modal-footer {
+      display: flex;
+      margin: 0 70px;
+      justify-content: space-between;
+
+      button {
+        box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.35);
+        cursor: pointer;
+        width: 80px;
+        height: 40px;
+        font-size: 20px;
         font-weight: bold;
-        padding: 24px 30px;
-
-        div {
-          margin-bottom: 10px;
-        }
-
-        input {
-          box-sizing: border-box;
-          border: none;
-          width: 300px;
-          height: 40px;
-          border-radius: 5px;
-          padding: 2px 10px;
-          border: 1px solid #797979;
-          background-color: #E0E6E3;
-        }
+        border-radius: 5px;
       }
 
-      .modal-footer {
-        display: flex;
-        margin: 0 70px;
-        justify-content: space-between;
-
-        button {
-          box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.25);
-          cursor: pointer;
-          width: 80px;
-          height: 40px;
-          font-size: 20px;
-          font-weight: bold;
-          border-radius: 5px;
-        }
-
-        .cancle {
-          background-color: #FFFFFF;
-          border: 2px solid #638271;
-          color: #638271;
-        }
-
-        .save {
-          background-color: #638271;
-          border: 2px solid #638271;
-          color: #FFFFFF;
-        }
-
+      .cancle {
+        background-color: #FFFFFF;
+        border: 2px solid #638271;
+        color: #638271;
       }
+
+      .save {
+        background-color: #638271;
+        border: 2px solid #638271;
+        color: #FFFFFF;
+      }
+
     }
   }
 

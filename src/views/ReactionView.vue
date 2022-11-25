@@ -25,12 +25,17 @@ export default {
     ReactionForm,
     ReactionRightBar
   },
-  data () {
+  data() {
     return {
       TopBarLeftImg: this.$config.TopBarLeftImg,
       TopBarSettingImg: this.$config.TopBarSettingImg,
       TopBarLogoutImg: this.$config.TopBarLogoutImg,
       NavPath: [{ name: '我的实验', path: '/#/main/user' }, { name: '项目', path: '/#/main/project' }, { name: '反应', path: '/#/main/project/reaction' }]
+    }
+  },
+  mounted() {
+    window.onbeforeunload = function () {
+      return ''
     }
   }
 }
@@ -43,6 +48,7 @@ export default {
   width: $min-width;
   margin: 0 auto;
   display: flex;
+
   .wrapper {
     display: flex;
   }

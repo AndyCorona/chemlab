@@ -23,7 +23,7 @@ export default {
   },
   data() {
     return {
-      open: 'close',
+      open: this.show,
       ToastSuccess: this.$config.ToastSuccess,
       ToastFail: this.$config.ToastFail,
       ToastForbid: this.$config.ToastForbid
@@ -64,7 +64,8 @@ export default {
             this.$emit('close')
           }, this.DurationTime)
         }
-      }
+      },
+      immediate: true
     }
   }
 }
@@ -76,6 +77,7 @@ export default {
   top: -10%;
   left: 50%;
   translate: -50% -50%;
+  z-index: 999999;
 
   .toast-container {
 

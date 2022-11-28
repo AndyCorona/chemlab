@@ -1,13 +1,14 @@
 <template>
   <div class="home-view">
-    <toast-props :show="this.ShowModal" text="登录成功" :state="1" :DurationTime="1000" @close="this.ShowModal = false">
+    <toast-props :show="this.ShowModal" :text="text" :state="state" :DurationTime="DurationTime"
+      @close="this.ShowModal = false">
     </toast-props>
     <div class="container" :style="`background-image: url(${backgroundImage})`">
-      <form>
+      <main>
         <home-header :welcomeText="welcomeText" :productIcon="productIcon"></home-header>
-        <router-view></router-view>
+        <router-view @toast="toast"></router-view>
         <home-footer></home-footer>
-      </form>
+      </main>
     </div>
   </div>
 </template>
@@ -23,9 +24,21 @@ export default {
   },
   data() {
     return {
+      state: 1,
+      text: '发生错误',
+      ShowModal: false,
+      DurationTime: 1500,
       productIcon: this.$config.productIcon,
       welcomeText: this.$config.welcomeText,
       backgroundImage: this.$config.backgroundImage
+    }
+  },
+  methods: {
+    toast(text, state, DurationTime = 1500) {
+      this.text = text
+      this.state = state
+      this.ShowModal = true
+      this.DurationTime = DurationTime
     }
   }
 }
@@ -35,15 +48,17 @@ export default {
 @import '../assets/scss/config.scss';
 
 .home-view {
+  position: relative;
+  width: $min-width;
+
   .container {
-    // 放在页面的内联样式中，这样可以通过 js 动态替换背景图片
+    // 放在页面的内联样式中，可以通过 js 动态替换背景图片
     background-size: cover;
     height: 1080px;
-    width: $min-width;
     margin: 0 auto;
     position: relative;
 
-    form {
+    main {
       border-radius: 20px;
       left: 50%;
       top: 150px;

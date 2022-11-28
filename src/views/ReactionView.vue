@@ -48,6 +48,7 @@ export default {
   width: $min-width;
   margin: 0 auto;
   display: flex;
+  position: relative;
 
   .wrapper {
     display: flex;

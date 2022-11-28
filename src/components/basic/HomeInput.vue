@@ -2,23 +2,42 @@
   <div class="home-input">
     <div class="wrapper">
       <label>{{ label }}</label>
-      <input autocomplete="off" :type="type" :placeholder="placeholder" :name="name" v-model="value">
+      <input :readonly="ReadOnly" @change="validate" autocomplete="off" :type="type" :placeholder="placeholder" :name="name" v-model="value">
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'HomeInput',
+  emits: ['intercept', 'pass'],
   props: {
     type: String,
     placeholder: String,
     label: String,
-    name: String
+    name: String,
+    ValidateExpression: RegExp,
+    ReadOnly: {
+      type: Boolean,
+      default: false
+    }
   },
-  data () {
+  data() {
     return {
       value: ''
+    }
+  },
+  methods: {
+    // 外部传入正则表达式，验证成功触发 pass 事件，验证失败触发 intercept 事件
+    validate() {
+      if (this.ValidateExpression.test(this.value)) {
+        // 校验成功
+        this.$emit('pass', this.value)
+      } else {
+        // 校验失败
+        this.$emit('intercept', this.value)
+      }
     }
   }
 }
@@ -48,7 +67,6 @@ export default {
       width: 300px;
       height: 40px;
       line-height: 40px;
-      color: #B3B3B3;
       padding: 6px 10px;
       box-sizing: border-box;
       background-color: #E0E6E3;

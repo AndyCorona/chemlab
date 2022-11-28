@@ -1,7 +1,12 @@
 <template>
   <div class="home-login">
-    <home-input type="text" placeholder="请输入用户名" label="用户名" name="username"></home-input>
-    <home-input type="password" placeholder="请输入密码" label="密码" name="password"></home-input>
+    <home-input @pass="GotUsername"
+      :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/" type="text" placeholder="请输入用户名" label="用户名"
+      name="username">
+    </home-input>
+    <home-input @pass="GotPassword"
+      :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/" type="password" placeholder="请输入密码" label="密码"
+      name="password"></home-input>
     <div class="forgot-password-tips">
       <svg viewBox="0 0 1024 1024" width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" data-v-029747aa="">
         <path fill="#797979"
@@ -10,10 +15,10 @@
       </svg>
       <a href="/#/forgot-password">忘记密码</a>
     </div>
-    <home-button @click="ToUserSpace($event)" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green">
+    <home-button @BtnClick="ToUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green">
     </home-button>
-    <home-button @click.prevent="ToSignup" buttonText="注册" buttonStyle="white"></home-button>
-    <home-button @click.prevent="this.$router.push('/error')" buttonText="出错了（测试）" buttonStyle="gray"></home-button>
+    <home-button @BtnClick="this.$router.push('/signup')" buttonText="注册" buttonStyle="white"></home-button>
+    <home-button @BtnClick="this.$router.push('/error')" buttonText="出错了（测试）" buttonStyle="gray"></home-button>
   </div>
 </template>
 
@@ -22,18 +27,39 @@ import HomeInput from '../basic/HomeInput.vue'
 import HomeButton from '../basic/HomeButton.vue'
 export default {
   name: 'HomeLogin',
+  emits: ['toast'],
   components: {
     HomeInput,
     HomeButton
   },
+  data() {
+    return {
+      username: '',
+      password: ''
+    }
+  },
   methods: {
-    ToSignup() {
-      this.$router.push('/signup')
+    GotUsername(value) {
+      this.username = value
     },
-    ToUserSpace(event) {
-      // TODO 根据校验情况决定是否提交
-      // event.preventDefault()
-      this.$router.push('/main')
+    GotPassword(value) {
+      this.password = value
+    },
+    ToUserSpace() {
+      if (this.username === '') {
+        this.$emit('toast', '请输入有效的用户名', 1)
+      } else if (this.password === '') {
+        this.$emit('toast', '请输入有效的密码', 1)
+      } else {
+        this.axios.post('/home/login', {
+          username: this.username,
+          password: this.password
+        }).then(() => {
+          this.$router.push('/main')
+        }).catch((resp) => {
+          this.$emit('toast', resp.msg, 1)
+        })
+      }
     }
   }
 }

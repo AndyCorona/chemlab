@@ -30,6 +30,7 @@ export default {
 @import '../assets/scss/config.scss';
 
 .error-view {
+  position: relative;
   text-align: center;
   margin: 0 auto;
   width: $min-width;

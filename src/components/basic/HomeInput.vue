@@ -2,7 +2,8 @@
   <div class="home-input">
     <div class="wrapper">
       <label>{{ label }}</label>
-      <input :readonly="ReadOnly" @change="validate" autocomplete="off" :type="type" :placeholder="placeholder" :name="name" v-model="value">
+      <input :readonly="ReadOnly" @change="validate" autocomplete="off" :type="type" :placeholder="placeholder"
+        :name="name" v-model="value">
     </div>
   </div>
 </template>
@@ -70,7 +71,7 @@ export default {
       padding: 6px 10px;
       box-sizing: border-box;
       background-color: #E0E6E3;
-      box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.25);
+      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
       border-radius: 5px;
       border: none;
     }

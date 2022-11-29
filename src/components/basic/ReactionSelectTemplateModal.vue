@@ -97,7 +97,7 @@ export default {
       padding: 16px;
       height: 60px;
       line-height: 28px;
-      box-shadow: 0 0 5px 0 rgba(0,0,0,0.75);
+      box-shadow: 0 0 5px 0 rgba(0,0,0,0.35);
       margin-bottom: 30px;
     }
 

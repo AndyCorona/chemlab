@@ -11,11 +11,10 @@ Mock.mock('/true/api/home/login', 'post', {
     userId: 1,
     email: 'likezhen@qq.com',
     username: 'likezhen',
-    isActivated: false,
     firstLogin: true,
-    school: '上海科技大学',
+    school: '门头沟大学',
     major: '化学',
-    filed: '发光材料',
+    filed: '有机',
 
     // 群组信息
     groupId: '11223344',
@@ -24,16 +23,19 @@ Mock.mock('/true/api/home/login', 'post', {
     isAdmin: false,
     members: [
       {
-        logo: 'xxx.img',
-        name: 'Ye'
+        logo: '/imgs/左边栏/头像-1.svg',
+        name: 'likezhen',
+        isAdmin: true
       },
       {
-        logo: 'xxx.img',
-        name: 'Li'
+        logo: '/imgs/左边栏/头像-2.svg',
+        name: 'Li',
+        isAdmin: false
       },
       {
-        logo: 'xxx.img',
-        name: 'Hong'
+        logo: '/imgs/左边栏/头像-3.svg',
+        name: 'Hong',
+        isAdmin: false
       }
     ]
   },
@@ -101,6 +103,105 @@ Mock.mock('/true/api/home/update', 'post', {
 
 // 修改密码接口-失败
 Mock.mock('/false/api/home/update', 'post', {
+  status: 500,
+  msg: '修改失败'
+})
+
+// 退出登录接口-成功
+Mock.mock('/true/api/main/logout', 'get', {
+  status: 200,
+  data: {
+  },
+  msg: '退出成功'
+})
+
+// 退出登录接口-失败
+Mock.mock('/false/api/main/logout', 'get', {
+  status: 500,
+  msg: '退出失败'
+})
+
+// 个人中心获取个人信息接口-成功
+Mock.mock('/true/api/main/info', 'get',
+  {
+    status: 200,
+    data: {
+      // 个人信息
+      userId: 1,
+      email: 'likezhen@qq.com',
+      username: 'likezhen',
+      firstLogin: true,
+      school: '门头沟大学',
+      major: '化学',
+      filed: '有机',
+
+      // 群组信息
+      groupId: '11223344',
+      groupDesc: '欢迎来到我的课题组',
+      groupName: 'xxx课题组',
+      isAdmin: false,
+      members: [
+        {
+          logo: '/imgs/左边栏/头像-1.svg',
+          name: 'likezhen',
+          isAdmin: true
+        },
+        {
+          logo: '/imgs/左边栏/头像-2.svg',
+          name: 'Li',
+          isAdmin: false
+        },
+        {
+          logo: '/imgs/左边栏/头像-3.svg',
+          name: 'Hong',
+          isAdmin: false
+        }
+      ]
+    },
+    msg: '获取成功'
+  }
+)
+
+// 个人中心获取个人信息接口-失败
+Mock.mock('/false/api/main/info', 'get', {
+  status: 500,
+  msg: '信息获取失败'
+})
+
+// 个人中心修改基本信息接口-成功
+Mock.mock('/true/api/main/update-basic', 'post', {
+  status: 200,
+  data: {},
+  msg: '修改成功'
+})
+
+// 个人中心修改基本信息接口-失败
+Mock.mock('/false/api/main/update-basic', 'post', {
+  status: 500,
+  msg: '修改失败'
+})
+
+// 个人中心修改个人信息接口-成功
+Mock.mock('/true/api/main/update-me', 'post', {
+  status: 200,
+  data: {},
+  msg: '修改成功'
+})
+
+// 个人中心修改个人信息接口-失败
+Mock.mock('/false/api/main/update-me', 'get', {
+  status: 500,
+  msg: '修改失败'
+})
+
+// 获取个人项目列表接口-成功
+
+// 获取个人项目列表接口-失败
+
+// 获取群组项目列表接口-成功
+
+// 获取群组项目列表接口-失败
+Mock.mock('/false/api/main/group/project', 'get', {
   status: 500,
   msg: '修改失败'
 })

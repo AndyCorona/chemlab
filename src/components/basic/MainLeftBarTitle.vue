@@ -2,14 +2,19 @@
   <div class="main-left-bar-title">
     <div class="wrapper">
       <img src="/imgs/左边栏/群组.svg">
-      <span>Ye Lab</span>
+      <span>{{ title }}</span>
     </div>
   </div>
 
 </template>
 <script>
 export default {
-  name: 'MainLeftBarTitle'
+  name: 'MainLeftBarTitle',
+  computed: {
+    title() {
+      return this.$store.state.userInfo.groupName === undefined ? '暂未加入' : this.$store.state.userInfo.groupName
+    }
+  }
 }
 </script>
 

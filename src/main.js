@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import config from './assets/js/config'
 import ToastProps from './components/basic/ToastProps.vue'
+import CommonInformModal from './components/basic/CommonInformModal.vue'
 import axios from './axios/index'
 import VueAxios from 'vue-axios'
 
@@ -16,6 +17,7 @@ if (mock) {
 
 const app = createApp(App)
 app.component('ToastProps', ToastProps)
+app.component('CommonInformModal', CommonInformModal)
 
 app.config.globalProperties.$config = config
 app.use(store).use(router).use(VueAxios, axios).mount('#app')

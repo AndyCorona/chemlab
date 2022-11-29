@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="wrapper" v-show="IsJoinGroup">
-      <div class="right-wrapper">
+      <div class="left-wrapper">
         <img src="/imgs/左边栏/加入.svg">
         <span>加入课题组</span>
       </div>
@@ -15,11 +15,13 @@
     <div class="wrapper" v-show="!IsJoinGroup" v-for="(item, index) in GroupMemberList" :key="index">
       <div class="left-wrapper">
         <img :src="item.logo">
-        <span>{{item.name}}</span>
+        <span>{{ item.name }}</span>
       </div>
       <div class="right-wrapper">
-        <img src="/imgs/左边栏/头像-1.svg">
-        <img src="/imgs/左边栏/删除成员.svg">
+        <img src="/imgs/左边栏/组长.svg" v-show="item.isAdmin">
+        <img src="/imgs/左边栏/成员.svg" v-show="!item.isAdmin">
+        <!-- 群主不能删除自己 -->
+        <img src="/imgs/左边栏/删除成员.svg" v-show="IsAdmin && (item.name !== this.$store.state.userInfo.username)">
       </div>
     </div>
     <div class="wrapper" v-show="!IsJoinGroup">
@@ -28,10 +30,16 @@
         <span>添加成员</span>
       </div>
     </div>
-    <div class="wrapper" v-show="!IsJoinGroup">
+    <div class="wrapper" v-show="!IsJoinGroup && IsAdmin">
       <div class="left-wrapper">
         <img src="/imgs/左边栏/解散群组.svg">
         <span>解散课题组</span>
+      </div>
+    </div>
+    <div class="wrapper" v-show="!IsJoinGroup && !IsAdmin">
+      <div class="left-wrapper">
+        <img src="/imgs/左边栏/解散群组.svg">
+        <span>退出课题组</span>
       </div>
     </div>
   </div>
@@ -40,32 +48,17 @@
 <script>
 export default {
   name: 'MainLeftBarList',
-  data () {
-    return {
-      // 是否出现 "创建课题组" 和 "加入课题组"
-      IsJoinGroup: false,
-      GroupMemberList: [
-        { name: 'Ye', logo: '/imgs/左边栏/组长.svg', role: '0' },
-        { name: '成员A', logo: '/imgs/左边栏/头像-1.svg', role: '1' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' },
-        { name: '成员B', logo: '/imgs/左边栏/头像-2.svg', role: '2' }
-      ]
+  computed: {
+    // 是否出现 "创建课题组" 和 "加入课题组"
+    IsJoinGroup() {
+      return !this.$store.state.userInfo.groupName
+    },
+    GroupMemberList() {
+      return this.$store.state.userInfo.members
+    },
+    // 是否为群主
+    IsAdmin() {
+      return this.$store.state.userInfo.isAdmin
     }
   }
 }
@@ -86,6 +79,7 @@ export default {
     }
 
     .left-wrapper {
+      cursor: pointer;
       display: flex;
       align-items: center;
 

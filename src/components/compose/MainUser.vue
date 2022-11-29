@@ -1,6 +1,6 @@
 <template>
   <div class="main-user">
-    <main-title-and-slogon title="我的实验" slogon="冲冲冲 666 777"></main-title-and-slogon>
+    <main-title-and-slogon title="我的实验" slogon="每个人都有梦想。但不同的是：有的人只梦，有的人敢想"></main-title-and-slogon>
     <main-project-and-reaction-title ClassType="project-title" ProjectName="项目列表"></main-project-and-reaction-title>
     <main-project-card></main-project-card>
   </div>

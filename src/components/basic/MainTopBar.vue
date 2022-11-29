@@ -2,11 +2,13 @@
   <div class="top-bar">
     <div class="left">
       <img :src="TopBarLeftImg">
-      <a v-for="(item, index) in NavPath" :key="index" :href="item.path">{{ item.name }}</a>
+      <a :style="`pointer-events: ${item.disabled ? 'none' : 'auto'}`" v-for="(item, index) in NavPath" :key="index"
+        :href="item.path">{{ item.name
+        }}</a>
     </div>
     <div class="right">
       <main-drop-list :src="TopBarSettingImg"></main-drop-list>
-      <img class="logout" @click="logout" :src="TopBarLogoutImg">
+      <img class="logout" @click="this.$emit('logout')" :src="TopBarLogoutImg">
     </div>
   </div>
 </template>
@@ -24,11 +26,7 @@ export default {
     TopBarLogoutImg: String,
     NavPath: Array
   },
-  methods: {
-    logout() {
-      alert('确认退出吗')
-    }
-  }
+  emits: ['logout']
 }
 </script>
 
@@ -71,6 +69,7 @@ export default {
 
   .right {
     display: flex;
+
     img {
       cursor: pointer;
       margin: 14px 10px;

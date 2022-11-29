@@ -2,8 +2,8 @@
   <div class="main-drop-list">
     <img :src="src" @click="this.drop = 'drop'">
     <div class="child" :id="drop">
-      <div @click="this.drop = 'close'">个人中心</div>
-      <div @click="this.drop = 'close'">帮助</div>
+      <div @click="details">个人中心</div>
+      <div @click="help">帮助</div>
     </div>
   </div>
 </template>
@@ -18,6 +18,16 @@ export default {
   data() {
     return {
       drop: 'close'
+    }
+  },
+  methods: {
+    help() {
+      this.drop = 'close'
+      alert('帮助页面，还没做')
+    },
+    details() {
+      this.drop = 'close'
+      this.$router.push('/main/details')
     }
   }
 }

@@ -1,12 +1,10 @@
 <template>
   <div class="home-login">
-    <home-input @pass="GotUsername"
-      :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/" type="text" placeholder="请输入用户名" label="用户名"
-      name="username">
+    <home-input @pass="GotUsername" :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/" type="text"
+      placeholder="请输入用户名" label="用户名" name="username">
     </home-input>
-    <home-input @pass="GotPassword"
-      :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/" type="password" placeholder="请输入密码" label="密码"
-      name="password"></home-input>
+    <home-input @pass="GotPassword" :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/" type="password"
+      placeholder="请输入密码" label="密码" name="password"></home-input>
     <div class="forgot-password-tips">
       <svg viewBox="0 0 1024 1024" width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" data-v-029747aa="">
         <path fill="#797979"
@@ -54,7 +52,10 @@ export default {
         this.axios.post('/home/login', {
           username: this.username,
           password: this.password
-        }).then(() => {
+        }).then((data) => {
+          // 将登录之后获取的信息存放到 vuex 中
+          this.$store.commit('saveIsGroup', false)
+          this.$store.commit('saveUserInfo', data)
           this.$router.push('/main')
         }).catch((resp) => {
           this.$emit('toast', resp.msg, 1)

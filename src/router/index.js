@@ -9,6 +9,7 @@ import HomeActivateSuccess from '../components/compose/HomeActivateSuccess.vue'
 import HomeUpdatepassword from '../components/compose/HomeUpdatePassword.vue'
 import HomeSignup from '../components/compose/HomeSignup.vue'
 import MainView from '../views/MainView.vue'
+import MainDetails from '../components/compose/MainDetails.vue'
 import MainUser from '../components/compose/MainUser.vue'
 import MainGroup from '../components/compose/MainGroup.vue'
 import MainProject from '../components/compose/MainProject.vue'
@@ -91,6 +92,11 @@ const routes = [
         path: 'group',
         name: 'MainGroup',
         component: MainGroup
+      },
+      {
+        path: 'details',
+        name: 'Details',
+        component: MainDetails
       }
     ]
   },

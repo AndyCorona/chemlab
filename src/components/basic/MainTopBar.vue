@@ -8,7 +8,7 @@
     </div>
     <div class="right">
       <main-drop-list :src="TopBarSettingImg"></main-drop-list>
-      <img class="logout" @click="this.$emit('logout')" :src="TopBarLogoutImg">
+      <img class="logout" @click="Logout" :src="TopBarLogoutImg">
     </div>
   </div>
 </template>
@@ -26,7 +26,21 @@ export default {
     TopBarLogoutImg: String,
     NavPath: Array
   },
-  emits: ['logout']
+  methods: {
+    Logout() {
+      this.$store.commit('dialog', { ShowModal: true, text: '是否退出?', title: '退出提醒' })
+      this.$store.commit('BindOkEvent', this.ConfirmLogout)
+    },
+    ConfirmLogout() {
+      this.axios.get('/main/logout')
+        .then(() => {
+          this.$router.push('/')
+        }).catch((resp) => {
+          this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+        })
+      this.$store.commit('dialog', { ShowModal: false })
+    }
+  }
 }
 </script>
 

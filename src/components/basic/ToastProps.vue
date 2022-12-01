@@ -1,5 +1,6 @@
 <template>
-  <div class="toast-props" :class="open">
+  <div class="toast-props" :class="open"
+    :style="`top:${this.open ==='open' ? this.$store.state.ScrollTop + 200 :-100}px`">
     <div class="toast-container" :id="ClassState">
       <img :src="icon">
       <span>{{ text }}</span>
@@ -56,7 +57,7 @@ export default {
   },
   watch: {
     show: {
-      handler(newVal, oldVal) {
+      handler(newVal) {
         if (newVal) {
           this.open = 'open'
           setTimeout(() => {
@@ -74,8 +75,8 @@ export default {
 <style lang="scss">
 .toast-props {
   position: absolute;
-  top: -10%;
-  left: 50%;
+  top: -100px;
+  left: 960px;
   translate: -50% -50%;
   z-index: 999999;
 
@@ -124,12 +125,12 @@ export default {
 }
 
 .close {
-  top: -10%;
-  transition: top .7s;
+  // top: -100px;
+  transition: top .5s;
 }
 
 .open {
-  transition: top .7s;
-  top: 20%;
+  transition: top .5s;
+  // top: 200px;
 }
 </style>

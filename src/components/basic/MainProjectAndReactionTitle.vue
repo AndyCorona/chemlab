@@ -3,7 +3,7 @@
   <div class="main-project-and-reaction-title">
     <div :class="ClassType">
       <img src="/imgs/用户主页/项目列表.svg">
-      <input @change="ChangeProjectName($event)" :readonly="ReadOnly" type="text" autocomplete="off" name="project-name" :value="Value">
+      <input :readonly="ReadOnly" type="text" autocomplete="off" name="project-name" :value="Value">
     </div>
   </div>
 </template>
@@ -11,12 +11,7 @@
 <script>
 export default {
   name: 'MainProjectAndReactionTitle',
-  props: { ClassType: String, ProjectName: String, ReadOnly: { default: true, type: Boolean }, Value: { type: String, default: '项目列表' } },
-  methods: {
-    ChangeProjectName (event) {
-      console.log(event.target.value)
-    }
-  }
+  props: { ClassType: String, ProjectName: String, ReadOnly: { default: true, type: Boolean }, Value: { type: String, default: '项目列表' } }
 }
 </script>
 <style lang="scss">

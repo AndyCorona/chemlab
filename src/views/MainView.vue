@@ -1,17 +1,20 @@
 <template>
   <div class="main-view">
-    <toast-props :show="this.ShowModal" :text="text" :state="state" :DurationTime="DurationTime"
-      @close="this.ShowModal = false"></toast-props>
-    <common-inform-modal @ok="confirmLogout" @no="this.ShowCommonModal = false" :show="this.ShowCommonModal"
-      :ShowText="ShowText" :ShowTitle="ShowTitle"></common-inform-modal>
+    <toast-props :show="this.$store.state.ShowToast" :text="this.$store.state.ToastText"
+      :state="this.$store.state.ToastState" :DurationTime="this.$store.state.ToastDurationTime" @close="CloseToast">
+    </toast-props>
+    <common-inform-modal @ok="this.$store.commit('DialogStateChange', true)"
+      @no="this.$store.commit('DialogStateChange', false)" :show="this.$store.state.ShowDialog"
+      :ShowText="this.$store.state.DialogText" :ShowTitle="this.$store.state.DialogTitle">
+    </common-inform-modal>
     <div class="left-container">
       <main-left-bar></main-left-bar>
     </div>
     <div class="right-container">
-      <main-top-bar @logout="logout" :TopBarLeftImg="TopBarLeftImg" :TopBarSettingImg="TopBarSettingImg"
+      <main-top-bar :TopBarLeftImg="TopBarLeftImg" :TopBarSettingImg="TopBarSettingImg"
         :TopBarLogoutImg="TopBarLogoutImg" :NavPath="NavPath"></main-top-bar>
       <main-background-and-profile :background="background" :logo="logo"></main-background-and-profile>
-      <router-view @toast="toast"></router-view>
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -29,48 +32,16 @@ export default {
   },
   data() {
     return {
-      isGroup: this.$store.state.isGroup,
-      ShowText: '是否删除',
-      ShowTitle: '删除提醒',
-      ShowCommonModal: false,
-      state: 1,
-      text: '发生错误',
-      ShowModal: false,
-      DurationTime: 1500,
       TopBarSettingImg: this.$config.TopBarSettingImg,
-      TopBarLogoutImg: this.$config.TopBarLogoutImg,
-      ProjectName: ''
+      TopBarLogoutImg: this.$config.TopBarLogoutImg
     }
   },
   methods: {
-    init() {
-      this.axios.get('/main/info').then((data) => {
-        // 异步操作使用 dispatch
-        this.$store.dispatch('saveUserInfo', data)
-      }).catch((resp) => {
-        this.toast(true, resp.msg, 1)
-      })
-    },
-    toast(ShowModal = true, text = '', state = 1, DurationTime = 1500) {
-      this.ShowModal = ShowModal
-      this.text = text
-      this.state = state
-      this.DurationTime = DurationTime
-    },
-    logout() {
-      this.ShowCommonModal = true
-      this.ShowText = '是否退出?'
-      this.ShowTitle = '退出提醒'
-    },
-    confirmLogout() {
-      this.axios.get('/main/logout')
-        .then(() => {
-          this.toast(true, '退出成功', 0)
-          this.$router.push('/')
-        }).catch((resp) => {
-          this.toast(true, resp.msg)
-          this.ShowCommonModal = false
-        })
+    CloseToast() {
+      setTimeout(() => {
+        this.$store.dispatch('toast', { ShowModal: false })
+        // 魔数
+      }, 300)
     }
   },
   computed: {
@@ -85,14 +56,7 @@ export default {
       }
     },
     logo() {
-      const path = this.$route.fullPath
-      if (path === '/main/user') {
-        return '/imgs/用户主页/头像.svg'
-      } else if (path === '/main/group') {
-        return '/imgs/群组主页/群组头像.svg'
-      } else {
-        return '/imgs/用户主页/头像.svg'
-      }
+      return this.$store.state.IsGroup ? '/imgs/群组主页/群组头像.svg' : '/imgs/用户主页/头像.svg'
     },
     TopBarLeftImg() {
       const path = this.$route.fullPath
@@ -107,27 +71,22 @@ export default {
       }
     },
     NavPath() {
-      const path = this.$route.fullPath
-      if (path === '/main/user') {
-        return [{ name: '我的实验', path: '/#/main/user', disabled: true }]
-      } else if (path === '/main/group') {
-        return [{ name: '我的课题组', path: '/#/main/group', disabled: true }]
-      } else if (path === '/main/project' && !this.isGroup) {
-        return [{ name: '我的实验', path: '/#/main/user', disabled: false }, { name: '项目', path: '/#/main/project', disabled: true }]
-      } else if (path === '/main/project' && this.isGroup) {
-        return [{ name: '我的课题组', path: '/#/main/group', disabled: false }, { name: '项目', path: '/#/main/project', disabled: true }]
-      } else {
-        return [{}]
-      }
+      return []
     }
   },
   mounted() {
-    // 首次登录时，跳转到个人中心
-    if (this.$store.state.userInfo.firstLogin) {
-      this.$router.push('/main/details')
-    } else {
-      this.init()
-    }
+    window.addEventListener('scroll', () => {
+      const scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop
+      this.$store.dispatch('SaveScrollTop', scrollTop)
+    })
+    window.addEventListener('resize', () => {
+      const height = document.body.clientHeight
+      this.$store.dispatch('SaveHeight', height)
+    })
+  },
+  updated() {
+    const height = document.body.clientHeight
+    this.$store.dispatch('SaveHeight', height)
   }
 }
 </script>
@@ -143,6 +102,7 @@ export default {
   justify-content: space-around;
 
   .left-container {
+    z-index: 20;
     width: 300px;
   }
 

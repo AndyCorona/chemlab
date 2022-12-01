@@ -33,7 +33,7 @@ export default {
     width: 350px;
 
     button {
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.35);
       text-align: center;
       margin-top: 20px;
       width: 300px;

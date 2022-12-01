@@ -1,12 +1,12 @@
 <template>
   <div class="home-view">
-    <toast-props :show="this.ShowModal" :text="text" :state="state" :DurationTime="DurationTime"
-      @close="this.ShowModal = false">
+    <toast-props :show="this.$store.state.ShowToast" :text="this.$store.state.ToastText"
+      :state="this.$store.state.ToastState" :DurationTime="this.$store.state.ToastDurationTime" @close="CloseToast">
     </toast-props>
     <div class="container" :style="`background-image: url(${backgroundImage})`">
       <main>
         <home-header :welcomeText="welcomeText" :productIcon="productIcon"></home-header>
-        <router-view @toast="toast"></router-view>
+        <router-view></router-view>
         <home-footer></home-footer>
       </main>
     </div>
@@ -22,23 +22,19 @@ export default {
     HomeHeader,
     HomeFooter
   },
+  methods: {
+    CloseToast() {
+      setTimeout(() => {
+        this.$store.dispatch('toast', { ShowModal: false })
+        // 魔数
+      }, 300)
+    }
+  },
   data() {
     return {
-      state: 1,
-      text: '发生错误',
-      ShowModal: false,
-      DurationTime: 1500,
       productIcon: this.$config.productIcon,
       welcomeText: this.$config.welcomeText,
       backgroundImage: this.$config.backgroundImage
-    }
-  },
-  methods: {
-    toast(text, state, DurationTime = 1500) {
-      this.text = text
-      this.state = state
-      this.ShowModal = true
-      this.DurationTime = DurationTime
     }
   }
 }

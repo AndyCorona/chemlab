@@ -1,10 +1,11 @@
 <template>
   <div class="main-project">
-    <main-project-and-reaction-title ClassType="reaction-title" ProjectName="项目一" :ReadOnly="false" Value="项目一"></main-project-and-reaction-title>
+    <main-project-and-reaction-title ClassType="reaction-title" ProjectName="项目一" :ReadOnly="false" Value="项目一">
+    </main-project-and-reaction-title>
     <div class="wrapper">
-      <img @click="func" src="/imgs/反应/添加.svg">
-      <img @click="func" src="/imgs/反应/分享.svg">
-      <img @click="func" src="/imgs/反应/删除.svg">
+      <img @click="addReaction" src="/imgs/反应/添加.svg">
+      <img @click="share" src="/imgs/反应/分享.svg">
+      <img @click="deleteReaction" src="/imgs/反应/删除.svg">
     </div>
   </div>
   <main-reaction></main-reaction>
@@ -20,9 +21,25 @@ export default {
     MainReaction
   },
   methods: {
-    func () {
+    init() {
+      // 当用户故意删除 sessionStorage 中的数据时，会查询一个不存在的项目列表，最中返回错误
+      const projectId = sessionStorage.getItem('projectId') === null ? '-1' : sessionStorage.getItem('projectId')
+      // 获取一个项目具体内容
+      this.axios.post('/project', {
+        projectId: projectId,
+        isGroup: this.$store.state.ProjectInfo.isGroup
+      }).then((data) => {
+        this.$store.dispatch('SaveProjectInfo', data)
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+      })
+    },
+    func() {
       alert('成功')
     }
+  },
+  mounted() {
+    this.init()
   }
 }
 </script>

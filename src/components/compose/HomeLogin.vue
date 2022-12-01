@@ -6,11 +6,7 @@
     <home-input @pass="GotPassword" :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/" type="password"
       placeholder="请输入密码" label="密码" name="password"></home-input>
     <div class="forgot-password-tips">
-      <svg viewBox="0 0 1024 1024" width="16px" height="16px" xmlns="http://www.w3.org/2000/svg" data-v-029747aa="">
-        <path fill="#797979"
-          d="M512 64a448 448 0 1 1 0 896 448 448 0 0 1 0-896zm23.744 191.488c-52.096 0-92.928 14.784-123.2 44.352-30.976 29.568-45.76 70.4-45.76 122.496h80.256c0-29.568 5.632-52.8 17.6-68.992 13.376-19.712 35.2-28.864 66.176-28.864 23.936 0 42.944 6.336 56.32 19.712 12.672 13.376 19.712 31.68 19.712 54.912 0 17.6-6.336 34.496-19.008 49.984l-8.448 9.856c-45.76 40.832-73.216 70.4-82.368 89.408-9.856 19.008-14.08 42.24-14.08 68.992v9.856h80.96v-9.856c0-16.896 3.52-31.68 10.56-45.76 6.336-12.672 15.488-24.64 28.16-35.2 33.792-29.568 54.208-48.576 60.544-55.616 16.896-22.528 26.048-51.392 26.048-86.592 0-42.944-14.08-76.736-42.24-101.376-28.16-25.344-65.472-37.312-111.232-37.312zm-12.672 406.208a54.272 54.272 0 0 0-38.72 14.784 49.408 49.408 0 0 0-15.488 38.016c0 15.488 4.928 28.16 15.488 38.016A54.848 54.848 0 0 0 523.072 768c15.488 0 28.16-4.928 38.72-14.784a51.52 51.52 0 0 0 16.192-38.72 51.968 51.968 0 0 0-15.488-38.016 55.936 55.936 0 0 0-39.424-14.784z">
-        </path>
-      </svg>
+      <img src="/imgs/登录页/忘记密码.svg">
       <a href="/#/forgot-password">忘记密码</a>
     </div>
     <home-button @BtnClick="ToUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green">
@@ -25,7 +21,6 @@ import HomeInput from '../basic/HomeInput.vue'
 import HomeButton from '../basic/HomeButton.vue'
 export default {
   name: 'HomeLogin',
-  emits: ['toast'],
   components: {
     HomeInput,
     HomeButton
@@ -44,23 +39,28 @@ export default {
       this.password = value
     },
     ToUserSpace() {
-      if (this.username === '') {
-        this.$emit('toast', '请输入有效的用户名', 1)
-      } else if (this.password === '') {
-        this.$emit('toast', '请输入有效的密码', 1)
-      } else {
-        this.axios.post('/home/login', {
-          username: this.username,
-          password: this.password
-        }).then((data) => {
-          // 将登录之后获取的信息存放到 vuex 中
-          this.$store.commit('saveIsGroup', false)
-          this.$store.commit('saveUserInfo', data)
-          this.$router.push('/main')
-        }).catch((resp) => {
-          this.$emit('toast', resp.msg, 1)
-        })
+      if (!/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/.test(this.username)) {
+        this.$store.commit('toast', { ShowModal: true, text: '用户名不正确' })
+        return
       }
+      if (!/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/.test(this.password)) {
+        this.$store.commit('toast', { ShowModal: true, text: '密码不正确' })
+        return
+      }
+      this.axios.post('/home/login', {
+        username: this.username,
+        password: this.password
+      }).then((data) => {
+        // 首次登录跳转到个人中心
+        if (data.firstLogin) {
+          this.$router.push('/main/details')
+          // 否则直接跳转到个人空间
+        } else {
+          this.$router.push('/main')
+        }
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+      })
     }
   }
 }
@@ -74,9 +74,12 @@ export default {
     position: absolute;
     top: 100px;
     right: 75px;
+    display: flex;
+    align-items: center;
 
-    svg {
-      vertical-align: middle;
+    img {
+      width: 16px;
+      height: 16px;
     }
 
     a {

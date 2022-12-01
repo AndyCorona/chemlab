@@ -1,15 +1,15 @@
 <template>
   <div class="home-signup">
-    <home-input @pass="GotUsername" @intercept="this.$emit('toast', '用户名不合法', 1)"
+    <home-input @pass="GotUsername" @intercept="this.$store.commit('toast', { ShowModal: true, text: '用户名不合法' })"
       :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/" type="text" placeholder="请输入2-20个字符的汉字、英文或数字" label="用户名"
       name="username"></home-input>
-    <home-input @pass="GotEmail" @intercept="this.$emit('toast', '邮箱不合法', 1)"
+    <home-input @pass="GotEmail" @intercept="this.$store.commit('toast', { ShowModal: true, text: '邮箱不合法' })"
       :ValidateExpression="/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/" type="email" placeholder="请输入你的邮箱"
       label="邮箱" name="email"></home-input>
-    <home-input @pass="GotPassword" @intercept="this.$emit('toast', '密码不合法', 1)"
+    <home-input @pass="GotPassword" @intercept="this.$store.commit('toast', { ShowModal: true, text: '密码不合法' })"
       :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/" type="password"
       placeholder="请输入6-20个字符的英文、数字或特殊字符" label="密码" name="password"></home-input>
-    <home-input @pass="GotConfirmPassword" @intercept="this.$emit('toast', '密码不合法', 1)"
+    <home-input @pass="GotConfirmPassword" @intercept="this.$store.commit('toast', { ShowModal: true, text: '密码不合法' })"
       :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/" type="password" placeholder="请再次确认密码" label="二次确认"
       name="password-confirm"></home-input>
     <home-button @BtnClick="Signup" buttonText="注册" buttonStyle="white"></home-button>
@@ -50,7 +50,7 @@ export default {
     GotConfirmPassword(value) {
       // 两次密码保持一致
       if (this.password !== value) {
-        this.$emit('toast', '两次输入密码不一致', 1)
+        this.$store.commit('toast', { ShowModal: true, text: '两次输入密码不一致' })
       } else {
         this.ConfirmPassword = value
       }
@@ -65,18 +65,18 @@ export default {
         }).then(() => {
           this.$router.push('/register-success')
         }).catch((resp) => {
-          this.$emit('toast', resp.msg, 1)
+          this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
         })
       } else if (this.username === '') {
-        this.$emit('toast', '用户名不合法', 1)
+        this.$store.commit('toast', { ShowModal: true, text: '用户名不合法' })
       } else if (this.email === '') {
-        this.$emit('toast', '邮箱不合法', 1)
+        this.$store.commit('toast', { ShowModal: true, text: '邮箱不合法' })
       } else if (this.password === '' || this.ConfirmPassword === '') {
-        this.$emit('toast', '密码不合法', 1)
+        this.$store.commit('toast', { ShowModal: true, text: '密码不合法' })
       } else if (this.password !== this.ConfirmPassword) {
-        this.$emit('toast', '两次输入密码不一致', 1)
+        this.$store.commit('toast', { ShowModal: true, text: '两次输入密码不一致' })
       } else {
-        this.$emit('toast', '未知错误，有 BUG', 1)
+        this.$store.commit('toast', { ShowModal: true, text: '位置错误，有 BUG !!!' })
       }
     }
   }

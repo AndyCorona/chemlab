@@ -63,7 +63,8 @@ export default {
       border-bottom: 1px solid #AAAAAA;
     }
 
-    input {
+    input,
+    input:focus {
       font-size: 14px;
       width: 300px;
       height: 40px;
@@ -71,9 +72,16 @@ export default {
       padding: 6px 10px;
       box-sizing: border-box;
       background-color: #E0E6E3;
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
       border-radius: 5px;
       border: none;
+    }
+
+    input {
+      box-shadow: inset 0 0 4px 1px rgba(0, 0, 0, 0.35);
+    }
+
+    input:focus {
+      box-shadow: inset 0 0 4px 1px rgba(0, 0, 0, 0.35), 0 0 10px 0 #99C8C9;
     }
 
     input::placeholder {

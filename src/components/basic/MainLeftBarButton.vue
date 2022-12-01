@@ -23,6 +23,7 @@ export default {
   cursor: pointer;
   border-bottom: 1px solid #FFFFFF;
   z-index: 10;
+
   .wrapper {
 
     display: flex;
@@ -40,6 +41,12 @@ export default {
       height: 32px;
       margin: 14px 20px;
     }
+  }
+}
+
+.main-left-bar-button:hover {
+  span {
+    color: #638271;
   }
 }
 </style>

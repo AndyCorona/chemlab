@@ -1,9 +1,10 @@
 <template>
-  <div class="common-info-modal">
-    <div class="mask" :class="open" @click="animate" :style="
-    `height:${height}px;width:${width}px`">
+  <div class="common-info-modal" @wheel.prevent="">
+    <div class="mask" :class="open" @click="closeAndEmitNo" :style="
+    `height:${this.$store.state.height}px`">
     </div>
-    <div class="modal" :class="[dynamic, open]">
+    <div class="modal" :class="open"
+      :style="`top:${this.open === 'open' ? this.$store.state.ScrollTop + 350 : -100}px`">
       <div class="modal-header">
         <img src="/imgs/Dialog/提醒.svg">
         <span>{{ ShowTitle }}</span>
@@ -30,10 +31,7 @@ export default {
   },
   data() {
     return {
-      dynamic: '',
-      open: this.show ? 'open' : 'close',
-      height: '1080',
-      width: '1920'
+      open: this.show ? 'open' : 'close'
     }
   },
   watch: {
@@ -42,9 +40,6 @@ export default {
         this.open = 'open'
       }
     }
-  },
-  mounted() {
-    this.height = document.body.clientHeight
   },
   methods: {
     close() {
@@ -57,12 +52,6 @@ export default {
     closeAndEmitNo() {
       this.$emit('no')
       this.close()
-    },
-    animate() {
-      this.dynamic = 'dynamic'
-      setTimeout(() => {
-        this.dynamic = ''
-      }, 300)
     }
   }
 }
@@ -71,6 +60,7 @@ export default {
 <style lang="scss">
 .common-info-modal {
   .mask {
+    width: 1920px;
     margin: 0 auto;
     backdrop-filter: blur(5px);
     position: absolute;
@@ -82,10 +72,9 @@ export default {
   .modal {
     transition: all .3s;
     z-index: 200;
-    width: 320px;
-    height: 180px;
+    min-width: 320px;
     position: absolute;
-    top: 40%;
+    // top: 540px;
     left: 50%;
     translate: -50% -50%;
     background-color: #FFFFFF;
@@ -93,6 +82,7 @@ export default {
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.35);
 
     .modal-header {
+      align-items: center;
       display: flex;
       box-sizing: border-box;
       padding: 20px;
@@ -113,6 +103,7 @@ export default {
     }
 
     .modal-body {
+      padding: 20px;
       font-size: 16px;
       text-align: center;
       margin-bottom: 20px;
@@ -120,7 +111,7 @@ export default {
 
     .modal-footer {
       display: flex;
-      margin: 0 60px;
+      margin: 20px 60px;
       justify-content: space-between;
 
       button {
@@ -144,14 +135,7 @@ export default {
         border: 2px solid #638271;
         color: #FFFFFF;
       }
-
     }
-  }
-
-  .dynamic {
-    width: 330px;
-    height: 197px;
-    transition: all .3s;
   }
 
   .close {

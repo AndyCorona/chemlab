@@ -2,7 +2,7 @@
   <div class="main-left-bar-title">
     <div class="wrapper">
       <img src="/imgs/左边栏/群组.svg">
-      <span>{{ title }}</span>
+      <span class="word-wrap">{{ title }}</span>
     </div>
   </div>
 
@@ -12,7 +12,7 @@ export default {
   name: 'MainLeftBarTitle',
   computed: {
     title() {
-      return this.$store.state.userInfo.groupName === undefined ? '暂未加入' : this.$store.state.userInfo.groupName
+      return this.$store.state.GroupInfo.groupUUID === undefined ? '暂未加入' : this.$store.state.GroupInfo.groupName
     }
   }
 }
@@ -32,6 +32,7 @@ export default {
     justify-content: flex-start;
 
     span {
+      padding-right: 5px;
       font-size: 18px;
       font-weight: bold;
       color: #000000;

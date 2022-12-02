@@ -1,14 +1,13 @@
 <template>
   <div class="top-bar">
     <div class="left">
-      <img :src="TopBarLeftImg">
-      <a :style="`pointer-events: ${item.disabled ? 'none' : 'auto'}`" v-for="(item, index) in NavPath" :key="index"
-        :href="item.path">{{ item.name
-        }}</a>
+      <img :src="topBarLeftImg">
+      <a class="word-wrap" :style="`pointer-events: ${item.disabled ? 'none' : 'auto'}`"
+        v-for="(item, index) in navPath" :key="index" :href="item.path">{{ item.name }}</a>
     </div>
     <div class="right">
-      <main-drop-list :src="TopBarSettingImg"></main-drop-list>
-      <img class="logout" @click="Logout" :src="TopBarLogoutImg">
+      <main-drop-list :src="topBarSettingImg"></main-drop-list>
+      <img class="logout" @click="logout" :src="topBarLogoutImg">
     </div>
   </div>
 </template>
@@ -21,24 +20,24 @@ export default {
     MainDropList
   },
   props: {
-    TopBarLeftImg: String,
-    TopBarSettingImg: String,
-    TopBarLogoutImg: String,
-    NavPath: Array
+    topBarLeftImg: String,
+    topBarSettingImg: String,
+    topBarLogoutImg: String,
+    navPath: Array
   },
   methods: {
-    Logout() {
-      this.$store.commit('dialog', { ShowModal: true, text: '是否退出?', title: '退出提醒' })
-      this.$store.commit('BindOkEvent', this.ConfirmLogout)
+    logout() {
+      this.$store.commit('dialog', { text: '是否退出?', title: '退出提醒' })
+      this.$store.commit('bindOkEvent', this.confirmLogout)
     },
-    ConfirmLogout() {
+    confirmLogout() {
       this.axios.get('/main/logout')
         .then(() => {
           this.$router.push('/')
         }).catch((resp) => {
-          this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+          this.$store.dispatch('toast', { text: resp.msg })
         })
-      this.$store.commit('dialog', { ShowModal: false })
+      this.$store.commit('dialog', { showModal: false })
     }
   }
 }
@@ -56,6 +55,7 @@ export default {
   border-bottom: 1px solid #D7D7D7;
 
   .left {
+    width: 1500px;
     display: flex;
     align-items: center;
 
@@ -66,6 +66,7 @@ export default {
     }
 
     a {
+      max-width: 33%;
       font-size: 20px;
       color: #000000;
     }
@@ -74,7 +75,7 @@ export default {
       color: gray;
     }
 
-    a:after {
+    a::before {
       content: '/';
       padding: 0 5px;
       color: #000000;

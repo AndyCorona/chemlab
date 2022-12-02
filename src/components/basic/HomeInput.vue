@@ -2,8 +2,7 @@
   <div class="home-input">
     <div class="wrapper">
       <label>{{ label }}</label>
-      <input :readonly="ReadOnly" @change="validate" autocomplete="off" :type="type" :placeholder="placeholder"
-        :name="name" v-model="value">
+      <input :readonly="readOnly" @change="validate" autocomplete="off" :type="type" :placeholder="placeholder" v-model="value">
     </div>
   </div>
 </template>
@@ -17,9 +16,8 @@ export default {
     type: String,
     placeholder: String,
     label: String,
-    name: String,
-    ValidateExpression: RegExp,
-    ReadOnly: {
+    validateExpression: RegExp,
+    readOnly: {
       type: Boolean,
       default: false
     }
@@ -32,7 +30,7 @@ export default {
   methods: {
     // 外部传入正则表达式，验证成功触发 pass 事件，验证失败触发 intercept 事件
     validate() {
-      if (this.ValidateExpression.test(this.value)) {
+      if (this.validateExpression.test(this.value)) {
         // 校验成功
         this.$emit('pass', this.value)
       } else {

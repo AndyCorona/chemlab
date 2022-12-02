@@ -1,7 +1,7 @@
 <template>
   <div class="toast-props" :class="open"
-    :style="`top:${this.open ==='open' ? this.$store.state.ScrollTop + 200 :-100}px`">
-    <div class="toast-container" :id="ClassState">
+    :style="`top:${this.open ==='open' ? this.$store.state.scrollTop + 200 :-100}px`">
+    <div class="toast-container" :id="classState">
       <img :src="icon">
       <span>{{ text }}</span>
     </div>
@@ -20,18 +20,18 @@ export default {
     // 0 代表成功， 1 代表失败， 2 代表禁止
     state: Number,
     // 持续时间
-    DurationTime: Number
+    durationTime: Number
   },
   data() {
     return {
       open: this.show,
-      ToastSuccess: this.$config.ToastSuccess,
-      ToastFail: this.$config.ToastFail,
-      ToastForbid: this.$config.ToastForbid
+      toastSuccess: this.$config.toastSuccess,
+      toastFail: this.$config.toastFail,
+      toastForbid: this.$config.toastForbid
     }
   },
   computed: {
-    ClassState() {
+    classState() {
       if (this.state === 0) {
         return 'success'
       } else if (this.state === 1) {
@@ -44,11 +44,11 @@ export default {
     },
     icon() {
       if (this.state === 0) {
-        return this.ToastSuccess
+        return this.toastSuccess
       } else if (this.state === 1) {
-        return this.ToastFail
+        return this.toastFail
       } else if (this.state === 2) {
-        return this.ToastForbid
+        return this.toastForbid
       } else {
         return ''
       }
@@ -63,7 +63,7 @@ export default {
           setTimeout(() => {
             this.open = 'close'
             this.$emit('close')
-          }, this.DurationTime)
+          }, this.durationTime)
         }
       },
       immediate: true

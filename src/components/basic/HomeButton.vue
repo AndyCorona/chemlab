@@ -2,7 +2,7 @@
   <div class="home-button">
     <div class="wrapper">
       <button :style="`cursor:${this.disabled ? 'not-allowed' : 'pointer'}`" :disabled="disabled" :class="buttonStyle"
-        @click="this.$emit('BtnClick')">{{ buttonText }}</button>
+        @click="this.$emit('btnClick')">{{ buttonText }}</button>
     </div>
   </div>
 </template>
@@ -10,17 +10,13 @@
 <script>
 export default {
   name: 'HomeButton',
-  emits: ['BtnClick'],
+  emits: ['btnClick'],
   props: {
     buttonText: String,
     buttonStyle: String,
     disabled: {
       type: Boolean,
       default: false
-    }
-  },
-  data() {
-    return {
     }
   }
 }

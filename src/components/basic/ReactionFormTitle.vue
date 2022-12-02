@@ -1,7 +1,7 @@
 <template>
   <div class="reaction-form-title">
     <img src="/imgs/实验内容/实验标题.svg">
-    <input type="text" name="title" v-model="FormData.title">
+    <input type="text" name="title" v-model="formData.title">
   </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
   name: 'ReactionFormTitle',
   data () {
     return {
-      FormData: {
+      formData: {
         title: '未命名'
       }
     }

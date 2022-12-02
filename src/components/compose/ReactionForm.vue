@@ -1,16 +1,15 @@
 <template>
   <div class="reaction-form">
-
     <form>
       <reaction-form-title></reaction-form-title>
-      <reaction-save-template-modal :show="ShowSaveTemplateModal" @close="this.ShowSaveTemplateModal = false">
+      <reaction-save-template-modal :show="showSaveTemplateModal" @close="this.showSaveTemplateModal = false">
       </reaction-save-template-modal>
-      <reaction-select-template-modal :show="ShowSelectTemplateModal" @close="this.ShowSelectTemplateModal = false">
+      <reaction-select-template-modal :show="showSelectTemplateModal" @close="this.showSelectTemplateModal = false">
       </reaction-select-template-modal>
       <div class="tool">
         <img src="/imgs/实验内容/保存实验.svg">
-        <img src="/imgs/实验内容/保存模板.svg" @click="this.ShowSaveTemplateModal = true">
-        <img src="/imgs/实验内容/我的模板.svg" @click="this.ShowSelectTemplateModal = true">
+        <img src="/imgs/实验内容/保存模板.svg" @click="this.showSaveTemplateModal = true">
+        <img src="/imgs/实验内容/我的模板.svg" @click="this.showSelectTemplateModal = true">
       </div>
       <reaction-form-date></reaction-form-date>
       <!-- <test-me :list="modules"></test-me> -->
@@ -49,11 +48,31 @@ export default {
   },
   data() {
     return {
-      ShowSaveTemplateModal: false,
-      ShowSelectTemplateModal: false,
+      showSaveTemplateModal: false,
+      showSelectTemplateModal: false,
       modules: [
         'scheme', 'table', 'text', 'data', 'reference'
       ]
+    }
+  },
+  mounted() {
+    this.init()
+  },
+  methods: {
+    init() {
+      // 当用户故意删除 sessionStorage 中的数据时，会查询一个不存在的反应列表，最终返回错误
+      const reactionId = sessionStorage.getItem('reactionId') === null ? '-1' : sessionStorage.getItem('reactionId')
+      // 获取一个项目具体内容
+      this.axios.get('/reaction', {
+        reactionId: reactionId,
+        isGroup: this.$store.state.isGroup
+      }).then((data) => {
+        this.projectName = data.projectName
+        sessionStorage.setItem('projectName', data.projectName)
+        this.$store.dispatch('saveProjectInfo', data)
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { text: resp.msg })
+      })
     }
   }
 }
@@ -65,6 +84,8 @@ export default {
   display: inline-block;
   width: 1320px;
   min-height: 1080px;
+  border-left: 1px solid #D7D7D7;
+  border-right: 1px solid #D7D7D7;
 
   form {
     position: relative;

@@ -43,14 +43,14 @@ export default {
     this.height = document.body.clientHeight
   },
   methods: {
-    EmitClose() {
+    emitClose() {
       this.$emit('close')
     },
     close() {
       this.open = 'close'
     },
     closeAndEmit() {
-      this.EmitClose()
+      this.emitClose()
       this.close()
     }
   }

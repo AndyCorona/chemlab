@@ -2,7 +2,7 @@
   <div class="home-activate-success">
     <p>激活成功！</p>
     <p>请使用用户名和密码登录！</p>
-    <home-button @click.prevent="ToLogin" buttonText="返回登录" buttonStyle="gray"></home-button>
+    <home-button @click.prevent="toLogin" buttonText="返回登录" buttonStyle="gray"></home-button>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
     HomeButton
   },
   methods: {
-    ToLogin () {
+    toLogin () {
       this.$router.push('/login')
     }
   }

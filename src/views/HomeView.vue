@@ -1,7 +1,7 @@
 <template>
   <div class="home-view">
-    <toast-props :show="this.$store.state.ShowToast" :text="this.$store.state.ToastText"
-      :state="this.$store.state.ToastState" :DurationTime="this.$store.state.ToastDurationTime" @close="CloseToast">
+    <toast-props :show="this.$store.state.showToast" :text="this.$store.state.toastText"
+      :state="this.$store.state.toastState" :durationTime="this.$store.state.toastDurationTime" @close="closeToast">
     </toast-props>
     <div class="container" :style="`background-image: url(${backgroundImage})`">
       <main>
@@ -23,9 +23,9 @@ export default {
     HomeFooter
   },
   methods: {
-    CloseToast() {
+    closeToast() {
       setTimeout(() => {
-        this.$store.dispatch('toast', { ShowModal: false })
+        this.$store.dispatch('toast', { showModal: false })
         // 魔数
       }, 300)
     }

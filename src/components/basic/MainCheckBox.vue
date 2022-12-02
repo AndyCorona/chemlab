@@ -2,8 +2,8 @@
   <div class="main-check-box">
     <!-- 防止点击复选框之后跳转页面 -->
     <div class="active" @click.stop="">
-      <input type="checkbox" :id="`checkbox${RandomNum}`">
-      <label :for="`checkbox${RandomNum}`"></label>
+      <input :reactionId="this.reactionId" type="checkbox" :id="`checkbox${randomNum}`" @change="changeFunc">
+      <label :for="`checkbox${randomNum}`"></label>
     </div>
   </div>
 </template>
@@ -11,13 +11,22 @@
 <script>
 export default {
   name: 'MainCheckBox',
-  data () {
+  emits: ['change'],
+  data() {
     return {
-      RandomNum: 1
+      randomNum: 1
     }
   },
-  mounted () {
-    this.RandomNum = Math.random()
+  methods: {
+    changeFunc(event) {
+      this.$emit('change', this.reactionId, event.target.checked)
+    }
+  },
+  props: {
+    reactionId: Number
+  },
+  mounted() {
+    this.randomNum = Math.random()
   }
 }
 </script>

@@ -4,13 +4,13 @@
     `height:${this.$store.state.height}px`">
     </div>
     <div class="modal" :class="open"
-      :style="`top:${this.open === 'open' ? this.$store.state.ScrollTop + 350 : -100}px`">
+      :style="`top:${this.open === 'open' ? this.$store.state.scrollTop + 350 : -100}px`">
       <div class="modal-header">
         <img src="/imgs/Dialog/提醒.svg">
-        <span>{{ ShowTitle }}</span>
+        <span>{{ showTitle }}</span>
       </div>
       <div class="modal-body">
-        <div>{{ ShowText }}</div>
+        <div>{{ showText }}</div>
       </div>
       <div class="modal-footer">
         <button @click.prevent="closeAndEmitOk" class="save">是</button>
@@ -25,8 +25,8 @@ export default {
   name: 'CommonInfoModal',
   emits: ['ok', 'no'],
   props: {
-    ShowText: String,
-    ShowTitle: String,
+    showText: String,
+    showTitle: String,
     show: Boolean
   },
   data() {
@@ -66,12 +66,12 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 100;
+    z-index: 300;
   }
 
   .modal {
     transition: all .3s;
-    z-index: 200;
+    z-index: 400;
     min-width: 320px;
     position: absolute;
     // top: 540px;

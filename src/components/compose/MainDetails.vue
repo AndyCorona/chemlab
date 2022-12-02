@@ -7,49 +7,48 @@
           <label>邮箱：</label>
           <input type="text" readonly :placeholder="this.email">
         </div>
-        <div class="wrapper" :class="this.BasicToggle ? 'unchangable' : 'changable'">
+        <div class="wrapper" :class="basitStyle">
           <label>用户名：</label>
-          <input @change="ValidateUsername" type="text" :readonly="BasicToggle" v-model="username"
+          <input @change="validateUsername" type="text" :readonly="basicToggle" v-model="username"
             :placeholder="this.username">
         </div>
-        <div class="wrapper" :class="this.BasicToggle ? 'unchangable' : 'changable'">
+        <div class="wrapper" :class="basitStyle">
           <label>密码：</label>
-          <input @change="ValidatePassword" type="password" :readonly="BasicToggle" v-model="password"
+          <input @change="validatePassword" type="password" :readonly="basicToggle" v-model="password"
             :placeholder="this.password">
         </div>
-        <div class="wrapper" :class="this.BasicToggle ? 'unchangable' : 'changable'"
-          :style="`opacity:${BasicToggle ? '0' : '100%'}`">
+        <div class="wrapper" :class="basitStyle" :style="`opacity:${basicToggle ? '0' : '100%'}`">
           <label>确认密码：</label>
-          <input @change="ValidateConfirmPassword" type="password" :readonly="BasicToggle" v-model="ConfirmPassword"
-            :placeholder="this.ConfirmPassword">
+          <input @change="validateConfirmPassword" type="password" :readonly="basicToggle" v-model="confirmPassword"
+            :placeholder="this.confirmPassword">
         </div>
         <div class="wrapper">
-          <button class="save" @click.prevent="SaveBasic">保存</button>
-          <button class="toggle" @click.prevent="this.BasicToggle = !BasicToggle">修改</button>
+          <button class="save" @click.prevent="saveBasic">保存</button>
+          <button class="toggle" @click.prevent="this.basicToggle = !basicToggle">修改</button>
         </div>
       </div>
     </div>
     <div class="right-container">
       <label class="title">个人信息</label>
       <div class="personal-details">
-        <div class="wrapper" :class="this.PersonalToggle ? 'unchangable' : 'changable'">
+        <div class="wrapper" :class="personalStyle">
           <label>学校：</label>
-          <input @change="ValidateSchool" type="text" :readonly="PersonalToggle" v-model="school"
+          <input @change="validateSchool" type="text" :readonly="personalToggle" v-model="school"
             :placeholder="this.school">
         </div>
-        <div class="wrapper" :class="this.PersonalToggle ? 'unchangable' : 'changable'">
+        <div class="wrapper" :class="personalStyle">
           <label>专业：</label>
-          <input @change="ValidateMajor" type="text" :readonly="PersonalToggle" v-model="major"
+          <input @change="validateMajor" type="text" :readonly="personalToggle" v-model="major"
             :placeholder="this.major">
         </div>
-        <div class="wrapper" :class="this.PersonalToggle ? 'unchangable' : 'changable'">
+        <div class="wrapper" :class="personalStyle">
           <label>研究领域：</label>
-          <input @change="ValidateField" type="text" :readonly="PersonalToggle" v-model="field"
+          <input @change="validateField" type="text" :readonly="personalToggle" v-model="field"
             :placeholder="this.field">
         </div>
         <div class="wrapper">
-          <button class="save" @click.prevent="SavePersonal">保存</button>
-          <button class="toggle" @click.prevent="this.PersonalToggle = !PersonalToggle">修改</button>
+          <button class="save" @click.prevent="savePersonal">保存</button>
+          <button class="toggle" @click.prevent="this.personalToggle = !personalToggle">修改</button>
         </div>
       </div>
     </div>
@@ -65,63 +64,63 @@ export default {
       username: '',
       email: '',
       password: '111111',
-      ConfirmPassword: '',
+      confirmPassword: '',
       school: '',
       major: '',
       field: '',
       // 个人信息不可修改
-      PersonalToggle: true,
+      personalToggle: true,
       // 基本信息不可修改
-      BasicToggle: true
+      basicToggle: true
     }
   },
   methods: {
-    ValidateUsername() {
+    validateUsername() {
       if (!this.validate(/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/, this.username)) {
-        this.$store.dispatch('toast', { ShowModal: true, text: '请输入有效的用户名' })
+        this.$store.commit('toast', { text: '请输入有效的用户名' })
       } else {
         return true
       }
     },
-    ValidatePassword() {
+    validatePassword() {
       if (!this.validate(/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/, this.password)) {
-        this.$store.dispatch('toast', { ShowModal: true, text: '请输入有效的密码' })
+        this.$store.commit('toast', { text: '请输入有效的密码' })
       } else {
         return true
       }
     },
-    ValidateConfirmPassword() {
-      if (!this.validate(/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/, this.ConfirmPassword)) {
-        this.$store.dispatch('toast', { ShowModal: true, text: '请输入有效的密码' })
-      } else if (this.password !== this.ConfirmPassword) {
-        this.$store.dispatch('toast', { ShowModal: true, text: '两次输入密码不一致' })
+    validateConfirmPassword() {
+      if (!this.validate(/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/, this.confirmPassword)) {
+        this.$store.commit('toast', { text: '请输入有效的密码' })
+      } else if (this.password !== this.confirmPassword) {
+        this.$store.commit('toast', { text: '两次输入密码不一致' })
       } else {
         return true
       }
     },
-    ValidateSchool() {
+    validateSchool() {
       if (!this.validate(/^[A-Za-z\u4e00-\u9fa5]{0,20}$/, this.school)) {
-        this.$store.dispatch('toast', { ShowModal: true, text: '请输入有效的学校名称' })
+        this.$store.commit('toast', { text: '请输入有效的学校名称' })
       } else {
         return true
       }
     },
-    ValidateMajor() {
+    validateMajor() {
       if (!this.validate(/^[A-Za-z\u4e00-\u9fa5]{0,20}$/, this.major)) {
-        this.$store.dispatch('toast', { ShowModal: true, text: '请输入有效的专业名称' })
+        this.$store.commit('toast', { text: '请输入有效的专业名称' })
       } else {
         return true
       }
     },
-    ValidateField() {
+    validateField() {
       if (!this.validate(/^[A-Za-z\u4e00-\u9fa5]{0,20}$/, this.field)) {
-        this.$store.dispatch('toast', { ShowModal: true, text: '请输入有效的研究方向' })
+        this.$store.commit('toast', { text: '请输入有效的研究方向' })
       } else {
         return true
       }
     },
-    validate(ValidateExpression, value) {
-      return ValidateExpression.test(value)
+    validate(validateExpression, value) {
+      return validateExpression.test(value)
     },
     init({ username, email, school, major, field }) {
       this.username = username
@@ -130,28 +129,28 @@ export default {
       this.major = major
       this.field = field
     },
-    SaveBasic() {
-      if (this.ValidateUsername() && this.ValidatePassword() && this.ValidateConfirmPassword()) {
+    saveBasic() {
+      if (this.validateUsername() && this.validatePassword() && this.validateConfirmPassword()) {
         this.axios.post('/main/update-basic', {
           username: this.username,
           password: this.password
         }).then(() => {
-          this.$store.dispatch('toast', { ShowModal: true, text: '修改成功', state: 0 })
+          this.$store.dispatch('toast', { text: '修改成功', state: 0 })
         }).catch((resp) => {
-          this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+          this.$store.dispatch('toast', { text: resp.msg })
         })
       }
     },
-    SavePersonal() {
-      if (this.ValidateSchool() && this.ValidateMajor() && this.ValidateField()) {
+    savePersonal() {
+      if (this.validateSchool() && this.validateMajor() && this.validateField()) {
         this.axios.post('/main/update-me', {
           school: this.school === '' ? '门头沟大学' : this.school,
           major: this.major === '' ? '化学' : this.major,
           field: this.field === '' ? '有机' : this.field
         }).then(() => {
-          this.$store.dispatch('toast', { ShowModal: true, text: '修改成功', state: 0 })
+          this.$store.dispatch('toast', { text: '修改成功', state: 0 })
         }).catch((resp) => {
-          this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+          this.$store.dispatch('toast', { text: resp.msg })
         })
       }
     }
@@ -161,8 +160,16 @@ export default {
     this.axios.get('/main/info').then((data) => {
       this.init(data)
     }).catch((resp) => {
-      this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+      this.$store.dispatch('toast', { text: resp.msg })
     })
+  },
+  computed: {
+    basitStyle() {
+      return this.basicToggle ? 'unchangable' : 'changable'
+    },
+    personalStyle() {
+      return this.personalToggle ? 'unchangable' : 'changable'
+    }
   }
 }
 </script>

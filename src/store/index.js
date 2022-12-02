@@ -2,79 +2,89 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    IsGroup: null,
-    GroupInfo: {},
-    ProjectInfo: {},
+    isGroup: null,
+    // 保存群组信息
+    groupInfo: {},
+    // 保存项目信息
+    projectInfo: {},
+    // 保存反应信息
+    reactionInfo: {},
     // toast 默认值
-    ToastState: null,
-    ToastText: null,
-    ShowToast: null,
-    ToastDurationTime: null,
+    toastState: null,
+    toastText: null,
+    showToast: null,
+    toastDurationTime: null,
     // dialog 默认值
-    DialogText: null,
-    DialogTitle: null,
-    ShowDialog: null,
-    OkEvent: null,
+    dialogText: null,
+    dialogTitle: null,
+    showDialog: null,
+    okEvent: null,
     // toast 和 dialog 自适应参数
-    ScrollTop: 0,
+    scrollTop: 0,
     height: 1080
   },
   getters: {
   },
   mutations: {
-    SaveGroupInfo(state, payload) {
-      state.GroupInfo = payload
+    saveGroupInfo(state, payload) {
+      state.groupInfo = payload
     },
-    SaveIsGroup(state, payload) {
-      state.IsGroup = payload
+    saveIsGroup(state, payload) {
+      state.isGroup = payload
     },
-    SaveProjectInfo(state, payload) {
-      state.ProjectInfo = payload
+    saveProjectInfo(state, payload) {
+      state.projectInfo = payload
     },
-    SaveScrollTop(state, payload) {
-      state.ScrollTop = payload
+    saveReactionInfo(state, payload) {
+      state.projectInfo = payload
     },
-    SaveHeight(state, payload) {
+    saveScrollTop(state, payload) {
+      state.scrollTop = payload
+    },
+    saveHeight(state, payload) {
       state.height = payload
     },
     toast(state, payload) {
-      state.ShowToast = payload.ShowModal === undefined ? false : payload.ShowModal
-      state.ToastText = payload.text === undefined ? '出 BUG !!!' : payload.text
-      state.ToastState = payload.state === undefined ? 1 : payload.state
-      state.ToastDurationTime = payload.DurationTime === undefined ? 1500 : payload.DurationTime
+      state.showToast = payload.showModal === undefined ? true : payload.showModal
+      state.toastText = payload.text === undefined ? '出 BUG !!!' : payload.text
+      state.toastState = payload.state === undefined ? 1 : payload.state
+      state.toastDurationTime = payload.durationTime === undefined ? 1500 : payload.durationTime
     },
     dialog(state, payload) {
-      state.ShowDialog = payload.ShowModal === undefined ? false : payload.ShowModal
-      state.DialogText = payload.text === undefined ? '出 BUG !!!' : payload.text
-      state.DialogTitle = payload.title === undefined ? '提醒: 出 BUG !!!' : payload.title
+      state.dialogText = payload.text === undefined ? '出 BUG !!!' : payload.text
+      state.dialogTitle = payload.title === undefined ? '提醒: 出 BUG !!!' : payload.title
+      state.showDialog = payload.showModal === undefined ? true : payload.showModal
     },
-    DialogStateChange(state, payload) {
+    dialogStateChange(state, payload) {
       // 点击确认时，执行确认事件
       if (payload) {
-        this.state.OkEvent()
+        this.state.okEvent()
       }
       // 确认或取消都需要关闭对话框
-      this.state.ShowDialog = false
+      this.state.showDialog = false
     },
-    BindOkEvent(state, payload) {
-      state.OkEvent = payload
+    bindOkEvent(state, payload) {
+      state.okEvent = payload
     }
   },
   actions: {
-    SaveGroupInfo(context, payload) {
-      context.commit('SaveGroupInfo', payload)
+    saveGroupInfo(context, payload) {
+      context.commit('saveGroupInfo', payload)
     },
-    SaveIsGroup(context, payload) {
-      context.commit('SaveIsGroup', payload)
+    saveIsGroup(context, payload) {
+      context.commit('saveIsGroup', payload)
     },
-    SaveProjectInfo(context, payload) {
-      context.commit('SaveProjectInfo', payload)
+    saveProjectInfo(context, payload) {
+      context.commit('saveProjectInfo', payload)
     },
-    SaveScrollTop(context, payload) {
-      context.commit('SaveScrollTop', payload)
+    saveReactionInfo(context, payload) {
+      context.commit('saveReactionInfo', payload)
     },
-    SaveHeight(context, payload) {
-      context.commit('SaveHeight', payload)
+    saveScrollTop(context, payload) {
+      context.commit('saveScrollTop', payload)
+    },
+    saveHeight(context, payload) {
+      context.commit('saveHeight', payload)
     },
     toast(context, payload) {
       context.commit('toast', payload)
@@ -82,11 +92,11 @@ export default createStore({
     dialog(context, payload) {
       context.commit('dialog', payload)
     },
-    DialogStateChange(context, payload) {
-      context.commit('DialogStateChange', payload)
+    dialogStateChange(context, payload) {
+      context.commit('dialogStateChange', payload)
     },
-    BindOkEvent(context, payload) {
-      context.commit('BindOkEvent', payload)
+    bindOkEvent(context, payload) {
+      context.commit('bindOkEvent', payload)
     }
   },
   modules: {

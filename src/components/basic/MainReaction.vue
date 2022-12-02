@@ -1,13 +1,13 @@
 <template>
   <div class="main-reaction">
-    <div class="wrapper" v-for="(item, i) in ReactionList" :key="i"
-      @click="this.$router.push('/main/project/reaction')">
+    <div class="wrapper" v-for="(item, i) in reactionList" :key="i"
+      @click="this.$router.push(`/main/${this.$store.state.isGroup ? 'group' : 'user'}/project/reaction`)">
       <p class="word-wrap">{{ item.name }}</p>
       <p>{{ item.updateDate }}</p>
       <p>
         <span class="word-wrap" v-for="(tag, j) in item.tags" :key="j">{{ tag }}</span>
       </p>
-      <main-check-box></main-check-box>
+      <main-check-box v-show="show" @change="selection" :ReactionId="item.id"></main-check-box>
     </div>
   </div>
 </template>
@@ -19,22 +19,34 @@ export default {
   components: {
     MainCheckBox
   },
+  props: {
+    show: Boolean
+  },
+  emits: ['change'],
   data() {
     return {
+      reactionIdList: []
     }
   },
   computed: {
-    ReactionList() {
-      return this.$store.state.ProjectInfo.reactions
+    reactionList() {
+      return this.$store.state.projectInfo.reactions
     }
   },
   methods: {
-    init() {
-
+    selection(reactionId, checked) {
+      if (checked) {
+        this.reactionIdList.push(reactionId)
+      } else {
+        // 遍历数组，找到该 id 对应的下标，然后进行删除
+        this.reactionIdList.forEach((item, index) => {
+          if (item === reactionId) {
+            this.reactionIdList.splice(index, 1)
+          }
+        })
+      }
+      this.$emit('change', this.reactionIdList)
     }
-  },
-  mounted() {
-    this.init()
   }
 }
 </script>

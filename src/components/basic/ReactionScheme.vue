@@ -1,12 +1,12 @@
 <template>
   <div class="reaction-scheme">
     <reaction-module-title placeholder="图片" name="scheme"></reaction-module-title>
-    <div class="container" v-show="NoImg">
+    <div class="container" v-show="noImg">
       <label :for="`img${randomNum}`">+</label>
       <input ref="inputRef" :id="`img${randomNum}`" type="file" @change="previewImg($event)">
     </div>
-    <div class="container" v-show="!NoImg">
-      <img :src="ImgPath" @click="changeInputFile">
+    <div class="container" v-show="!noImg">
+      <img :src="imgPath" @click="changeInputFile">
     </div>
   </div>
 </template>
@@ -20,20 +20,20 @@ export default {
   },
   data() {
     return {
-      ImgPath: '',
+      imgPath: '',
       randomNum: Math.random(),
       title: '',
-      NoImg: true
+      noImg: true
     }
   },
   methods: {
     previewImg(event) {
-      this.NoImg = false
+      this.noImg = false
       const file = event.target.files[0]
       const reader = new FileReader()
 
       reader.addEventListener('load', () => {
-        this.ImgPath = reader.result
+        this.imgPath = reader.result
       }, false)
 
       if (file) {

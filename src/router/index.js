@@ -10,10 +10,8 @@ import HomeUpdatepassword from '../components/compose/HomeUpdatePassword.vue'
 import HomeSignup from '../components/compose/HomeSignup.vue'
 import MainView from '../views/MainView.vue'
 import MainDetails from '../components/compose/MainDetails.vue'
-import MainUser from '../components/compose/MainUser.vue'
-import MainGroup from '../components/compose/MainGroup.vue'
+import MainUserAndGroup from '../components/compose/MainUserAndGroup.vue'
 import MainProject from '../components/compose/MainProject.vue'
-import ReactionView from '../views/ReactionView.vue'
 import ErrorView from '../views/ErrorView.vue'
 const routes = [
   {
@@ -64,12 +62,12 @@ const routes = [
   },
   {
     path: '/privacy-policy',
-    name: 'privacyPolicy',
+    name: 'privacy-policy',
     component: HomeProvacyPolicy
   },
   {
     path: '/user-agreement',
-    name: 'userAgreement',
+    name: 'user-agreement',
     component: HomeUserAgreement
   },
   {
@@ -79,35 +77,45 @@ const routes = [
     redirect: '/main/user',
     children: [
       {
-        path: 'project',
-        name: 'MainProject',
+        path: 'user',
+        name: 'main-user',
+        component: MainUserAndGroup
+      },
+      {
+        path: 'user/project',
+        name: 'main-user-project',
         component: MainProject
       },
       {
-        path: 'user',
-        name: 'MainUser',
-        component: MainUser
+        path: 'group',
+        name: 'main-group',
+        component: MainUserAndGroup
       },
       {
-        path: 'group',
-        name: 'MainGroup',
-        component: MainGroup
+        path: 'group/project',
+        name: 'main-group-project',
+        component: MainProject
       },
       {
         path: 'details',
-        name: 'Details',
+        name: 'main-details',
         component: MainDetails
       }
     ]
   },
   {
-    path: '/main/project/reaction',
-    name: 'ReactionView',
-    component: ReactionView
+    path: '/main/user/project/reaction',
+    name: 'main-user-reaction',
+    component: MainView
+  },
+  {
+    path: '/main/group/project/reaction',
+    name: 'main-group-reaction',
+    component: MainView
   },
   {
     path: '/error',
-    name: 'ErrorView',
+    name: 'error-view',
     component: ErrorView
   }
 ]

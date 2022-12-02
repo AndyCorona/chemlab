@@ -16,7 +16,7 @@
         <div class="container">
           <button class="define" @click.prevent="" v-for="(item, index) in templates.define" :key="index">{{ item
           }}</button>
-          <button class="NewTemplate" @click.prevent="" v-show="this.templates.define.length < 5">+</button>
+          <button class="newTemplate" @click.prevent="" v-show="this.templates.define.length < 5">+</button>
         </div>
       </div>
       <div class="modal-footer">
@@ -53,14 +53,14 @@ export default {
     this.height = document.body.clientHeight
   },
   methods: {
-    EmitClose() {
+    emitClose() {
       this.$emit('close')
     },
     close() {
       this.open = 'close'
     },
     closeAndEmit() {
-      this.EmitClose()
+      this.emitClose()
       this.close()
     }
   }

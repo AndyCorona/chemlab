@@ -1,9 +1,8 @@
-
 <template>
   <div class="main-project-and-reaction-title">
-    <div :class="ClassType">
+    <div :class="classType">
       <img src="/imgs/用户主页/项目列表.svg">
-      <input :readonly="ReadOnly" type="text" autocomplete="off" name="project-name" :value="Value">
+      <input @change="this.$emit('change', name)" :readonly="readOnly" type="text" autocomplete="off" v-model="name">
     </div>
   </div>
 </template>
@@ -11,9 +10,38 @@
 <script>
 export default {
   name: 'MainProjectAndReactionTitle',
-  props: { ClassType: String, ProjectName: String, ReadOnly: { default: true, type: Boolean }, Value: { type: String, default: '项目列表' } }
+  emits: ['change'],
+  props: {
+    classType: String,
+    readOnly: {
+      default: true,
+      type: Boolean
+    }
+  },
+  data() {
+    return {
+      name: this.classType === 'project-title' ? '项目列表' : ''
+    }
+  },
+  computed: {
+    titleName() {
+      return !this.$store.state.projectInfo.projectName ? '未命名' : this.$store.state.projectInfo.projectName
+    }
+  },
+  watch: {
+    titleName: {
+      handler(newVal) {
+        if (this.name === '项目列表') {
+          return
+        }
+        this.name = newVal
+      },
+      immediate: true
+    }
+  }
 }
 </script>
+
 <style lang="scss">
 .main-project-and-reaction-title {
   margin: auto 140px;

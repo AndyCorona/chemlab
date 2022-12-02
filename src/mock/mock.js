@@ -139,34 +139,18 @@ Mock.mock('/false/api/main/update-me', 'get', {
   msg: '修改失败'
 })
 
-// 获取个人项目列表接口-成功
-Mock.mock('/true/api/main/user/project', 'get', {
-  status: 200,
-  data: {
-    isGroup: false,
-    projectList: [{ id: 1, name: '个人项目1' }, { id: 2, name: '个人项目2' }, { id: 3, name: '个人项目3' }, { id: 4, name: '个人项目4' }, { id: 5, name: '个人项目5' }, { id: 6, name: '个人项目6' }, { id: 7, name: '个人项目7' }, { id: 8, name: '个人项目8' }]
-  },
-  msg: '获取成功'
-})
-
-// 获取个人项目列表接口-失败
-Mock.mock('/false/api/main/user/project', 'get', {
-  status: 500,
-  msg: '获取失败'
-})
-
-// 获取群组项目列表接口-成功
-Mock.mock('/true/api/main/group/project', 'get', {
+// 获取个人 | 群组项目列表接口-成功
+Mock.mock(/\/true\/api\/main\/project.*/, 'get', {
   status: 200,
   data: {
     isGroup: true,
-    projectList: [{ id: 1, name: '群组项目1' }, { id: 2, name: '群组项目2' }, { id: 3, name: '群组项目3' }, { id: 4, name: '群组项目4' }, { id: 5, name: '群组项目5' }, { id: 6, name: '群组项目6' }, { id: 7, name: '群组项目7' }, { id: 8, name: '群组项目8' }, { id: 1, name: '群组项目1' }, { id: 2, name: '群组项目2' }, { id: 3, name: '群组项目3' }, { id: 4, name: '群组项目4' }, { id: 5, name: '群组项目5' }, { id: 6, name: '群组项目6' }, { id: 7, name: '群组项目7' }, { id: 8, name: '群组项目8' }, { id: 1, name: '群组项目1' }, { id: 2, name: '群组项目2' }, { id: 3, name: '群组项目3' }, { id: 4, name: '群组项目4' }, { id: 5, name: '群组项目5' }, { id: 6, name: '群组项目6' }, { id: 7, name: '群组项目7' }, { id: 8, name: '群组项目8' }, { id: 1, name: '群组项目1' }, { id: 2, name: '群组项目2' }, { id: 3, name: '群组项目3' }, { id: 4, name: '群组项目4' }, { id: 5, name: '群组项目5' }, { id: 6, name: '群组项目6' }, { id: 7, name: '群组项目7' }, { id: 8, name: '群组项目8' }]
+    projectList: [{ id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }]
   },
   msg: '获取成功'
 })
 
-// 获取群组项目列表接口-失败
-Mock.mock('/false/api/main/group/project', 'get', {
+// 获取个人 | 群组项目列表接口-失败
+Mock.mock(/\/false\/api\/main\/project/, 'get', {
   status: 500,
   msg: '获取失败'
 })
@@ -182,6 +166,24 @@ Mock.mock('/true/api/project', 'delete', {
 Mock.mock('/false/api/project', 'delete', {
   status: 500,
   msg: '删除失败'
+})
+
+// 新建个人 | 群组项目接口-成功
+Mock.mock('/true/api/project', 'put', {
+  status: 200,
+  data: {
+    projectId: 1,
+    projectName: '项目1(固定数据哦)',
+    isGroup: false,
+    reactions: []
+  },
+  msg: '创建成功'
+})
+
+// 新建个人 | 群组项目接口-失败
+Mock.mock('/false/api/project', 'put', {
+  status: 500,
+  msg: '创建失败'
 })
 
 // 成员退出 ｜｜ 群主解散群组接口-成功
@@ -341,11 +343,11 @@ Mock.mock('/false/api/group', 'delete', {
 })
 
 // 查询一个项目具体信息接口-成功
-Mock.mock('/true/api/project', 'post', {
+Mock.mock('/true/api/project', 'get', {
   status: 200,
   data: {
     projectId: 1,
-    projectName: '1234567899',
+    projectName: '个人项目（固定数据哦）',
     isGroup: false,
     reactions: [
       {
@@ -384,7 +386,33 @@ Mock.mock('/true/api/project', 'post', {
 })
 
 // 查询一个项目具体信息接口-失败
-Mock.mock('/false/api/project', 'post', {
+Mock.mock('/false/api/project', 'get', {
   status: 500,
   msg: '获取失败'
+})
+
+// 重命名个人 | 群组项目接口-成功
+Mock.mock('/true/api/project', 'post', {
+  status: 200,
+  data: {
+  },
+  msg: '修改成功'
+})
+
+// 重命名个人 ｜ 群组项目接口-失败
+Mock.mock('/false/api/project', 'post', {
+  status: 500,
+  msg: '修改失败'
+})
+
+// 删除反应接口-成功
+Mock.mock('/true/api/reaction', 'delete', {
+  status: 200,
+  msg: '删除成功'
+})
+
+// 删除反应接口-失败
+Mock.mock('/false/api/reaction', 'delete', {
+  status: 500,
+  msg: '删除失败'
 })

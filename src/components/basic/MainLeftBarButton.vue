@@ -22,7 +22,6 @@ export default {
   background-color: #DE8D4C;
   cursor: pointer;
   border-bottom: 1px solid #FFFFFF;
-  z-index: 10;
 
   .wrapper {
 

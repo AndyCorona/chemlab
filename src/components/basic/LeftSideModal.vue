@@ -5,15 +5,15 @@
     </div>
     <div class="modal" :class="open">
       <div class="modal-header">
-        <img :src="TitleImg">
-        <span>{{ ShowTitle }}</span>
+        <img :src="titleImg">
+        <span>{{ showTitle }}</span>
       </div>
       <div class="modal-body">
         <slot :name="type"></slot>
       </div>
       <div class="modal-footer">
-        <button @click.prevent="ClickClose ? this.closeAndEmitOk : this.$emit('ok')" class="confirm">确认</button>
-        <button @click.prevent="ClickClose ? this.closeAndEmitNo : this.$emit('no')" class="cancle">取消</button>
+        <button @click.prevent="clickClose ? this.closeAndEmitOk : this.$emit('ok')" class="confirm">确认</button>
+        <button @click.prevent="clickClose ? this.closeAndEmitNo : this.$emit('no')" class="cancle">取消</button>
       </div>
     </div>
   </div>
@@ -24,20 +24,20 @@ export default {
   name: 'LeftSideModal',
   emits: ['ok', 'no'],
   props: {
-    ShowText: String,
-    ShowTitle: String,
+    showText: String,
+    showTitle: String,
     show: Boolean,
-    TitleImg: String,
+    titleImg: String,
     type: String,
     // 是否开启自动关闭对话框
-    ClickClose: {
+    clickClose: {
       type: Boolean,
       default: true
     }
   },
   data() {
     return {
-      scrollTop: this.$store.state.ScrollTop,
+      scrollTop: this.$store.state.scrollTop,
       height: this.$store.state.height,
       open: this.show ? 'open' : 'close'
     }

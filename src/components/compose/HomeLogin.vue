@@ -1,18 +1,18 @@
 <template>
   <div class="home-login">
-    <home-input @pass="GotUsername" :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/" type="text"
+    <home-input @pass="gotUsername" :validateExpression="/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/" type="text"
       placeholder="请输入用户名" label="用户名" name="username">
     </home-input>
-    <home-input @pass="GotPassword" :ValidateExpression="/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/" type="password"
+    <home-input @pass="gotPassword" :validateExpression="/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/" type="password"
       placeholder="请输入密码" label="密码" name="password"></home-input>
     <div class="forgot-password-tips">
       <img src="/imgs/登录页/忘记密码.svg">
       <a href="/#/forgot-password">忘记密码</a>
     </div>
-    <home-button @BtnClick="ToUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green">
+    <home-button @btnClick="toUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green">
     </home-button>
-    <home-button @BtnClick="this.$router.push('/signup')" buttonText="注册" buttonStyle="white"></home-button>
-    <home-button @BtnClick="this.$router.push('/error')" buttonText="出错了（测试）" buttonStyle="gray"></home-button>
+    <home-button @btnClick="this.$router.push('/signup')" buttonText="注册" buttonStyle="white"></home-button>
+    <home-button @btnClick="this.$router.push('/error')" buttonText="出错了（测试）" buttonStyle="gray"></home-button>
   </div>
 </template>
 
@@ -32,19 +32,19 @@ export default {
     }
   },
   methods: {
-    GotUsername(value) {
+    gotUsername(value) {
       this.username = value
     },
-    GotPassword(value) {
+    gotPassword(value) {
       this.password = value
     },
-    ToUserSpace() {
+    toUserSpace() {
       if (!/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/.test(this.username)) {
-        this.$store.commit('toast', { ShowModal: true, text: '用户名不正确' })
+        this.$store.commit('toast', { text: '用户名不正确' })
         return
       }
       if (!/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/.test(this.password)) {
-        this.$store.commit('toast', { ShowModal: true, text: '密码不正确' })
+        this.$store.commit('toast', { text: '密码不正确' })
         return
       }
       this.axios.post('/home/login', {
@@ -59,7 +59,7 @@ export default {
           this.$router.push('/main')
         }
       }).catch((resp) => {
-        this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+        this.$store.dispatch('toast', { text: resp.msg })
       })
     }
   }

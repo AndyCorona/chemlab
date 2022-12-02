@@ -12,7 +12,7 @@ export default {
   name: 'MainLeftBarTitle',
   computed: {
     title() {
-      return this.$store.state.GroupInfo.groupUUID === undefined ? '暂未加入' : this.$store.state.GroupInfo.groupName
+      return this.$store.state.groupInfo.groupUUID === undefined ? '暂未加入' : this.$store.state.groupInfo.groupName
     }
   }
 }

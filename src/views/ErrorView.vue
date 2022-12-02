@@ -1,11 +1,11 @@
 <template>
   <div class="error-view">
-    <toast-props :show="this.ShowModal" :text="this.randomTitle[this.count % 3]" :state="this.count % 3"
-      :DurationTime="1000" @close="this.ShowModal = false"></toast-props>
+    <toast-props :show="this.showModal" :text="this.randomTitle[this.count % 3]" :state="this.count % 3"
+      :durationTime="1000" @close="this.showModal = false"></toast-props>
     <div class="title">{{ title }}</div>
     <div class="subtitle">{{ subtitle }}</div>
     <div class="container">
-      <button class="flush" @click.prevent="this.count++;this.ShowModal = true">刷新试试</button>
+      <button class="flush" @click.prevent="this.count++;this.showModal = true">刷新试试</button>
       <button class="index" @click.prevent="this.$router.push('/')">返回首页</button>
     </div>
   </div>
@@ -16,10 +16,10 @@ export default {
   name: 'ErrorView',
   data() {
     return {
-      title: this.$config.ErrorTitle,
-      subtitle: this.$config.ErrorSubTitle,
+      title: this.$config.errorTitle,
+      subtitle: this.$config.errorSubTitle,
       count: 0,
-      ShowModal: false,
+      showModal: false,
       randomTitle: ['没用的，网线断了', '服务器挂了-_-', '点击 100 次数就可以了']
     }
   }

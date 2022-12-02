@@ -1,18 +1,18 @@
 <template>
   <div class="main-left-bar-list">
-    <div class="wrapper" v-show="IsJoinGroup">
-      <div class="left-wrapper" @click="CreateGroup">
+    <div class="wrapper" v-show="isJoinGroup">
+      <div class="left-wrapper" @click="createGroup">
         <img src="/imgs/左边栏/创建.svg">
         <span>创建课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="IsJoinGroup">
-      <div class="left-wrapper" @click="JoinGroup">
+    <div class="wrapper" v-show="isJoinGroup">
+      <div class="left-wrapper" @click="joinGroup">
         <img src="/imgs/左边栏/加入.svg">
         <span>加入课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="!IsJoinGroup" v-for="(item, index) in GroupMemberList" :key="index">
+    <div class="wrapper" v-show="!isJoinGroup" v-for="(item, index) in groupMemberList" :key="index">
       <div class="left-wrapper">
         <img :src="item.logo">
         <span>{{ item.name }}</span>
@@ -21,22 +21,22 @@
         <img src="/imgs/左边栏/组长.svg" v-show="item.isAdmin">
         <img src="/imgs/左边栏/成员.svg" v-show="!item.isAdmin">
         <!-- 群主不能删除自己 -->
-        <img @click="DeleteMember(item.name)" src="/imgs/左边栏/删除成员.svg" v-show="IsAdmin && !item.isAdmin">
+        <img @click="deleteMember(item.name)" src="/imgs/左边栏/删除成员.svg" v-show="isAdmin && !item.isAdmin">
       </div>
     </div>
-    <div class="wrapper" v-show="!IsJoinGroup && IsAdmin">
-      <div class="left-wrapper" @click="AddMember">
+    <div class="wrapper" v-show="(!isJoinGroup && isAdmin)">
+      <div class="left-wrapper" @click="addMember">
         <img src="/imgs/左边栏/添加成员.svg">
         <span>添加成员</span>
       </div>
     </div>
-    <div class="wrapper" v-show="!IsJoinGroup && IsAdmin">
+    <div class="wrapper" v-show="(!isJoinGroup && isAdmin)">
       <div class="left-wrapper" @click="quit(1)">
         <img src="/imgs/左边栏/解散群组.svg">
         <span>解散课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="!IsJoinGroup && !IsAdmin">
+    <div class="wrapper" v-show="(!isJoinGroup && !isAdmin)">
       <div class="left-wrapper" @click="quit(0)">
         <img src="/imgs/左边栏/解散群组.svg">
         <span>退出课题组</span>
@@ -57,58 +57,58 @@ export default {
   methods: {
     // state 标识是解散还是退出，0 代表退出， 1 代表解散
     quit(state = 0) {
-      this.$store.commit('dialog', { ShowModal: true, text: `是否${state === 0 ? '退出' : '解散'}当前课题组?`, title: `${state === 0 ? '退出' : '解散'}提醒` })
-      this.$store.commit('BindOkEvent', this.ConfirmQuit)
+      this.$store.commit('dialog', { text: `是否${state === 0 ? '退出' : '解散'}当前课题组?`, title: `${state === 0 ? '退出' : '解散'}提醒` })
+      this.$store.commit('bindOkEvent', this.confirmQuit)
     },
-    ConfirmQuit() {
+    confirmQuit() {
       this.axios.delete('/group/quit').then(() => {
-        this.$store.dispatch('toast', { ShowModal: true, text: '操作成功', state: 0 })
+        this.$store.dispatch('toast', { text: '操作成功', state: 0 })
         // 清空 vuex 中的群组信息
-        this.$store.dispatch('SaveGroupInfo', {})
+        this.$store.dispatch('saveGroupInfo', {})
         // 用户可以在任何地方选择退出群组，所以退出后跳转到用户个人空间
         this.$router.push('/main')
       }).catch((resp) => {
-        this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+        this.$store.dispatch('toast', { text: resp.msg })
       })
     },
-    DeleteMember(name) {
-      this.$store.commit('dialog', { ShowModal: true, text: `是否将${name}移除？`, title: '删除提醒' })
+    deleteMember(name) {
+      this.$store.commit('dialog', { text: `是否将${name}移除？`, title: '删除提醒' })
       this.deleteUserName = name
-      this.$store.commit('BindOkEvent', this.ConfirmDeleteMember)
+      this.$store.commit('bindOkEvent', this.confirmDeleteMember)
     },
-    ConfirmDeleteMember() {
+    confirmDeleteMember() {
       this.axios.delete('/group', {
         deleteUserName: this.deleteUserName
       }).then((data) => {
-        this.$store.dispatch('toast', { ShowModal: true, text: '移除成功', state: 0 })
-        this.$store.dispatch('SaveGroupInfo', data)
+        this.$store.dispatch('toast', { text: '移除成功', state: 0 })
+        this.$store.dispatch('saveGroupInfo', data)
       }).catch((resp) => {
-        this.$store.dispatch('toast', { ShowModal: true, text: resp.msg })
+        this.$store.dispatch('toast', { text: resp.msg })
       })
     },
-    CreateGroup() {
+    createGroup() {
       this.$emit('create')
     },
-    JoinGroup() {
+    joinGroup() {
       this.$emit('join')
     },
-    AddMember() {
+    addMember() {
       this.$emit('addMember')
     },
-    ConfirmAddMember() {
+    confirmAddMember() {
     }
   },
   computed: {
     // 是否出现 "创建课题组" 和 "加入课题组"
-    IsJoinGroup() {
-      return !this.$store.state.GroupInfo.groupUUID
+    isJoinGroup() {
+      return !this.$store.state.groupInfo.groupUUID
     },
-    GroupMemberList() {
-      return this.$store.state.GroupInfo.members
+    groupMemberList() {
+      return this.$store.state.groupInfo.members
     },
     // 当前用户是否为群主
-    IsAdmin() {
-      return this.$store.state.GroupInfo.isAdmin
+    isAdmin() {
+      return this.$store.state.groupInfo.isAdmin
     }
   }
 }

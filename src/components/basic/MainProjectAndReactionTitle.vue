@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      name: this.classType === 'project-title' ? '项目列表' : ''
+      name: this.classType === 'project-title' ? '项目列表' : this.$store.state.projectInfo.projectName
     }
   },
   computed: {
@@ -31,12 +31,11 @@ export default {
   watch: {
     titleName: {
       handler(newVal) {
-        if (this.name === '项目列表') {
+        if (this.name === '项目列表' && (this.$route.fullPath === '/main/group' || this.$router.fullPath === '/main/user')) {
           return
         }
         this.name = newVal
-      },
-      immediate: true
+      }
     }
   }
 }

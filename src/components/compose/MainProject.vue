@@ -3,7 +3,7 @@
     <main-project-and-reaction-title classType="reaction-title" :readOnly="readOnly" @change="rename">
     </main-project-and-reaction-title>
     <div class="wrapper">
-      <img @click="addReaction" src="/imgs/反应/添加.svg" v-show="!isGroup">
+      <img @click="addReaction" src="/imgs/反应/添加.svg" v-show="(!isGroup && !isProjectLimitation)">
       <img @click="share" src="/imgs/反应/分享.svg" v-show="!isGroup">
       <img @click="deleteReaction" src="/imgs/反应/删除.svg"
         v-show="!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin)">
@@ -25,7 +25,8 @@ export default {
   data() {
     return {
       reactionIdList: [],
-      projectName: ''
+      projectName: '',
+      isProjectLimitation: null
     }
   },
   methods: {
@@ -65,7 +66,7 @@ export default {
     deleteReaction() {
       const length = this.reactionIdList.length
       if (length === 0) {
-        this.$store.commit('toast', { text: '请选择要删除的反应' })
+        this.$store.commit('toast', { text: '请勾选要删除的实验', state: 2 })
         return
       }
       this.$store.commit('dialog', { text: `确认删除${length > 1 ? '这些' : '该'}反应吗?`, title: '删除提醒' })
@@ -84,7 +85,9 @@ export default {
       })
     },
     addReaction() {
-
+      // reactionId 为 0 代表是一个新增实验的行为
+      sessionStorage.setItem('reactionId', 0)
+      this.$router.push(`/main/${this.isGroup ? 'group' : 'user'}/project/reaction`)
     },
     share() {
 
@@ -107,6 +110,14 @@ export default {
     },
     isGroup() {
       return this.$store.state.isGroup
+    },
+    reactions() {
+      return this.$store.state.projectInfo.reactions
+    }
+  },
+  watch: {
+    reactions(newVal) {
+      this.isProjectLimitation = newVal.length >= 50
     }
   }
 }

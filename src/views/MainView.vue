@@ -50,7 +50,10 @@ export default {
   data() {
     return {
       topBarSettingImg: this.$config.topBarSettingImg,
-      topBarLogoutImg: this.$config.topBarLogoutImg
+      topBarLogoutImg: this.$config.topBarLogoutImg,
+      projectName: '',
+      groupName: '',
+      reactionName: !this.$store.state.reactionInfo.reactionName ? '未命名' : this.$store.state.reactionInfo.reactionName
     }
   },
   methods: {
@@ -96,9 +99,9 @@ export default {
       } else if (path === '/main/group') {
         return [{ name: `${this.groupName}`, path: '/#/main/group', disabled: true }]
       } else if (path === '/main/group/project') {
-        return [{ name: `${this.groupName}`, path: '/#/main/group', disabled: false }, { name: `${this.projectName}`, path: '/#/main/group/project', disabled: true }]
+        return [{ name: `${this.groupName}`, path: '/#/main/group', disabled: false }, { name: this.projectName, path: '/#/main/group/project', disabled: true }]
       } else if (path === '/main/user/project') {
-        return [{ name: '我的实验', path: '/#/main/user', disabled: false }, { name: `${this.projectName}`, path: '/#/main/user/project', disabled: true }]
+        return [{ name: '我的实验', path: '/#/main/user', disabled: false }, { name: this.projectName, path: '/#/main/user/project', disabled: true }]
       } else {
         let projectName = sessionStorage.getItem('projectName')
         if (projectName === null) {
@@ -113,17 +116,28 @@ export default {
         }
       }
     },
-    projectName() {
+    readonlyprojectName() {
       return this.$store.state.projectInfo.projectName
     },
-    groupName() {
-      return this.$store.state.groupInfo.groupName === undefined ? '暂未加入' : this.$store.state.groupInfo.groupName
+    readonlygroupName() {
+      return !this.$store.state.groupInfo.groupName ? '暂未加入' : this.$store.state.groupInfo.groupName
     },
     isGroup() {
       return this.$store.state.isGroup
     },
-    reactionName() {
-      return '还没拿到数据呢'
+    readonlyreactionName() {
+      return !this.$store.state.reactionInfo.reactionName ? '未命名' : this.$store.state.reactionInfo.reactionName
+    }
+  },
+  watch: {
+    readonlygroupName(newVal) {
+      this.groupName = newVal
+    },
+    readonlyprojectName(newVal) {
+      this.projectName = newVal
+    },
+    readonlyreactionName(newVal) {
+      this.reactionName = newVal
     }
   },
   mounted() {

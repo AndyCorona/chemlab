@@ -10,9 +10,19 @@
 <script>
 export default {
   name: 'MainLeftBarTitle',
+  data() {
+    return {
+      title: ''
+    }
+  },
   computed: {
-    title() {
-      return this.$store.state.groupInfo.groupUUID === undefined ? '暂未加入' : this.$store.state.groupInfo.groupName
+    readonlyTitle() {
+      return !this.$store.state.groupInfo.groupUUID ? '暂未加入' : this.$store.state.groupInfo.groupName
+    }
+  },
+  watch: {
+    readonlyTitle(newVal) {
+      this.title = newVal
     }
   }
 }

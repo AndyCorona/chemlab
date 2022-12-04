@@ -142,10 +142,7 @@ Mock.mock('/false/api/main/update-me', 'get', {
 // 获取个人 | 群组项目列表接口-成功
 Mock.mock(/\/true\/api\/main\/project.*/, 'get', {
   status: 200,
-  data: {
-    isGroup: true,
-    projectList: [{ id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }]
-  },
+  data: [{ id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }, { id: 1, name: '项目1' }, { id: 2, name: '项目2' }, { id: 3, name: '项目3' }, { id: 4, name: '项目4' }, { id: 5, name: '项目5' }, { id: 6, name: '项目6' }, { id: 7, name: '项目7' }, { id: 8, name: '项目8' }],
   msg: '获取成功'
 })
 
@@ -352,33 +349,45 @@ Mock.mock('/true/api/project', 'get', {
     reactions: [
       {
         id: 1,
-        name: '我们得出两条不可争辩的真理：第一条是，具有决定性的机动越简单，就越有把握成功；第二条是，在战斗过程中随机应变采取突然的机动，往往比事先预定的计划容易获得成功。',
+        name: '正则重中之重重中之重正则重中之重重中之重正则重中之重重中之重',
         updateDate: '2022-12-12',
-        tags: ['2222', '3333']
+        tags: ['正则重中之重重中之重', '正则重中之重重中之重']
       },
       {
         id: 2,
-        name: '实验2',
+        name: '111111111122222222223333333333',
         updateDate: '2022-12-12',
-        tags: ['1111', '2222', '3333']
+        tags: ['正则重中之重重中之重', '正则重中之重重中之重', '正则重中之重重中之重']
       },
       {
         id: 3,
-        name: '实验3',
+        name: 'aaaaaaaaaazzzzzzzzzzoooooooooo',
         updateDate: '2022-12-12',
-        tags: ['1111', '2222', '3333']
+        tags: ['正则重中之重重中之重']
       },
       {
         id: 4,
         name: '实验4',
         updateDate: '2022-12-12',
-        tags: ['1111', '2222', '3333']
+        tags: ['1111111111', '2222222222', '9999999999']
       },
       {
         id: 5,
         name: '实验5',
         updateDate: '2022-12-12',
-        tags: ['1111', '2222', '3333']
+        tags: ['aaaaaaaaaa', 'zzzzzzzzzz', 'oooooooooo']
+      },
+      {
+        id: 6,
+        name: '实验6',
+        updateDate: '2022-12-12',
+        tags: []
+      },
+      {
+        id: 6,
+        name: '实验6',
+        updateDate: '2022-12-12',
+        tags: ['1', '2', '3']
       }
     ]
   },
@@ -415,4 +424,67 @@ Mock.mock('/true/api/reaction', 'delete', {
 Mock.mock('/false/api/reaction', 'delete', {
   status: 500,
   msg: '删除失败'
+})
+
+// 获取一个反应下的具体内容接口-成功
+Mock.mock('/true/api/reaction', 'get', {
+  status: 200,
+  data: {
+    reactionId: 1,
+    reactionName: '正则重中之重重中之重正则重中之重重中之重正则重中之重重中之重',
+    updateDate: '2022-12-12',
+    tags: ['正则重中之重重中之重', '正则重中之重重中之重', '正则重中之重重中之重'],
+    data: [
+      { type: 'scheme', title: '这是一个图片模块', content: 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333' },
+      { type: 'text', title: '这是一个文本模块', content: '11111111' },
+      { type: 'table', title: '这是一个表格模块', content: [[228, 228, 228, 228, 228], ['名称', '分子量', '质量', '产率', '备注'], ['苯甲酸', '191.3g/mol', '13g', '25%', '无'], ['苯甲酸2', '191.3g/mol', '13g', '25%', '无']] },
+      { type: 'data', title: '这是一个数据模块', content: [['仪器', '测试类型', '日期', '文件', '下载路径'], ['NMR', '谱图测试', '2022-12-12', '222.zip', 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333']] }
+    ],
+    imgPaths: [],
+    filePaths: [],
+    versions: [
+      {
+        id: 1,
+        updateDate: '2022-12-01 11:11:42'
+      },
+      {
+        id: 2,
+        updateDate: '2022-12-02 11:11:42'
+      }, {
+        id: 3,
+        updateDate: '2022-12-12 11:11:42'
+      }, {
+        id: 4,
+        updateDate: '2022-12-14 11:11:42'
+      }, {
+        id: 5,
+        updateDate: '2022-12-12 11:11:42'
+      }, {
+        id: 6,
+        updateDate: '2022-12-16 11:11:42'
+      }, {
+        id: 7,
+        updateDate: '2022-12-19 11:11:42'
+      }, {
+        id: 7,
+        updateDate: '2022-12-19 11:11:42'
+      }, {
+        id: 7,
+        updateDate: '2022-12-19 11:11:42'
+      }, {
+        id: 7,
+        updateDate: '2022-12-19 11:11:42'
+      }, {
+        id: 7,
+        updateDate: '2022-12-19 11:11:42'
+      }
+    ]
+  },
+  msg: '获取成功'
+})
+
+// 获取一个反应下的具体内容接口-失败
+Mock.mock('/false/api/reaction', 'get', {
+  status: 500,
+  msg: '获取失败'
 })

@@ -28,8 +28,24 @@ export default {
   },
   methods: {
     previewImg(event) {
-      this.noImg = false
       const file = event.target.files[0]
+      const type = ['bmp', 'jpg', 'png', 'tif', 'gif', 'svg']
+      let isValidImg = false
+      for (let i = 0; i < type.length; i++) {
+        if (file.type.includes(type[i])) {
+          isValidImg = true
+          break
+        }
+      }
+      if (!isValidImg) {
+        this.$store.commit('toast', { text: '请选择正确的图片类型', state: 2 })
+        return
+      }
+      if (file.size >= 1024 * 3 * 1024) {
+        this.$store.commit('toast', { text: '上传图片大小不超过 3 M', state: 2 })
+        return
+      }
+      this.noImg = false
       const reader = new FileReader()
 
       reader.addEventListener('load', () => {
@@ -40,7 +56,7 @@ export default {
         reader.readAsDataURL(file)
       }
     },
-    changeInputFile () {
+    changeInputFile() {
       this.$refs.inputRef.click()
     }
   }

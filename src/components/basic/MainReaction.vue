@@ -1,7 +1,6 @@
 <template>
   <div class="main-reaction">
-    <div class="wrapper" v-for="(item, i) in reactionList" :key="i"
-      @click="this.$router.push(`/main/${this.$store.state.isGroup ? 'group' : 'user'}/project/reaction`)">
+    <div class="wrapper" v-for="(item, i) in reactionList" :key="i" @click="toReaction(item.id)">
       <p class="word-wrap">{{ item.name }}</p>
       <p>{{ item.updateDate }}</p>
       <p>
@@ -46,6 +45,10 @@ export default {
         })
       }
       this.$emit('change', this.reactionIdList)
+    },
+    toReaction(id) {
+      sessionStorage.setItem('reactionId', id)
+      this.$router.push(`/main/${this.$store.state.isGroup ? 'group' : 'user'}/project/reaction`)
     }
   }
 }
@@ -73,23 +76,23 @@ export default {
     }
 
     p:first-child {
-      width: 725px;
+      width: 540px;
       text-align: left;
     }
 
     p:nth-child(2) {
-      width: 100px;
+      width: 140px;
       text-align: center;
     }
 
     p:nth-child(3) {
       text-align: center;
-      width: 470px;
+      width: 574px;
       display: flex;
       align-items: center;
 
       span {
-        max-width: 133px;
+        max-width: 160px;
         padding: 3px;
         font-size: 16px;
         margin-left: 10px;

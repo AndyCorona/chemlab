@@ -8,8 +8,8 @@
           src="/imgs/用户主页/删除项目.svg">
       </div>
     </div>
-    <div @click="addProject" class="wrapper" v-show="((projectList.length < 8 && !isGroup) || (isGroup &&
-    projectList.length < 50 && this.$store.state.groupInfo.isAdmin))">
+    <div @click="addProject" class="wrapper"
+      v-show="((projectList.length < 8 && !inGroup && projectList.length !== 0) || (inGroup && projectList.length < 50 && this.$store.state.groupInfo.isAdmin))">
       <div class="new-project">
         <img src="/imgs/用户主页/添加项目.svg">
         <span>添加项目</span>
@@ -24,7 +24,8 @@ export default {
   data() {
     return {
       projectList: [],
-      projectId: null
+      projectId: null,
+      inGroup: null
     }
   },
   methods: {
@@ -33,8 +34,7 @@ export default {
       this.axios.get('/main/project', {
         params: { isGroup: this.isGroup }
       }).then((data) => {
-        this.projectList = data.projectList
-        this.$store.dispatch('saveIsGroup', data.isGroup)
+        this.projectList = data
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
@@ -90,6 +90,13 @@ export default {
   computed: {
     isGroup() {
       return this.$store.state.isGroup
+    }
+  },
+  watch: {
+    isGroup: {
+      handler(newVal) {
+        this.inGroup = newVal
+      }
     }
   }
 }

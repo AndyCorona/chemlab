@@ -36,7 +36,7 @@ export default createStore({
       state.projectInfo = payload
     },
     saveReactionInfo(state, payload) {
-      state.projectInfo = payload
+      state.reactionInfo = payload
     },
     saveScrollTop(state, payload) {
       state.scrollTop = payload

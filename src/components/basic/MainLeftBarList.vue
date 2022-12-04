@@ -1,18 +1,18 @@
 <template>
   <div class="main-left-bar-list">
-    <div class="wrapper" v-show="isJoinGroup">
+    <div class="wrapper" v-show="inGroup">
       <div class="left-wrapper" @click="createGroup">
         <img src="/imgs/左边栏/创建.svg">
         <span>创建课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="isJoinGroup">
+    <div class="wrapper" v-show="inGroup">
       <div class="left-wrapper" @click="joinGroup">
         <img src="/imgs/左边栏/加入.svg">
         <span>加入课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="!isJoinGroup" v-for="(item, index) in groupMemberList" :key="index">
+    <div class="wrapper" v-show="!inGroup" v-for="(item, index) in this.$store.state.groupInfo.members" :key="index">
       <div class="left-wrapper">
         <img :src="item.logo">
         <span>{{ item.name }}</span>
@@ -21,22 +21,22 @@
         <img src="/imgs/左边栏/组长.svg" v-show="item.isAdmin">
         <img src="/imgs/左边栏/成员.svg" v-show="!item.isAdmin">
         <!-- 群主不能删除自己 -->
-        <img @click="deleteMember(item.name)" src="/imgs/左边栏/删除成员.svg" v-show="isAdmin && !item.isAdmin">
+        <img @click="deleteMember(item.name)" src="/imgs/左边栏/删除成员.svg" v-show="admin && !item.isAdmin">
       </div>
     </div>
-    <div class="wrapper" v-show="(!isJoinGroup && isAdmin)">
+    <div class="wrapper" v-show="(!inGroup && admin && !isGroupLimitation)">
       <div class="left-wrapper" @click="addMember">
         <img src="/imgs/左边栏/添加成员.svg">
         <span>添加成员</span>
       </div>
     </div>
-    <div class="wrapper" v-show="(!isJoinGroup && isAdmin)">
+    <div class="wrapper" v-show="(!inGroup && admin)">
       <div class="left-wrapper" @click="quit(1)">
         <img src="/imgs/左边栏/解散群组.svg">
         <span>解散课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="(!isJoinGroup && !isAdmin)">
+    <div class="wrapper" v-show="(!inGroup && !admin && show)">
       <div class="left-wrapper" @click="quit(0)">
         <img src="/imgs/左边栏/解散群组.svg">
         <span>退出课题组</span>
@@ -51,7 +51,10 @@ export default {
   emits: ['create', 'join', 'addMember'],
   data() {
     return {
-      deleteUserName: ''
+      deleteUserName: '',
+      inGroup: null,
+      admin: null,
+      show: null
     }
   },
   methods: {
@@ -94,8 +97,6 @@ export default {
     },
     addMember() {
       this.$emit('addMember')
-    },
-    confirmAddMember() {
     }
   },
   computed: {
@@ -103,12 +104,22 @@ export default {
     isJoinGroup() {
       return !this.$store.state.groupInfo.groupUUID
     },
-    groupMemberList() {
-      return this.$store.state.groupInfo.members
-    },
     // 当前用户是否为群主
     isAdmin() {
       return this.$store.state.groupInfo.isAdmin
+    },
+    // 群组成员个数是否超过上限
+    isGroupLimitation() {
+      return this.$store.state.groupInfo.members.length >= 20
+    }
+  },
+  watch: {
+    isJoinGroup(newVal) {
+      this.inGroup = newVal
+    },
+    isAdmin(newVal) {
+      this.admin = newVal
+      this.show = true
     }
   }
 }

@@ -1,17 +1,27 @@
 <template>
   <div class="reaction-form-title">
     <img src="/imgs/实验内容/实验标题.svg">
-    <input type="text" name="title" v-model="formData.title">
+    <input type="text" name="title" v-model="title">
   </div>
 </template>
 
 <script>
 export default {
   name: 'ReactionFormTitle',
-  data () {
+  data() {
     return {
-      formData: {
-        title: '未命名'
+      title: this.$store.state.reactionInfo.reactionName
+    }
+  },
+  computed: {
+    readonlyTitle() {
+      return this.$store.state.reactionInfo.reactionName
+    }
+  },
+  watch: {
+    readonlyTitle: {
+      handler(newVal) {
+        this.title = newVal
       }
     }
   }

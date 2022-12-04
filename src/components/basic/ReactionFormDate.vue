@@ -2,11 +2,12 @@
   <div class="reaction-form-date">
     <input type="date" name="date" v-model="date">
     <div class="tags">
-      <span v-for="(item, index) in tags" :key="index" class="word-wrap" contenteditable="true"
-        :id="`tag${index + 1}`">{{
-    item
+      <span title="没有文字的标签不会被保存" :ref="`tag${index}`" v-for="(item, index) in this.$store.state.reactionInfo.tags"
+        :key="index" contenteditable="true" :id="`tag${index + 1}`" @input.prevent=""
+        @focusout="validateTag($event, index)">{{
+            item
         }}</span>
-      <span id="addTag">+</span>
+      <span id="addTag" v-show="(this.tags.length < 3)" @click="addTag">+</span>
     </div>
   </div>
 </template>
@@ -16,9 +17,50 @@ export default {
   name: 'ReactionFormDate',
   data() {
     return {
-      showAddTag: false,
-      date: '2022-03-04',
-      tags: ['你好', 'ddddd']
+      date: this.$store.state.reactionInfo.updateDate,
+      tags: []
+    }
+  },
+  updated() {
+    const index = this.tags.length
+    if (this.$refs[`tag${index - 1}`]) {
+      this.$refs[`tag${index - 1}`][0].focus()
+    }
+  },
+  methods: {
+    addTag() {
+      this.tags.forEach(item => {
+        if (item.trim() === '') {
+          this.$store.commit('toast', { text: '没有内容的标签将不会被保存', state: 2, durationTime: 3000 })
+        }
+      })
+      this.tags.push('')
+    },
+    validateTag(event, index) {
+      if (!/^.{0,10}$/.test(event.target.innerHTML)) {
+        this.$store.commit('toast', { text: `标签${index + 1}的字数超过 10 个`, state: 2, durationTime: 3000 })
+      }
+      if (event.target.innerHTML.trim() === '') {
+        this.$store.commit('toast', { text: '没有内容的标签将不会被保存', state: 2, durationTime: 3000 })
+      }
+    }
+  },
+  computed: {
+    readonlyDate() {
+      return this.$store.state.reactionInfo.updateDate
+    },
+    readonlyTags() {
+      return this.$store.state.reactionInfo.tags
+    }
+  },
+  watch: {
+    readonlyDate: {
+      handler(newVal) {
+        this.date = newVal
+      }
+    },
+    readonlyTags(newVal) {
+      this.tags = newVal
     }
   }
 }
@@ -40,16 +82,18 @@ export default {
     display: flex;
 
     span {
-      padding: 4px;
+      box-sizing: border-box;
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 4px 10px;
       border-radius: 5px;
       font-size: 16px;
-      height: 20px;
-      line-height: 20px;
+      height: 30px;
       outline: none;
       display: inline-block;
       color: #FFFFFF;
       min-width: 20px;
-      max-width: 133px;
+      max-width: 180px;
       margin-left: 20px;
     }
 

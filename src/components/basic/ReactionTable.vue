@@ -1,23 +1,29 @@
 <template>
-  <div class="reaction-table">
-    <reaction-module-title placeholder="表格" name="table"></reaction-module-title>
+  <div class="reaction-table" :style="`user-select:${userSelect}`"
+    @mouseup="(this.mouseX = 0, this.firstDeltaMouseMove = false, this.contenteditable = true, this.userSelect = 'auto')"
+    @mousemove="resize($event)">
+    <reaction-module-title placeholder="表格"></reaction-module-title>
     <div class="container">
       <div class="thead">
-        <div class="wrapper" :style="`width:${width}`" v-for="(item, index) in table.thead" :key="index">
-          <div contenteditable="true">
+        <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
+          <div class="data" :style="`width:${tWidth[index] - 20}px`" :contenteditable="contenteditable"
+            @input="synThead($event, index)">
             {{ item }}
           </div>
-          <img src="/imgs/用户主页/删除项目.svg">
+          <img src="/imgs/用户主页/删除项目.svg" @click="deleteCol(index)" v-show="(this.thead.length > 1)">
+          <div
+            @mousedown="(this.userSelect = 'none', this.firstDeltaMouseMove = true, this.mouseX = $event.pageX, this.contenteditable = false, this.index = index)"
+            @mousemove="resize($event)" class="slider" v-show="(index != thead.length - 1)"></div>
         </div>
-        <img src="/imgs/用户主页/添加项目.svg" v-show="this.table.thead.length <= 10">
+        <img src="/imgs/用户主页/添加项目.svg" v-show="thead.length < 10" @click="addCol">
       </div>
-      <div class="tbody" v-for="(row, i) in table.tbody" :key="i">
-        <div class="wrapper" :style="`width:${width}`" v-for="(item, j) in row" :key="j">
-          <div contenteditable="true">{{ item }}</div>
+      <div class="tbody" v-for="(row, i) in tbody" :key="i">
+        <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
+          <div :style="`width:${tWidth[j]}px`" contenteditable="true" @input="synTbody($event, i, j)">{{ item }}</div>
         </div>
-        <img src="/imgs/左边栏/删除成员.svg">
+        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)">
       </div>
-      <div class="NewRow" contenteditable="false">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-show="(this.tbody.length < 500)">+</div>
     </div>
   </div>
 </template>
@@ -28,25 +34,162 @@ export default {
   name: 'ReactionTable',
   components:
     { ReactionModuleTitle },
+  props: {
+    moduleOrder: Number
+  },
   data() {
     return {
-      width: '210px',
-      // table: {
-      //   thead: ['名称', '分子量', '质量', '产率', '备注', '名称', '分子量', '质量', '产率', '备注'],
-      //   tbody: [['苯甲酸', '191.3g/mol', '13g', '25%', '无', '苯甲酸', '191.3g/mol', '13g', '25%', '无'], ['大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考', '大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考大幅拉升房间看哈上课的话费卡上飞机后打开撒谎疯狂的还是分开啊截断复活卡都是分开后的撒开发数据库的饭卡收到后尽快发哈就开始大幅加快和思考']]
-      // }
-      table: {
-        thead: ['名称', '分子量', '质量', '产率', '备注'],
-        tbody: [['苯甲酸', '191.3g/mol', '13g', '25%', '无']]
+      thead: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[1],
+      tbody: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content.splice(2),
+      tWidth: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[0],
+      col: null,
+      row: null,
+      mouseX: 0,
+      lastMouseX: 0,
+      firstDeltaMouseMove: false,
+      contenteditable: true,
+      index: null,
+      userSelect: 'auto'
+    }
+  },
+  methods: {
+    addCol() {
+      this.thead.push(`列${this.col + 1}`)
+      this.tbody.forEach(item => {
+        item.push('')
+      })
+      // 添加列的宽度分配规则：分摊法。列的最大宽度为 1140 px，列的最小宽度为 114 px
+      let newArr = []
+      this.tWidth.forEach(item => {
+        if (item <= 114) {
+          // 已经是最小宽度则不再参与分配
+          newArr.push(0)
+        } else {
+          // 否则按照当前的权重进行分配
+          newArr.push(item / 1140)
+        }
+      })
+      // 归一化处理，保证最后分配总和为 100%
+      newArr = this.normalize(newArr)
+
+      const retArr = []
+      // 将所有列按照权重减去应该付出的宽度
+      newArr.forEach((item, index) => {
+        const oldVal = this.tWidth[index]
+        retArr.push(oldVal - 114 * item)
+      })
+      retArr.push(114)
+      this.tWidth = retArr
+      this.col++
+    },
+    // 分摊法，将删除的宽度按照权重分摊到所有列上
+    deleteCol(index) {
+      this.col--
+      this.thead.splice(index, 1)
+      this.tbody.forEach(item => {
+        item.splice(index, 1)
+      })
+      const deleteWidth = this.tWidth.splice(index, 1)
+      let newArr = []
+      this.tWidth.forEach(item => {
+        if (item >= 1140) {
+          // 已经是最大宽度则不再参与分配
+          newArr.push(0)
+        } else {
+          // 否则按照当前的权重进行分配
+          newArr.push(item / 1140)
+        }
+      })
+      newArr = this.normalize(newArr)
+
+      const retArr = []
+      // 将所有列按照权重加上应该得到的宽度
+      newArr.forEach((item, index) => {
+        const oldVal = this.tWidth[index]
+        retArr.push(oldVal + deleteWidth * item)
+      })
+      this.tWidth = retArr
+    },
+    // 最多添加到 500 行
+    addRow() {
+      this.row++
+      const arr = []
+      arr.push(`行${this.row}`)
+      for (let i = 1; i < this.thead.length; i++) {
+        arr.push('')
       }
+      this.tbody.push(arr)
+    },
+    deleteRow(index) {
+      this.tbody.splice(index, 1)
+      this.row--
+    },
+    // 给表头双向绑定
+    synThead(event, index) {
+      this.thead[index] = event.target.innerHTML
+    },
+    // 给表体双向绑定
+    synTbody(event, i, j) {
+      this.tbody[i][j] = event.target.innerHTML
+    },
+    normalize(arr) {
+      let sum = 0
+      arr.forEach(item => {
+        sum += item
+      })
+      if (sum === 1) {
+        return arr
+      }
+      // 缩放系数，如果数组总和比 1 大则系数小于 1，如果数组总和比 1 小则系数大于 1
+      const ratio = 1 / sum
+      let withoutLastSum = 0
+      for (let i = 0; i < arr.length - 1; i++) {
+        const newVal = arr[i] * ratio
+        arr[i] = newVal
+        withoutLastSum += newVal
+      }
+
+      arr[arr.length - 1] = 1 - withoutLastSum
+      return arr
+    },
+    resize(event) {
+      if (this.mouseX === 0) {
+        return
+      }
+      const modifier = 1
+      // 第一次移动参考最原始的位置，后面的移动参考上一次移动的位置
+      if (this.firstDeltaMouseMove) {
+        this.lastMouseX = this.mouseX
+      }
+      const deltaX = event.pageX - this.lastMouseX
+      // 如果左边列宽已经小于最小值或右边列宽已经大于最大值，禁止向左边调整
+      if ((this.tWidth[this.index] <= 114 || this.tWidth[this.index + 1] >= 1140) && deltaX < 0) {
+        return
+      } else if ((this.tWidth[this.index] >= 1140 || this.tWidth[this.index + 1] <= 114) && deltaX > 0) {
+        return
+      }
+      // 若果左边列宽已经超过最大值或者右边列宽已经小于最小值，禁止向右边调整
+      this.tWidth[this.index] += deltaX * modifier
+      this.tWidth[this.index + 1] -= deltaX * modifier
+      this.lastMouseX = event.pageX
+      this.firstDeltaMouseMove = false
+    },
+    func() {
+      event.target.innerHTML.trim()
     }
   },
   watch: {
-    table: {
-      handler(oldValue, newValue) {
-        this.width = 1200 / newValue.thead.length + 'px'
+    thead: {
+      handler(newVal) {
+        this.col = newVal.length
       },
-      deep: true
+      immediate: true
+    },
+    tbody: {
+      handler(newVal) {
+        this.row = newVal.length + 1
+      },
+      immediate: true
     }
   }
 }
@@ -56,7 +199,6 @@ export default {
   .container {
     box-sizing: border-box;
     font-size: 16px;
-    user-select: text;
     width: 1200px;
     border-radius: 5px;
     border: 1px solid #000000;
@@ -71,29 +213,45 @@ export default {
       align-items: center;
 
       .wrapper {
-
-        margin-right: 10px;
-
-        border: 1px solid #FFFFFF;
+        display: flex;
+        align-items: center;
 
         div {
-          padding: 2px;
-          width: 100%;
+          min-height: 26px;
+          border: 1px solid #FFFFFF;
         }
-      }
 
-      img {
-        cursor: pointer;
-        width: 20px;
-        height: 20px;
-        opacity: 0;
+        .slider:hover {
+          opacity: 100%;
+          border: 1px solid #FFFFFF;
+        }
+
+        .slider {
+          height: 26px;
+          line-height: 26px;
+          cursor: col-resize;
+          width: 4px;
+          opacity: 0;
+          border: none;
+        }
+
+        .slider::before,
+        .slider::after {
+          content: '|';
+        }
       }
     }
 
     .thead:hover,
     .tbody:hover {
       .wrapper {
-        border: 1px solid #D7D7D7;
+        div {
+          border: 1px solid #D7D7D7;
+        }
+
+        .slider {
+          border: none;
+        }
       }
 
       img {
@@ -106,8 +264,6 @@ export default {
 
       .wrapper {
 
-        position: relative;
-
         &:hover img {
           transition: opacity 1s;
           opacity: 100%;
@@ -117,9 +273,6 @@ export default {
           opacity: 0;
           width: 16px;
           height: 16px;
-          position: absolute;
-          top: 4px;
-          right: 5px;
         }
       }
     }

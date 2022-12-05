@@ -2,11 +2,14 @@
   <div class="reaction-form-date">
     <input type="date" name="date" v-model="date">
     <div class="tags">
-      <span title="没有文字的标签不会被保存" :ref="`tag${index}`" v-for="(item, index) in this.$store.state.reactionInfo.tags"
-        :key="index" contenteditable="true" :id="`tag${index + 1}`" @input.prevent=""
-        @focusout="validateTag($event, index)">{{
-            item
-        }}</span>
+      <div class="tag" v-for="(item, index) in this.$store.state.reactionInfo.tags" :key="index">
+        <span title="没有文字的标签不会被保存" :ref="`tag${index}`" contenteditable="true" :id="`tag${index + 1}`"
+          @input="this.tags[index] = $event.target.innerHTML" @focusout="validateTag($event, index)">{{
+              item
+          }}
+        </span>
+        <img src="/imgs/左边栏/删除成员.svg" @click.stop="deleteTag(index)">
+      </div>
       <span id="addTag" v-show="(this.tags.length < 3)" @click="addTag">+</span>
     </div>
   </div>
@@ -15,26 +18,34 @@
 <script>
 export default {
   name: 'ReactionFormDate',
+  inject: ['isSubmit'],
+  emits: ['success', 'fail'],
   data() {
     return {
-      date: this.$store.state.reactionInfo.updateDate,
-      tags: []
+      date: this.$store.state.reactionInfo.date,
+      tags: !this.$store.state.reactionInfo.tags ? [] : this.$store.state.reactionInfo.tags,
+      isAddTag: false
     }
   },
   updated() {
     const index = this.tags.length
-    if (this.$refs[`tag${index - 1}`]) {
+    if (this.isAddTag && this.$refs[`tag${index - 1}`]) {
       this.$refs[`tag${index - 1}`][0].focus()
+      this.isAddTag = false
     }
   },
   methods: {
     addTag() {
+      this.isAddTag = true
       this.tags.forEach(item => {
         if (item.trim() === '') {
           this.$store.commit('toast', { text: '没有内容的标签将不会被保存', state: 2, durationTime: 3000 })
         }
       })
       this.tags.push('')
+    },
+    deleteTag(index) {
+      this.tags.splice(index, 1)
     },
     validateTag(event, index) {
       if (!/^.{0,10}$/.test(event.target.innerHTML)) {
@@ -43,11 +54,25 @@ export default {
       if (event.target.innerHTML.trim() === '') {
         this.$store.commit('toast', { text: '没有内容的标签将不会被保存', state: 2, durationTime: 3000 })
       }
+    },
+    serialize() {
+      let isValid = true
+      this.tags.forEach((item, index) => {
+        if (!/^.{0,10}$/.test(item)) {
+          this.$store.commit('toast', { text: `标签${index}的字数超过 10 个`, state: 2, durationTime: 3000 })
+          isValid = false
+        }
+      })
+      if (isValid) {
+        this.$emit('success', this.date, this.tags)
+      } else {
+        this.$emit('fail')
+      }
     }
   },
   computed: {
     readonlyDate() {
-      return this.$store.state.reactionInfo.updateDate
+      return this.$store.state.reactionInfo.date
     },
     readonlyTags() {
       return this.$store.state.reactionInfo.tags
@@ -61,6 +86,11 @@ export default {
     },
     readonlyTags(newVal) {
       this.tags = newVal
+    },
+    isSubmit(newVal) {
+      if (newVal) {
+        this.serialize()
+      }
     }
   }
 }
@@ -70,6 +100,7 @@ export default {
 .reaction-form-date {
   display: flex;
   margin: 30px 60px;
+  height: 36px;
 
   input {
     display: inline;
@@ -81,6 +112,19 @@ export default {
   .tags {
     display: flex;
 
+    .tag {
+      position: relative;
+
+      img {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+      }
+    }
+
     span {
       box-sizing: border-box;
       overflow: hidden;
@@ -88,7 +132,8 @@ export default {
       padding: 4px 10px;
       border-radius: 5px;
       font-size: 16px;
-      height: 30px;
+      height: 36px;
+      line-height: 28px;
       outline: none;
       display: inline-block;
       color: #FFFFFF;

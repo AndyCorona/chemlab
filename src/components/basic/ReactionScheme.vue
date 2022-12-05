@@ -1,6 +1,7 @@
 <template>
   <div class="reaction-scheme">
-    <reaction-module-title placeholder="图片" name="scheme"></reaction-module-title>
+    <reaction-module-title placeholder="图片" @input="gotTitle" :moduleOrder="moduleOrder"
+      :dataOrder="dataOrder"></reaction-module-title>
     <div class="container" v-show="noImg">
       <label :for="`img${randomNum}`">+</label>
       <input ref="inputRef" :id="`img${randomNum}`" type="file" @change="previewImg($event)">
@@ -18,18 +19,31 @@ export default {
   components: {
     ReactionModuleTitle
   },
+  props: {
+    moduleOrder: Number,
+    dataOrder: Number
+  },
+  inject: ['isSubmit'],
+  emits: ['success', 'fail'],
   data() {
     return {
-      imgPath: '',
+      imgPath: !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].content,
       randomNum: Math.random(),
       title: '',
-      noImg: true
+      noImg: true,
+      imgFile: null
     }
   },
   methods: {
+    gotTitle(value) {
+      this.title = value
+    },
     previewImg(event) {
       const file = event.target.files[0]
-      const type = ['bmp', 'jpg', 'png', 'tif', 'gif', 'svg']
+      if (!file) {
+        return
+      }
+      const type = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'gif', 'svg']
       let isValidImg = false
       for (let i = 0; i < type.length; i++) {
         if (file.type.includes(type[i])) {
@@ -51,13 +65,67 @@ export default {
       reader.addEventListener('load', () => {
         this.imgPath = reader.result
       }, false)
-
-      if (file) {
-        reader.readAsDataURL(file)
+      reader.readAsDataURL(file)
+      this.imgFile = file
+    },
+    serialize() {
+      let isBlank = true
+      // 标题不为空
+      if (this.title.trim() !== '') {
+        isBlank = false
+      }
+      // 图片内容不为空
+      if (isBlank && this.imgFile !== null && this.imgPath !== null) {
+        isBlank = false
+      }
+      if (isBlank) {
+        this.$emit('success', null)
+        return
+      }
+      // 将当前图片上传到服务器中，并返回图片的 url 地址。若上传成功则触发 success 事件，否则触发 fail 事件
+      // this.axios.post('')
+      const isUploaded = true
+      this.imgPath = 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333'
+      if (isUploaded) {
+        const data = {
+          type: 'scheme',
+          title: this.title,
+          content: this.imgPath
+        }
+        this.$emit('success', data)
+      } else {
+        this.$emit('fail')
       }
     },
     changeInputFile() {
       this.$refs.inputRef.click()
+    }
+  },
+  computed: {
+    readonlyImgPath() {
+      return !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].content
+    }
+  },
+  watch: {
+    isSubmit(newVal) {
+      if (newVal) {
+        this.serialize()
+      }
+    },
+    imgPath: {
+      handler(newVal) {
+        if (newVal !== '') {
+          this.noImg = false
+        } else {
+          this.noImg = true
+        }
+      },
+      immediate: true
+    },
+    readonlyImgPath: {
+      handler(newVal) {
+        this.imgPath = newVal
+      }
     }
   }
 }

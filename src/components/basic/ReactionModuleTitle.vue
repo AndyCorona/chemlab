@@ -1,20 +1,41 @@
 <template>
   <div class="reaction-module-title">
-    <input type="text" :name='name' :placeholder='placeholder' v-model="title">
-    <img class="delete-reaction" src="/imgs/用户主页/删除项目.svg">
+    <input type="text" :placeholder='placeholder' v-model="title" @input="$emit('input', title)">
+    <img class="delete-reaction" src="/imgs/用户主页/删除项目.svg" @click="deleteModule(moduleOrder)">
   </div>
 </template>
 
 <script>
 export default {
   name: 'ReactionModuleTitle',
+  emits: ['input'],
   props: {
     placeholder: String,
-    name: String
+    moduleOrder: Number,
+    dataOrder: Number
+  },
+  methods: {
+    deleteModule(number) {
+      this.$store.commit('deleteModuleNumber', number)
+    }
   },
   data() {
     return {
-      title: ''
+      title: !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].title
+    }
+  },
+  computed: {
+    readonlyTitle() {
+      return !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].title
+    }
+  },
+  watch: {
+    readonlyTitle: {
+      handler(newVal) {
+        this.title = newVal
+        this.$emit('input', this.title)
+      },
+      immediate: true
     }
   }
 }

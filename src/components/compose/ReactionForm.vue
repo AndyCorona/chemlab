@@ -1,7 +1,8 @@
 <template>
   <div class="reaction-form">
     <form>
-      <reaction-form-title></reaction-form-title>
+      <reaction-form-title @success="(value) => { this.reactionName = value }"
+        @fail="(this.isSubmitFail = true)"></reaction-form-title>
       <reaction-save-template-modal :show="showSaveTemplateModal" @close="this.showSaveTemplateModal = false">
       </reaction-save-template-modal>
       <reaction-select-template-modal :show="showSelectTemplateModal" @close="this.showSelectTemplateModal = false">
@@ -11,10 +12,14 @@
         <img src="/imgs/实验内容/保存模板.svg" @click="this.showSaveTemplateModal = true">
         <img src="/imgs/实验内容/我的模板.svg" @click="this.showSelectTemplateModal = true">
       </div>
-      <reaction-form-date></reaction-form-date>
+      <reaction-form-date @success="(date, tags) => {
+        if (date) { this.date = date }
+        this.tags = tags
+      }"></reaction-form-date>
       <div class="form-container">
-        <reaction-module-wrapper v-for="(item, index) in readonlyModule" :key="index" :moduleName="item"
-          :moduleOrder="index"></reaction-module-wrapper>
+        <reaction-module-wrapper @success="(value) => {this.success(value, index)}" @fail="fail"
+          v-for="(item, index) in modules" :key="index" :moduleName="item.name" :moduleOrder="index"
+          :dataOrder="item.dataIndex"></reaction-module-wrapper>
       </div>
     </form>
   </div>
@@ -25,6 +30,7 @@ import ReactionFormDate from '../basic/ReactionFormDate.vue'
 import ReactionSaveTemplateModal from '../basic/ReactionSaveTemplateModal.vue'
 import ReactionSelectTemplateModal from '../basic/ReactionSelectTemplateModal.vue'
 import ReactionModuleWrapper from './ReactionModuleWrapper.vue'
+import { computed } from '@vue/reactivity'
 export default {
   name: 'ReactionForm',
   components: {
@@ -38,15 +44,13 @@ export default {
     return {
       showSaveTemplateModal: false,
       showSelectTemplateModal: false,
-      reactionName: '',
-      reactionId: -1,
-      updateDate: '',
-      tags: [],
+      modules: [{ name: 'scheme', dataIndex: 0 }, { name: 'text', dataIndex: 1 }, { name: 'table', dataIndex: 2 }, { name: 'data', dataIndex: 3 }, { name: 'reference', dataIndex: 4 }],
+      submit: false,
+      isSubmitFail: false,
+      reactionName: '未命名',
       data: [],
-      imgPaths: [],
-      filePaths: [],
-      versions: [],
-      modules: []
+      date: this.dateFormat('YYYY-mm-dd', new Date()),
+      tags: []
     }
   },
   mounted() {
@@ -64,11 +68,9 @@ export default {
         this.$store.commit('saveReactionInfo', {
           reactionId: null,
           reactionName: '未命名',
-          updateDate: this.dateFormat('YYYY-mm-dd', new Date()),
+          date: this.dateFormat('YYYY-mm-dd', new Date()),
           tags: [],
           data: [],
-          imgPaths: [],
-          filePaths: [],
           versions: []
         })
       } else {
@@ -77,10 +79,6 @@ export default {
           reactionId: reactionId,
           isGroup: this.isGroup
         }).then((data) => {
-          this.reactionName = data.reactionName
-          this.reactionId = data.reactionId
-          this.updateDate = data.updateDate
-          this.tags = data.tags
           this.$store.dispatch('saveReactionInfo', data)
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
@@ -112,32 +110,55 @@ export default {
       }
       return fmt
     },
+    success(value, index) {
+      this.data[index] = value
+    },
+    fail() {
+      this.isSubmitFail = true
+    },
     saveReaction() {
-      alert('开始序列化')
+      this.submit = true
       // 序列化，对每个模块获取信息
       // 对所有图片模块进行校验，所有图片必须都上传成功，获取所有图片的后台 url 地址
       // 对所有文件模块进行校验，所有文件必须都上传成功，获取所有文件的后台 url 地址
       // 对所有模块按约定格式序列化
-      // 调用保存实验内容接口，保存序列化数据
+      if (this.isSubmitFail) {
+        this.$store.commit('toast', { text: '保存失败，请重试', durationTime: 3000 })
+      } else {
+        // 调用保存实验内容接口，保存序列化数据
+        const reactionId = JSON.parse(sessionStorage.getItem('reactionId') === null ? '-1' : sessionStorage.getItem('reactionId'))
+        if (reactionId === 0) {
+          return true
+        } else {
+          return true
+        }
+      }
     }
   },
   computed: {
     isGroup() {
       return this.$store.state.isGroup
     },
-    readonlyModule: {
-      get() {
-        const module = []
-        if (this.$store.state.reactionInfo.data) {
-          this.$store.state.reactionInfo.data.forEach(item => {
-            module.push(item.type)
-          })
-        }
-        return module
-      },
-      set(newVal) {
-        this.modules = newVal
+    deleteModuleNumber() {
+      return this.$store.state.deleteModuleNumber
+    }
+  },
+  watch: {
+    deleteModuleNumber(newVal) {
+      if (newVal !== -1) {
+        this.$store.commit('deleteModuleNumber', -1)
+        let retArr = []
+        retArr = this.modules.filter((item, index) => {
+          return index !== newVal
+        })
+        this.modules = retArr
       }
+    }
+  },
+  provide() {
+    return {
+      // 响应式数据，给所有模块发送序列化信号
+      isSubmit: computed(() => this.submit)
     }
   }
 }

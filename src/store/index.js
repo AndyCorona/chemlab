@@ -21,7 +21,9 @@ export default createStore({
     okEvent: null,
     // toast 和 dialog 自适应参数
     scrollTop: 0,
-    height: 1080
+    height: 1080,
+    // 要被删除的模组序号
+    deleteModuleNumber: -1
   },
   getters: {
   },
@@ -65,6 +67,9 @@ export default createStore({
     },
     bindOkEvent(state, payload) {
       state.okEvent = payload
+    },
+    deleteModuleNumber(state, payload) {
+      state.deleteModuleNumber = payload
     }
   },
   actions: {
@@ -97,6 +102,9 @@ export default createStore({
     },
     bindOkEvent(context, payload) {
       context.commit('bindOkEvent', payload)
+    },
+    deleteModuleNumber(context, payload) {
+      context.deleteModuleNumber = payload
     }
   },
   modules: {

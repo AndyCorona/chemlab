@@ -2,7 +2,7 @@
   <div class="reaction-table" :style="`user-select:${userSelect}`"
     @mouseup="(this.mouseX = 0, this.firstDeltaMouseMove = false, this.contenteditable = true, this.userSelect = 'auto')"
     @mousemove="resize($event)">
-    <reaction-module-title placeholder="表格"></reaction-module-title>
+    <reaction-module-title placeholder="表格" @input="gotTitle" :moduleOrder="moduleOrder" :dataOrder="dataOrder"></reaction-module-title>
     <div class="container">
       <div class="thead">
         <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
@@ -35,13 +35,17 @@ export default {
   components:
     { ReactionModuleTitle },
   props: {
-    moduleOrder: Number
+    moduleOrder: Number,
+    dataOrder: Number
   },
+  inject: ['isSubmit'],
+  emits: ['success', 'fail'],
   data() {
     return {
-      thead: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[1],
-      tbody: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content.splice(2),
-      tWidth: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[0],
+      title: '',
+      thead: !this.$store.state.reactionInfo.data ? ['默认'] : this.$store.state.reactionInfo.data[this.dataOrder].content[1],
+      tbody: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content.slice(2),
+      tWidth: !this.$store.state.reactionInfo.data ? ['1120'] : this.$store.state.reactionInfo.data[this.dataOrder].content[0],
       col: null,
       row: null,
       mouseX: 0,
@@ -53,6 +57,9 @@ export default {
     }
   },
   methods: {
+    gotTitle(value) {
+      this.title = value
+    },
     addCol() {
       this.thead.push(`列${this.col + 1}`)
       this.tbody.forEach(item => {
@@ -174,11 +181,81 @@ export default {
       this.lastMouseX = event.pageX
       this.firstDeltaMouseMove = false
     },
-    func() {
-      event.target.innerHTML.trim()
+    // 当表格有内容时进行序列化
+    serialize() {
+      let isBlank = true
+      // 标题不为空
+      if (this.title.trim() !== '') {
+        isBlank = false
+      } else {
+        // 表头不为空
+        for (let i = 0; i < this.thead.length; i++) {
+          if (this.thead[i].trim() !== '') {
+            isBlank = false
+            break
+          }
+        }
+        // 表体不为空
+        if (isBlank) {
+          for (let i = 0; i < this.tbody.length; i++) {
+            for (let j = 0; j < this.tbody[i].length; j++) {
+              if (this.tbody[i][j].trim() !== '') {
+                isBlank = false
+                break
+              }
+            }
+          }
+        }
+      }
+      // 如果是空白表格
+      if (isBlank) {
+        this.$emit('success', null)
+        return
+      }
+      const data = {
+        type: 'table',
+        title: this.title,
+        content: [this.tWidth, this.thead]
+      }
+      this.tbody.forEach(item => {
+        data.content.push(item)
+      })
+      this.$emit('success', data)
+    }
+  },
+  computed: {
+    readonlyThead() {
+      return !this.$store.state.reactionInfo.data ? ['默认'] : this.$store.state.reactionInfo.data[this.dataOrder].content[1]
+    },
+    readonlyTbody() {
+      if (!this.$store.state.reactionInfo.data) {
+        return []
+      } else {
+        const retArr = []
+        const arr = this.$store.state.reactionInfo.data[this.dataOrder].content
+        const length = arr.length
+        if (length > 2) {
+          for (let i = 2; i < length; i++) {
+            retArr.push(arr[i])
+          }
+        }
+        return retArr
+      }
+    },
+    readonlyTwidth() {
+      return !this.$store.state.reactionInfo.data ? [1120] : this.$store.state.reactionInfo.data[this.dataOrder].content[0]
     }
   },
   watch: {
+    readonlyThead(newVal) {
+      this.thead = newVal
+    },
+    readonlyTbody(newVal) {
+      this.tbody = newVal
+    },
+    readonlyTwidth(newVal) {
+      this.tWidth = newVal
+    },
     thead: {
       handler(newVal) {
         this.col = newVal.length
@@ -190,6 +267,11 @@ export default {
         this.row = newVal.length + 1
       },
       immediate: true
+    },
+    isSubmit(newVal) {
+      if (newVal) {
+        this.serialize()
+      }
     }
   }
 }
@@ -217,7 +299,8 @@ export default {
         align-items: center;
 
         div {
-          min-height: 26px;
+          min-height: 30px;
+          line-height: 30px;
           border: 1px solid #FFFFFF;
         }
 
@@ -227,8 +310,8 @@ export default {
         }
 
         .slider {
-          height: 26px;
-          line-height: 26px;
+          height: 30px;
+          line-height:30px;
           cursor: col-resize;
           width: 4px;
           opacity: 0;
@@ -278,10 +361,11 @@ export default {
     }
 
     .NewRow {
+      box-sizing: border-box;
       border-radius: 5px;
       border: 1px dashed #000000;
-      height: 24px;
-      line-height: 24px;
+      height: 30px;
+      line-height: 28px;
       width: 1180px;
       cursor: pointer;
       text-align: center;

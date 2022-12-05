@@ -1,6 +1,6 @@
 <template>
-  <div class="reaction-data">
-    <reaction-module-title placeholder="数据" @input="gotTitle" :moduleOrder="moduleOrder"
+  <div class="reaction-reference">
+    <reaction-module-title placeholder="引用" @input="gotTitle" :moduleOrder="moduleOrder"
       :dataOrder="dataOrder"></reaction-module-title>
     <div class="container">
       <div class="thead">
@@ -17,12 +17,11 @@
           }}</div>
         </div>
         <div :style="`width:${tWidth[3]}px`" class="show-input" v-show="!hasFile[i]">
-          <label :for="`img${randomNum * (i + 1)}`">上传</label>
-          <input :id="`img${randomNum * (i + 1)}`" type="file" @change="uploadFile($event, i)">
+          <label :for="`img${randomNum * (i + 1)}`">解析文件</label>
+          <input :id="`img${randomNum * (i + 1)}`" type="file" @change="resolveFile($event, i)">
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-file-name" v-show="hasFile[i]">
-          <div @click="downloadFile(dataFilePath[i][1])">{{ !dataFilePath[i] ? dataFilePath[i] : dataFilePath[i][0] }}
-          </div>
+        <div :style="`width:${tWidth[3]}px`" class="show-reference" v-show="hasFile[i]">
+          <a class="word-wrap" target="_blank" :href="referencePath[i]">{{ referencePath[i] }}</a>
         </div>
         <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)">
       </div>
@@ -32,9 +31,9 @@
 </template>
 
 <script>
-import ReactionModuleTitle from '../basic/ReactionModuleTitle.vue'
+import ReactionModuleTitle from './ReactionModuleTitle.vue'
 export default {
-  name: 'ReactionData',
+  name: 'ReactionReference',
   components: {
     ReactionModuleTitle
   },
@@ -47,15 +46,14 @@ export default {
   data() {
     return {
       title: '',
-      thead: ['仪器', '测试类型', '日期', '文件'],
+      thead: ['日期', '期刊', '标题', '链接'],
       tWidth: [200, 200, 200, 510],
       tbody: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content.slice(1),
-      dataFilePath: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content[0],
+      referencePath: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content[0],
       col: 4,
       row: null,
       randomNum: Math.random(),
-      hasFile: [],
-      dataFile: []
+      hasFile: []
     }
   },
   methods: {
@@ -66,7 +64,6 @@ export default {
     synTbody(event, i, j) {
       this.tbody[i][j] = event.target.innerHTML
     },
-    // 最多添加 10 行
     addRow() {
       this.row++
       const arr = []
@@ -75,32 +72,22 @@ export default {
         arr.push('')
       }
       this.tbody.push(arr)
-      this.dataFilePath.push(['', ''])
+      this.referencePath.push('')
     },
     deleteRow(index) {
       this.tbody.splice(index, 1)
-      this.dataFilePath.splice(index, 1)
-      this.dataFile.splice(index, 1)
+      this.referencePath.splice(index, 1)
       this.row--
     },
-    downloadFile(url) {
-      // 使用 item 提供的 utl 进行下载
-      alert('下载成功')
-    },
-    uploadFile(event, row) {
+    resolveFile(event, row) {
       const file = event.target.files[0]
       if (!file) {
         return
       }
-      if (file.size >= 1024 * 5 * 1024) {
-        this.$store.commit('toast', { text: '上传文件大小不超过 5 M', state: 2 })
-        return
-      }
       // 改变文件之后，文件状态为已经上传
       this.hasFile[row] = true
-      this.dataFile.splice(row, 0, file)
-      // 显示当前文件名字
-      this.dataFilePath[row][0] = file.name
+      this.referencePath[row] = '111111111'
+      // 解析文件并进行填充单元格
     },
     serialize() {
       // 只有一列，不需要上传
@@ -115,7 +102,7 @@ export default {
       }
       // 单元格内容不为空
       if (isBlank) {
-        for (let i = 0; i < this.row - 1; i++) {
+        for (let i = 0; i < this.row; i++) {
           for (let j = 0; j < this.col; j++) {
             if (this.tbody[i][j].trim() !== '') {
               isBlank = false
@@ -124,35 +111,20 @@ export default {
           }
         }
       }
-      // 是否有文件需要上传
-      if (isBlank) {
-        for (let i = 0; i < this.dataFile.length; i++) {
-          if (this.dataFile[i] instanceof Object) {
-            isBlank = false
-            break
-          }
-        }
-      }
       if (isBlank) {
         this.$emit('success', null)
         return
       }
-      // 将当前所有文件上传到服务器中，并返回所有文件的 url 地址。若上传成功则触发 success 事件，否则触发 fail 事件
       // this.axios.post('')
-      const isUploaded = true
-      this.dataFilePath = ['https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333', 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333', 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333']
-      if (isUploaded) {
-        const data = {
-          type: 'data',
-          title: this.title,
-          content: []
-        }
-        data.content.push(this.dataFilePath)
-        data.content.push(this.tbody)
-        this.$emit('success', data)
-      } else {
-        this.$emit('fail')
+      this.referencePath = ['https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333', 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333', 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333']
+      const data = {
+        type: 'data',
+        title: this.title,
+        content: []
       }
+      data.content.push(this.referencePath)
+      data.content.push(this.tbody)
+      this.$emit('success', data)
     }
   },
   computed: {
@@ -171,7 +143,7 @@ export default {
         return retArr
       }
     },
-    readonlyDataFilePath() {
+    readonlyreferencePath() {
       return !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content[0]
     },
     readyonlyHasFile() {
@@ -182,24 +154,11 @@ export default {
         const arr = this.$store.state.reactionInfo.data[this.dataOrder].content[0]
         const length = arr.length
         for (let i = 0; i < length; i++) {
-          if (arr[i][0] !== '') {
+          if (arr[i] !== '') {
             retArr.push(true)
           } else {
             retArr.push(false)
           }
-        }
-        return retArr
-      }
-    },
-    readonlyDataFile() {
-      if (!this.$store.state.reactionInfo.data) {
-        return []
-      } else {
-        const retArr = []
-        const arr = this.$store.state.reactionInfo.data[this.dataOrder].content[0]
-        const length = arr.length
-        for (let i = 0; i < length; i++) {
-          retArr.push(arr[i][1])
         }
         return retArr
       }
@@ -209,20 +168,16 @@ export default {
     readonlyTbody(newVal) {
       this.tbody = newVal
     },
-    readonlyDataFilePath: {
+    readonlyreferencePath: {
       handler(newVal) {
-        this.dataFilePath = newVal
-      },
-      deep: true
+        this.referencePath = newVal
+      }
     },
     readyonlyHasFile: {
       handler(newVal) {
         this.hasFile = newVal
       },
       immediate: true
-    },
-    readonlyDataFile(newVal) {
-      this.dataFile = newVal
     },
     tbody: {
       handler(newVal) {
@@ -240,7 +195,7 @@ export default {
 </script>
 
 <style lang="scss">
-.reaction-data {
+.reaction-reference {
   .container {
     box-sizing: border-box;
     font-size: 16px;
@@ -269,9 +224,16 @@ export default {
         }
       }
 
-      .show-file-name {
-        text-decoration: underline;
-        color: #638271;
+      .show-reference {
+        a {
+          text-decoration: underline;
+          color: #638271;
+          display: inline-block;
+          line-height: 30px;
+          height: 30px;
+          max-width: 510px;
+        }
+
         cursor: pointer;
       }
 

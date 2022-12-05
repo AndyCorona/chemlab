@@ -432,16 +432,15 @@ Mock.mock('/true/api/reaction', 'get', {
   data: {
     reactionId: 1,
     reactionName: '正则重中之重重中之重正则重中之重重中之重正则重中之重重中之重',
-    updateDate: '2022-12-12',
+    date: '2022-12-12',
     tags: ['正则重中之重重中之重', '正则重中之重重中之重', '正则重中之重重中之重'],
     data: [
-      { type: 'scheme', title: '这是一个图片模块', content: 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333' },
+      { type: 'scheme', title: '这是一个图片模块', content: '/imgs/登录页/产品图标.png' },
       { type: 'text', title: '这是一个文本模块', content: '11111111' },
       { type: 'table', title: '这是一个表格模块', content: [[228, 228, 228, 228, 228], ['名称', '分子量', '质量', '产率', '备注'], ['苯甲酸', '191.3g/mol', '13g', '25%', '无'], ['苯甲酸2', '191.3g/mol', '13g', '25%', '无']] },
-      { type: 'data', title: '这是一个数据模块', content: [['仪器', '测试类型', '日期', '文件', '下载路径'], ['NMR', '谱图测试', '2022-12-12', '222.zip', 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333']] }
+      { type: 'data', title: '这是一个数据模块', content: [[['222.zip', 'url1'], ['', '']], ['NMR', '谱图测试', '2022-12-12'], ['NMR', '谱图测试', '2022-12-12']] },
+      { type: 'reference', title: '这是一个引用模块', content: [['https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', 'https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', ''], ['2022', 'Science', '这是一个题目'], ['2022', 'Science111111', '这是一个题目'], ['2022', '', '这是一个题目']] }
     ],
-    imgPaths: [],
-    filePaths: [],
     versions: [
       {
         id: 1,

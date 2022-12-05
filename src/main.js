@@ -20,4 +20,5 @@ app.component('ToastProps', ToastProps)
 app.component('CommonInformModal', CommonInformModal)
 
 app.config.globalProperties.$config = config
+app.config.unwrapInjectedRef = true
 app.use(store).use(router).use(VueAxios, axios).mount('#app')

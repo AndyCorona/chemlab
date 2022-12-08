@@ -1,8 +1,8 @@
 <template>
   <div class="reaction-form-date">
-    <input type="date" name="date" v-model="date">
+    <input type="date" v-model="date">
     <div class="tags">
-      <div class="tag" v-for="(item, index) in this.$store.state.reactionInfo.tags" :key="index">
+      <div class="tag" v-for="(item, index) in tags" :key="index">
         <span title="没有文字的标签不会被保存" :ref="`tag${index}`" contenteditable="true" :id="`tag${index + 1}`"
           @input="this.tags[index] = $event.target.innerHTML" @focusout="validateTag($event, index)">{{
               item
@@ -22,8 +22,7 @@ export default {
   emits: ['success', 'fail'],
   data() {
     return {
-      date: this.$store.state.reactionInfo.date,
-      tags: !this.$store.state.reactionInfo.tags ? [] : this.$store.state.reactionInfo.tags,
+      // 点击添加标签按钮才触发 focus 事件
       isAddTag: false
     }
   },
@@ -37,11 +36,6 @@ export default {
   methods: {
     addTag() {
       this.isAddTag = true
-      this.tags.forEach(item => {
-        if (item.trim() === '') {
-          this.$store.commit('toast', { text: '没有内容的标签将不会被保存', state: 2, durationTime: 3000 })
-        }
-      })
       this.tags.push('')
     },
     deleteTag(index) {
@@ -71,22 +65,24 @@ export default {
     }
   },
   computed: {
-    readonlyDate() {
-      return this.$store.state.reactionInfo.date
+    date: {
+      get() {
+        return this.$store.state.reactionInfo.date
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDate', newVal)
+      }
     },
-    readonlyTags() {
-      return this.$store.state.reactionInfo.tags
+    tags: {
+      get() {
+        return this.$store.state.reactionInfo.tags
+      },
+      set(newVal) {
+        return this.$store.commit('saveReactionTags', newVal)
+      }
     }
   },
   watch: {
-    readonlyDate: {
-      handler(newVal) {
-        this.date = newVal
-      }
-    },
-    readonlyTags(newVal) {
-      this.tags = newVal
-    },
     isSubmit(newVal) {
       if (newVal) {
         this.serialize()

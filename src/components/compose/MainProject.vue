@@ -3,8 +3,9 @@
     <main-project-and-reaction-title classType="reaction-title" :readOnly="readOnly" @change="rename">
     </main-project-and-reaction-title>
     <div class="wrapper">
-      <img @click="addReaction" src="/imgs/反应/添加.svg" v-show="(!isGroup && !isProjectLimitation)">
-      <img @click="share" src="/imgs/反应/分享.svg" v-show="!isGroup">
+      <img @click="addReaction" src="/imgs/反应/添加.svg"
+        v-show="(!isGroup && this.$store.state.projectInfo.reactions.length < 50)">
+      <img @click="shareReaction" src="/imgs/反应/分享.svg" v-show="!isGroup">
       <img @click="deleteReaction" src="/imgs/反应/删除.svg"
         v-show="!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin)">
     </div>
@@ -25,8 +26,7 @@ export default {
   data() {
     return {
       reactionIdList: [],
-      projectName: '',
-      isProjectLimitation: null
+      projectName: ''
     }
   },
   methods: {
@@ -69,7 +69,7 @@ export default {
         this.$store.commit('toast', { text: '请勾选要删除的实验', state: 2 })
         return
       }
-      this.$store.commit('dialog', { text: `确认删除${length > 1 ? '这些' : '该'}反应吗?`, title: '删除提醒' })
+      this.$store.commit('modal', { text: `确认删除${length > 1 ? '这些' : '该'}反应吗?`, title: '删除提醒', slotType: 0 })
       this.$store.commit('bindOkEvent', this.confirmDeleteReaction)
     },
     confirmDeleteReaction() {
@@ -89,8 +89,39 @@ export default {
       sessionStorage.setItem('reactionId', 0)
       this.$router.push(`/main/${this.isGroup ? 'group' : 'user'}/project/reaction`)
     },
-    share() {
-
+    shareReaction() {
+      // 判断用户是否有加入群组中
+      if (!this.inGroup) {
+        this.$store.commit('toast', { text: '请先加入一个群组', state: 2 })
+        return
+      }
+      // 获取该用户所在群组中的项目列表
+      this.axios.get('/main/project', {
+        params: { isGroup: this.isGroup }
+      }).then((data) => {
+        console.log(data)
+        this.$store.dispatch('saveProjectList', data)
+        // 打开模态框
+        this.$store.commit('modal', { slotType: 4 })
+        // 绑定确认事件
+        this.$store.commit('bindOkEvent', this.confirmShareReaction)
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { text: resp.msg })
+      })
+      return true
+    },
+    confirmShareReaction() {
+      const shareProjectId = this.$store.state.shareProjectId
+      this.axios.post('/reaction/share', {
+        projectId: shareProjectId,
+        reactionid: this.reactionIdList
+      }).then(() => {
+        this.$store.dispatch('toast', { text: '分享成功', state: 0 })
+        // 手动关闭模态框
+        this.$store.dispatch('modal', { showModal: false })
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { text: resp.msg })
+      })
     },
     selection(reactionIdList) {
       this.reactionIdList = reactionIdList
@@ -108,16 +139,13 @@ export default {
         return false
       }
     },
+    // 用户当前是否处于群组页面
     isGroup() {
       return this.$store.state.isGroup
     },
-    reactions() {
-      return this.$store.state.projectInfo.reactions
-    }
-  },
-  watch: {
-    reactions(newVal) {
-      this.isProjectLimitation = newVal.length >= 50
+    // 用户是否有加入群组中
+    inGroup() {
+      return this.$store.state.groupInfo.members.length
     }
   }
 }

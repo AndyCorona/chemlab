@@ -5,26 +5,26 @@
       <div class="basic-details">
         <div class="wrapper">
           <label>邮箱：</label>
-          <input type="text" readonly :placeholder="this.email">
+          <input type="text" readonly :placeholder="email">
         </div>
         <div class="wrapper" :class="basitStyle">
           <label>用户名：</label>
           <input @change="validateUsername" type="text" :readonly="basicToggle" v-model="username"
-            :placeholder="this.username">
+            :placeholder="username">
         </div>
         <div class="wrapper" :class="basitStyle">
           <label>密码：</label>
           <input @change="validatePassword" type="password" :readonly="basicToggle" v-model="password"
-            :placeholder="this.password">
+            :placeholder="password">
         </div>
         <div class="wrapper" :class="basitStyle" :style="`opacity:${basicToggle ? '0' : '100%'}`">
           <label>确认密码：</label>
           <input @change="validateConfirmPassword" type="password" :readonly="basicToggle" v-model="confirmPassword"
-            :placeholder="this.confirmPassword">
+            :placeholder="confirmPassword">
         </div>
         <div class="wrapper">
           <button class="save" @click.prevent="saveBasic">保存</button>
-          <button class="toggle" @click.prevent="this.basicToggle = !basicToggle">修改</button>
+          <button class="toggle" @click.prevent="basicToggle = !basicToggle">修改</button>
         </div>
       </div>
     </div>
@@ -34,21 +34,21 @@
         <div class="wrapper" :class="personalStyle">
           <label>学校：</label>
           <input @change="validateSchool" type="text" :readonly="personalToggle" v-model="school"
-            :placeholder="this.school">
+            :placeholder="school">
         </div>
         <div class="wrapper" :class="personalStyle">
           <label>专业：</label>
           <input @change="validateMajor" type="text" :readonly="personalToggle" v-model="major"
-            :placeholder="this.major">
+            :placeholder="major">
         </div>
         <div class="wrapper" :class="personalStyle">
           <label>研究领域：</label>
           <input @change="validateField" type="text" :readonly="personalToggle" v-model="field"
-            :placeholder="this.field">
+            :placeholder="field">
         </div>
         <div class="wrapper">
           <button class="save" @click.prevent="savePersonal">保存</button>
-          <button class="toggle" @click.prevent="this.personalToggle = !personalToggle">修改</button>
+          <button class="toggle" @click.prevent="personalToggle = !personalToggle">修改</button>
         </div>
       </div>
     </div>

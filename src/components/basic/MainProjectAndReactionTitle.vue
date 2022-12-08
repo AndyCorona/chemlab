@@ -18,23 +18,13 @@ export default {
       type: Boolean
     }
   },
-  data() {
-    return {
-      name: this.classType === 'project-title' ? '项目列表' : this.$store.state.projectInfo.projectName
-    }
-  },
   computed: {
-    titleName() {
-      return !this.$store.state.projectInfo.projectName ? '未命名' : this.$store.state.projectInfo.projectName
-    }
-  },
-  watch: {
-    titleName: {
-      handler(newVal) {
-        if (this.name === '项目列表' && (this.$route.fullPath === '/main/group' || this.$router.fullPath === '/main/user')) {
-          return
-        }
-        this.name = newVal
+    name: {
+      get() {
+        return this.classType === 'project-title' ? '项目列表' : this.$store.state.projectInfo.projectName
+      },
+      set(newVal) {
+        this.$store.commit('saveProjectName', newVal)
       }
     }
   }

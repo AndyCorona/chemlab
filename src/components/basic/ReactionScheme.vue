@@ -1,13 +1,12 @@
 <template>
   <div class="reaction-scheme">
-    <reaction-module-title placeholder="图片" @input="gotTitle" :moduleOrder="moduleOrder"
-      :dataOrder="dataOrder"></reaction-module-title>
-    <div class="container" v-show="noImg">
+    <reaction-module-title placeholder="图片" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
+    <div class="container" v-show="!imgPath">
       <label :for="`img${randomNum}`">+</label>
       <input ref="inputRef" :id="`img${randomNum}`" type="file" @change="previewImg($event)">
     </div>
-    <div class="container" v-show="!noImg">
-      <img :src="imgPath" @click="changeInputFile">
+    <div class="container" v-show="imgPath">
+      <img :src="imgPath" @click="this.$refs.inputRef.click()">
     </div>
   </div>
 </template>
@@ -21,23 +20,16 @@ export default {
   },
   props: {
     moduleOrder: Number,
-    dataOrder: Number
+    showBlock: Boolean
   },
   inject: ['isSubmit'],
   emits: ['success', 'fail'],
   data() {
     return {
-      imgPath: !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].content,
-      randomNum: Math.random(),
-      title: '',
-      noImg: true,
-      imgFile: null
+      randomNum: Math.random()
     }
   },
   methods: {
-    gotTitle(value) {
-      this.title = value
-    },
     previewImg(event) {
       const file = event.target.files[0]
       if (!file) {
@@ -59,72 +51,73 @@ export default {
         this.$store.commit('toast', { text: '上传图片大小不超过 3 M', state: 2 })
         return
       }
-      this.noImg = false
       const reader = new FileReader()
-
       reader.addEventListener('load', () => {
-        this.imgPath = reader.result
+        this.$store.dispatch('saveReactionDataContent', { index: this.moduleOrder, content: [file, reader.result] })
       }, false)
       reader.readAsDataURL(file)
-      this.imgFile = file
     },
     serialize() {
+      const file = this.$store.state.reactionInfo.data[this.moduleOrder].content[0]
       let isBlank = true
       // 标题不为空
       if (this.title.trim() !== '') {
         isBlank = false
       }
-      // 图片内容不为空
-      if (isBlank && this.imgFile !== null && this.imgPath !== null) {
+      // 用户重新上传的图片
+      if (isBlank && file) {
         isBlank = false
       }
+      // 用户没有重新上传图片，但是原来图片路径还在
+      if (isBlank && this.imgPath) {
+        isBlank = false
+      }
+      // 标题为空、用户没有重新上传图片、原来的图片路径不存在 => 该模块不需要保存
       if (isBlank) {
         this.$emit('success', null)
         return
       }
-      // 将当前图片上传到服务器中，并返回图片的 url 地址。若上传成功则触发 success 事件，否则触发 fail 事件
+      // 如果没有更新图片，不用上传，否则将当前图片上传到服务器中，并返回图片的 url 地址。若上传成功则触发 success 事件，否则触发 fail 事件
       // this.axios.post('')
       const isUploaded = true
-      this.imgPath = 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333'
+      // 用户重新上传文件后替换之前的图片路径
+      if (file) {
+        this.imgPath = 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333'
+      }
       if (isUploaded) {
         const data = {
           type: 'scheme',
           title: this.title,
-          content: this.imgPath
+          content: ['', this.imgPath]
         }
         this.$emit('success', data)
       } else {
         this.$emit('fail')
       }
-    },
-    changeInputFile() {
-      this.$refs.inputRef.click()
     }
   },
   computed: {
-    readonlyImgPath() {
-      return !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].content
+    title: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
+      }
+    },
+    imgPath: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].content[1]
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: ['', newVal] })
+      }
     }
   },
   watch: {
     isSubmit(newVal) {
       if (newVal) {
         this.serialize()
-      }
-    },
-    imgPath: {
-      handler(newVal) {
-        if (newVal !== '') {
-          this.noImg = false
-        } else {
-          this.noImg = true
-        }
-      },
-      immediate: true
-    },
-    readonlyImgPath: {
-      handler(newVal) {
-        this.imgPath = newVal
       }
     }
   }

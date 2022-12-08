@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     logout() {
-      this.$store.commit('dialog', { text: '是否退出?', title: '退出提醒' })
+      this.$store.commit('modal', { text: '是否退出?', title: '退出提醒', slotType: 0 })
       this.$store.commit('bindOkEvent', this.confirmLogout)
     },
     confirmLogout() {
@@ -37,7 +37,8 @@ export default {
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })
-      this.$store.commit('dialog', { showModal: false })
+      // 无论成功与否，都要关闭模态框
+      this.$store.dispatch('modal', { showModal: false })
     }
   }
 }

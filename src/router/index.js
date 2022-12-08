@@ -1,13 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import HomeLogin from '../components/compose/HomeLogin.vue'
 import HomeProvacyPolicy from '../components/compose/HomePrivacyPolicy.vue'
 import HomeUserAgreement from '../components/compose/HomeUserAgreement.vue'
-import HomeForgotPassword from '../components/compose/HomeForgotPassword.vue'
-import HomeRegisterSuccess from '../components/compose/HomeRegisterSuccess.vue'
-import HomeActivateSuccess from '../components/compose/HomeActivateSuccess.vue'
-import HomeUpdatepassword from '../components/compose/HomeUpdatePassword.vue'
-import HomeSignup from '../components/compose/HomeSignup.vue'
 import MainView from '../views/MainView.vue'
 import MainDetails from '../components/compose/MainDetails.vue'
 import MainUserAndGroup from '../components/compose/MainUserAndGroup.vue'
@@ -23,42 +17,34 @@ const routes = [
       {
         path: '/login',
         name: 'home-login',
-        component: HomeLogin
+        component: HomeView
       },
       {
         path: '/signup',
         name: 'home-signup',
-        component: HomeSignup
+        component: HomeView
       },
       {
         path: '/register-success',
         name: 'home-register-success',
-        component: HomeRegisterSuccess
+        component: HomeView
       },
       {
         path: '/activate-success',
         name: 'home-activate-success',
-        component: HomeActivateSuccess
+        component: HomeView
       },
       {
         path: '/forgot-password',
         name: 'home-forgot-password',
-        component: HomeForgotPassword
+        component: HomeView
       },
       {
         path: '/update-password',
         name: 'home-update-password',
-        component: HomeUpdatepassword
+        component: HomeView
       }
     ]
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   },
   {
     path: '/privacy-policy',

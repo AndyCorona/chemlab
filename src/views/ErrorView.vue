@@ -28,7 +28,6 @@ export default {
 
 <style lang="scss">
 @import '../assets/scss/config.scss';
-
 .error-view {
   position: relative;
   text-align: center;

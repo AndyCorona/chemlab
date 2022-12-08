@@ -1,25 +1,24 @@
 <template>
-  <div class="reaction-form">
+  <div class="reaction-form" @drop="drop($event, this.modules.length)" @dragenter.prevent="" @dragover.prevent="">
     <form>
       <reaction-form-title @success="(value) => { this.reactionName = value }"
         @fail="(this.isSubmitFail = true)"></reaction-form-title>
-      <reaction-save-template-modal :show="showSaveTemplateModal" @close="this.showSaveTemplateModal = false">
-      </reaction-save-template-modal>
-      <reaction-select-template-modal :show="showSelectTemplateModal" @close="this.showSelectTemplateModal = false">
-      </reaction-select-template-modal>
       <div class="tool" v-show="!isGroup">
         <img src="/imgs/实验内容/保存实验.svg" @click="saveReaction">
-        <img src="/imgs/实验内容/保存模板.svg" @click="this.showSaveTemplateModal = true">
-        <img src="/imgs/实验内容/我的模板.svg" @click="this.showSelectTemplateModal = true">
+        <img src="/imgs/实验内容/保存模板.svg" @click="saveTemplate">
+        <img src="/imgs/实验内容/我的模板.svg" @click="selectTemplate">
       </div>
       <reaction-form-date @success="(date, tags) => {
         if (date) { this.date = date }
         this.tags = tags
       }"></reaction-form-date>
       <div class="form-container">
-        <reaction-module-wrapper @success="(value) => {this.success(value, index)}" @fail="fail"
-          v-for="(item, index) in modules" :key="index" :moduleName="item.name" :moduleOrder="index"
-          :dataOrder="item.dataIndex"></reaction-module-wrapper>
+        <reaction-module-wrapper :draggable="isDraggable" @success="(value) => { this.success(value, index) }"
+          @fail="fail" v-for="(item, index) in modules" :key="index" :moduleName="item.type" :moduleOrder="index"
+          @dragover.prevent="" @dragstart="dragStart($event, index)" @dragend="dragEnd($event, index)"
+          @dragenter.prevent="dragEnter($event, index)" @dragleave="dragLeave($event, index)"
+          @drop.stop="drop($event, index)" :class="{ dragging: isDragging }"
+          :showBlock="showBlock[index]"></reaction-module-wrapper>
       </div>
     </form>
   </div>
@@ -27,8 +26,6 @@
 <script>
 import ReactionFormTitle from '../basic/ReactionFormTitle.vue'
 import ReactionFormDate from '../basic/ReactionFormDate.vue'
-import ReactionSaveTemplateModal from '../basic/ReactionSaveTemplateModal.vue'
-import ReactionSelectTemplateModal from '../basic/ReactionSelectTemplateModal.vue'
 import ReactionModuleWrapper from './ReactionModuleWrapper.vue'
 import { computed } from '@vue/reactivity'
 export default {
@@ -36,15 +33,11 @@ export default {
   components: {
     ReactionFormTitle,
     ReactionFormDate,
-    ReactionSaveTemplateModal,
-    ReactionSelectTemplateModal,
     ReactionModuleWrapper
   },
   data() {
     return {
-      showSaveTemplateModal: false,
-      showSelectTemplateModal: false,
-      modules: [{ name: 'scheme', dataIndex: 0 }, { name: 'text', dataIndex: 1 }, { name: 'table', dataIndex: 2 }, { name: 'data', dataIndex: 3 }, { name: 'reference', dataIndex: 4 }],
+      showBlock: [],
       submit: false,
       isSubmitFail: false,
       reactionName: '未命名',
@@ -60,20 +53,57 @@ export default {
     }
   },
   methods: {
+    dragEnter(event, index) {
+      this.showBlock[index] = true
+    },
+    dragLeave(event, index) {
+      this.showBlock[index] = false
+    },
+    drop(event, index) {
+      // 每个实验模块数量不超过 15 个
+      if (this.modules.length >= 15) {
+        this.$store.commit('toast', { text: '每个实验最多只能放置 15 个模块', state: 2, durationTime: 3000 })
+        this.showBlock = []
+        return
+      }
+      // 放置成功后所有装饰块都应该取消显示
+      this.showBlock = []
+      // 根据指定模块添加对应的模块数据
+      const data = event.dataTransfer.getData('text/plain')
+      // 如果是从右边栏目拖拽的
+      if (data === 'scheme' || data === 'text') {
+        this.modules.splice(index, 0, { type: data, title: '', content: [] })
+      } else if (data === 'table') {
+        this.modules.splice(index, 0, { type: data, title: '', content: [['1120'], ['默认'], []] })
+      } else if (data === 'data' || data === 'reference') {
+        this.modules.splice(index, 0, { type: data, title: '', content: [[], []] })
+        // 如果是从已经有的模块进行拖拽的
+      } else {
+        // 获取被拖拽模块的之前位置
+        const module = this.modules.splice(parseInt(data), 1)
+        // 放置在实验内容的最后一个模块之后
+        this.modules.splice(index, 0, module[0])
+      }
+    },
+    dragStart(event, index) {
+      // 启动拖拽事件，让表单元素禁止
+      this.$store.commit('saveIsDragging', true)
+      const img = document.createElement('img')
+      img.src = '/imgs/登录页/产品图标.png'
+      // 设置传输的数据
+      event.dataTransfer.setData('text/plain', index)
+      // 设置拖动时的图片效果
+      event.dataTransfer.setDragImage(img, 200, 200)
+    },
+    dragEnd() {
+      this.dragCursor = 'pointer'
+      this.$store.commit('saveIsDragging', false)
+    },
     init() {
       // 当用户故意删除 sessionStorage 中的数据时，会查询一个不存在的反应列表，最终返回错误
       const reactionId = JSON.parse(sessionStorage.getItem('reactionId') === null ? '-1' : sessionStorage.getItem('reactionId'))
       // reactionId 为 0 代表新增反应的行为，为 > 0 的整数代表查询反应的行为
-      if (reactionId === 0) {
-        this.$store.commit('saveReactionInfo', {
-          reactionId: null,
-          reactionName: '未命名',
-          date: this.dateFormat('YYYY-mm-dd', new Date()),
-          tags: [],
-          data: [],
-          versions: []
-        })
-      } else {
+      if (reactionId > 0) {
         // 获取一个项目具体内容
         this.axios.get('/reaction', {
           reactionId: reactionId,
@@ -84,6 +114,12 @@ export default {
           this.$store.dispatch('toast', { text: resp.msg })
         })
       }
+      // 获取用户的所有自定义模版
+      this.axios.get('/template').then((data) => {
+        this.$store.dispatch('saveTemplateDefine', data)
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { text: resp.msg })
+      })
     },
     dateFormat(fmt, date) {
       let ret
@@ -133,25 +169,54 @@ export default {
           return true
         }
       }
+    },
+    saveTemplate () {
+      this.$store.commit('modal', { slotType: 5 })
+      this.$store.commit('bindOkEvent', this.confirmSaveTemplate)
+    },
+    confirmSaveTemplate() {
+      this.axios.post('/template', {
+        templateName: '模版1',
+        data: ['scheme', 'table', 'text']
+      }).then((data) => {
+        this.$store.dispatch('toast', { text: '保存成功', state: 0 })
+        // 将数据保存到 vuex 中
+        this.$store.dispatch('saveTemplateDefine', data)
+        // 手动关闭模态框
+        this.$store.dispatch('modal', { showModal: false })
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { text: resp.msg })
+      })
+    },
+    selectTemplate () {
+      this.$store.commit('modal', { slotType: 6 })
+      this.$store.commit('bindOkEvent', this.confirmSelectTemplate)
+    },
+    confirmSelectTemplate () {
+      this.axios.get('/template', {
+        template: ''
+      }).then((data) => {
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { text: resp.msg })
+      })
     }
   },
   computed: {
     isGroup() {
       return this.$store.state.isGroup
     },
-    deleteModuleNumber() {
-      return this.$store.state.deleteModuleNumber
-    }
-  },
-  watch: {
-    deleteModuleNumber(newVal) {
-      if (newVal !== -1) {
-        this.$store.commit('deleteModuleNumber', -1)
-        let retArr = []
-        retArr = this.modules.filter((item, index) => {
-          return index !== newVal
-        })
-        this.modules = retArr
+    isDragging() {
+      return this.$store.state.isDragging
+    },
+    isDraggable() {
+      return this.$store.state.draggable
+    },
+    modules: {
+      get() {
+        return this.$store.state.reactionInfo.data
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionData', newVal)
       }
     }
   },
@@ -172,6 +237,8 @@ export default {
   min-height: 1080px;
   border-left: 1px solid #D7D7D7;
   border-right: 1px solid #D7D7D7;
+  // 为了方便用户将模块放置在实验的最下方
+  padding-bottom: 200px;
 
   form {
     position: relative;
@@ -192,6 +259,11 @@ export default {
     .form-container {
       margin: 0 60px 20px 60px;
       width: 1200px;
+
+      // 防止在拖拽过程中，模块内部数据对拖拽的影星啊
+      .dragging *:not(.picture, .rText, .rTable, .rData, .rReference) {
+        pointer-events: none;
+      }
     }
   }
 }

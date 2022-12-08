@@ -75,8 +75,8 @@ export default {
 <style lang="scss">
 .toast-props {
   position: absolute;
-  top: -100px;
-  left: 960px;
+  top: -10%;
+  left: 50%;
   translate: -50% -50%;
   z-index: 999999;
 
@@ -125,12 +125,10 @@ export default {
 }
 
 .close {
-  // top: -100px;
   transition: top .5s;
 }
 
 .open {
   transition: top .5s;
-  // top: 200px;
 }
 </style>

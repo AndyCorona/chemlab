@@ -1,6 +1,8 @@
 <template>
   <div class="reaction-module-title">
-    <input type="text" :placeholder='placeholder' v-model="title" @input="$emit('input', title)">
+    <div class="block" v-show="showBlock">将放在这里</div>
+    <input type="text" :placeholder='placeholder' v-model="title" @focusout="this.$store.commit('saveDraggable', true)"
+      @focusin="this.$store.commit('saveDraggable', false)">
     <img class="delete-reaction" src="/imgs/用户主页/删除项目.svg" @click="deleteModule(moduleOrder)">
   </div>
 </template>
@@ -8,34 +10,24 @@
 <script>
 export default {
   name: 'ReactionModuleTitle',
-  emits: ['input'],
   props: {
     placeholder: String,
     moduleOrder: Number,
-    dataOrder: Number
+    showBlock: Boolean
   },
   methods: {
     deleteModule(number) {
-      this.$store.commit('deleteModuleNumber', number)
-    }
-  },
-  data() {
-    return {
-      title: !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].title
+      this.$store.commit('deleteReactionData', number)
     }
   },
   computed: {
-    readonlyTitle() {
-      return !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].title
-    }
-  },
-  watch: {
-    readonlyTitle: {
-      handler(newVal) {
-        this.title = newVal
-        this.$emit('input', this.title)
+    title: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
       },
-      immediate: true
+      set(newVal) {
+        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
+      }
     }
   }
 }
@@ -45,6 +37,7 @@ export default {
   position: relative;
   width: 1200px;
   box-sizing: border-box;
+  padding-bottom: 10px;
   padding-top: 20px;
 
   &:hover img {
@@ -56,7 +49,7 @@ export default {
     opacity: 0;
     cursor: pointer;
     position: absolute;
-    top: 20px;
+    top: 25px;
     right: 0px;
     width: 20px;
     height: 20px;
@@ -65,9 +58,18 @@ export default {
   input {
     width: 1150px;
     border: none;
-    font-size: 20px;
-    line-height: 20px;
+    font-size: 25px;
+    line-height: 25px;
     font-weight: bold;
+  }
+
+  .block {
+    height: 100px;
+    border-radius: 10px;
+    border: 1px dashed gray;
+    font-size: 50px;
+    text-align: center;
+    line-height: 100px;
     margin-bottom: 10px;
   }
 }

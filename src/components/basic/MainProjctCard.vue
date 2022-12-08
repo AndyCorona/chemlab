@@ -4,12 +4,12 @@
       <img class="project-img" src="/imgs/用户主页/项目图片3.png">
       <div class="project-text">
         <p class="project-title word-wrap">{{ item.name }}</p>
-        <img v-show="this.$store.state.groupInfo.isAdmin" @click.stop="deleteProject(item)" class="delete-project"
-          src="/imgs/用户主页/删除项目.svg">
+        <img v-show="(!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin))" @click.stop="deleteProject(item)"
+          class="delete-project" src="/imgs/用户主页/删除项目.svg">
       </div>
     </div>
     <div @click="addProject" class="wrapper"
-      v-show="((projectList.length < 8 && !inGroup && projectList.length !== 0) || (inGroup && projectList.length < 50 && this.$store.state.groupInfo.isAdmin))">
+      v-show="((!isGroup && projectList.length < 8) || (isGroup && projectList.length < 50 && this.$store.state.groupInfo.isAdmin && projectList.length !== 0))">
       <div class="new-project">
         <img src="/imgs/用户主页/添加项目.svg">
         <span>添加项目</span>
@@ -24,8 +24,7 @@ export default {
   data() {
     return {
       projectList: [],
-      projectId: null,
-      inGroup: null
+      projectId: null
     }
   },
   methods: {
@@ -64,7 +63,7 @@ export default {
       })
     },
     deleteProject(item) {
-      this.$store.commit('dialog', { text: `是否删除${item.name}?该项目下的所有数据都将删除`, title: '删除提醒' })
+      this.$store.commit('modal', { text: `是否删除${item.name}?该项目下的所有数据都将删除`, title: '删除提醒', slotType: 0 })
       this.projectId = item.id
       this.$store.commit('bindOkEvent', this.confirmDeleteProject)
     },
@@ -81,7 +80,8 @@ export default {
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
-      this.$store.dispatch('dialog', { showModal: false })
+      // 无论成功与否，都需要关闭模态框
+      this.$store.dispatch('modal', { showModal: false })
     }
   },
   mounted() {
@@ -90,13 +90,6 @@ export default {
   computed: {
     isGroup() {
       return this.$store.state.isGroup
-    }
-  },
-  watch: {
-    isGroup: {
-      handler(newVal) {
-        this.inGroup = newVal
-      }
     }
   }
 }

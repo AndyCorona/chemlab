@@ -1,7 +1,7 @@
 <template>
   <div class="reaction-form-title">
     <img src="/imgs/实验内容/实验标题.svg">
-    <input type="text" name="title" v-model="title" @change="valiDateTitle">
+    <input type="text" v-model="title" @change="valiDateTitle">
   </div>
 </template>
 
@@ -10,11 +10,6 @@ export default {
   name: 'ReactionFormTitle',
   inject: ['isSubmit'],
   emits: ['success', 'fail'],
-  data() {
-    return {
-      title: this.$store.state.reactionInfo.reactionName
-    }
-  },
   methods: {
     valiDateTitle() {
       if (!/^.{0,30}$/.test(this.title)) {
@@ -31,16 +26,16 @@ export default {
     }
   },
   computed: {
-    readonlyTitle() {
-      return this.$store.state.reactionInfo.reactionName
+    title: {
+      get() {
+        return this.$store.state.reactionInfo.reactionName
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionName', newVal)
+      }
     }
   },
   watch: {
-    readonlyTitle: {
-      handler(newVal) {
-        this.title = newVal
-      }
-    },
     isSubmit(newVal) {
       if (newVal) {
         this.serialize()

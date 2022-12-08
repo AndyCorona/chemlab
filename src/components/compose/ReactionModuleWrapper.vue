@@ -1,15 +1,15 @@
 <template>
   <div class="reaction-module-wrapper">
     <reaction-scheme @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'scheme'" :moduleOrder="moduleOrder" :dataOrder="dataOrder"></reaction-scheme>
+      v-if="moduleName === 'scheme'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-scheme>
     <reaction-table @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'table'" :moduleOrder="moduleOrder" :dataOrder="dataOrder"></reaction-table>
+      v-if="moduleName === 'table'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-table>
     <reaction-text @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'text'" :moduleOrder="moduleOrder" :dataOrder="dataOrder"></reaction-text>
+      v-if="moduleName === 'text'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-text>
     <reaction-data @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'data'" :moduleOrder="moduleOrder" :dataOrder="dataOrder"></reaction-data>
+      v-if="moduleName === 'data'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-data>
     <reaction-reference @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'reference'" :moduleOrder="moduleOrder" :dataOrder="dataOrder"></reaction-reference>
+      v-if="moduleName === 'reference'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-reference>
   </div>
 </template>
 <script>
@@ -31,7 +31,7 @@ export default {
   props: {
     moduleName: String,
     moduleOrder: Number,
-    dataOrder: Number
+    showBlock: Boolean
   }
 }
 </script>

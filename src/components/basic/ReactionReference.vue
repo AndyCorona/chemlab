@@ -1,11 +1,11 @@
 <template>
   <div class="reaction-reference">
-    <reaction-module-title placeholder="引用" @input="gotTitle" :moduleOrder="moduleOrder"
-      :dataOrder="dataOrder"></reaction-module-title>
+    <reaction-module-title placeholder="引用" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
     <div class="container">
       <div class="thead">
         <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
-          <div :style="`width:${tWidth[index]}px`">
+          <div :style="`width:${tWidth[index]}px`" @focusout="this.$store.commit('saveDraggable', true)"
+            @focusin="this.$store.commit('saveDraggable', false)">
             {{ item }}
           </div>
         </div>
@@ -13,19 +13,21 @@
       </div>
       <div class="tbody" v-for="(row, i) in tbody" :key="i">
         <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
-          <div :style="`width:${tWidth[j]}px`" contenteditable="true" @input="synTbody($event, i, j)">{{ item
-          }}</div>
+          <div :style="`width:${tWidth[j]}px`" contenteditable="true" @input="synTbody($event, i, j)"
+            @focusout="this.$store.commit('saveDraggable', true)" @focusin="this.$store.commit('saveDraggable', false)">
+            {{ item
+            }}</div>
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-input" v-show="!hasFile[i]">
-          <label :for="`img${randomNum * (i + 1)}`">解析文件</label>
+        <div :style="`width:${tWidth[3]}px`" class="show-input" v-show="!referencePath[i]">
+          <label :for="`img${randomNum * (i + 1)}`" draggable="false">解析文件</label>
           <input :id="`img${randomNum * (i + 1)}`" type="file" @change="resolveFile($event, i)">
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-reference" v-show="hasFile[i]">
-          <a class="word-wrap" target="_blank" :href="referencePath[i]">{{ referencePath[i] }}</a>
+        <div :style="`width:${tWidth[3]}px`" class="show-reference" v-show="referencePath[i]">
+          <a class="word-wrap" target="_blank" :href="referencePath[i]" draggable="false">{{ referencePath[i] }}</a>
         </div>
         <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)">
       </div>
-      <div class="NewRow" contenteditable="false" @click="addRow" v-show="(this.tbody.length < 10)">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-show="(tbody.length < 10)">+</div>
     </div>
   </div>
 </template>
@@ -39,35 +41,25 @@ export default {
   },
   props: {
     moduleOrder: Number,
-    dataOrder: Number
+    showBlock: Boolean
   },
   inject: ['isSubmit'],
   emits: ['success', 'fail'],
   data() {
     return {
-      title: '',
       thead: ['日期', '期刊', '标题', '链接'],
       tWidth: [200, 200, 200, 510],
-      tbody: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content.slice(1),
-      referencePath: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content[0],
-      col: 4,
-      row: null,
-      randomNum: Math.random(),
-      hasFile: []
+      randomNum: Math.random()
     }
   },
   methods: {
-    gotTitle(value) {
-      this.title = value
-    },
     // 给表体双向绑定
     synTbody(event, i, j) {
-      this.tbody[i][j] = event.target.innerHTML
+      this.tbody[i][j] = event.target.innerHTML.trim()
     },
     addRow() {
-      this.row++
       const arr = []
-      arr.push(`行${this.row}`)
+      arr.push(`行${this.tbody.length + 1}`)
       for (let i = 2; i < this.thead.length; i++) {
         arr.push('')
       }
@@ -77,17 +69,16 @@ export default {
     deleteRow(index) {
       this.tbody.splice(index, 1)
       this.referencePath.splice(index, 1)
-      this.row--
     },
     resolveFile(event, row) {
       const file = event.target.files[0]
       if (!file) {
         return
       }
-      // 改变文件之后，文件状态为已经上传
-      this.hasFile[row] = true
-      this.referencePath[row] = '111111111'
+      // 改变文件之后，修改 referencePath 中的文件名
+      this.referencePath[row] = 'https://www.baidu.com'
       // 解析文件并进行填充单元格
+      // TODO
     },
     serialize() {
       // 只有一列，不需要上传
@@ -111,6 +102,7 @@ export default {
           }
         }
       }
+      // 标题为空、所有单元格内容为空 => 该模块不需要保存
       if (isBlank) {
         this.$emit('success', null)
         return
@@ -120,71 +112,38 @@ export default {
       const data = {
         type: 'data',
         title: this.title,
-        content: []
+        content: [this.referencePath, this.tbody]
       }
-      data.content.push(this.referencePath)
-      data.content.push(this.tbody)
       this.$emit('success', data)
     }
   },
   computed: {
-    readonlyTbody() {
-      if (!this.$store.state.reactionInfo.data) {
-        return []
-      } else {
-        const retArr = []
-        const arr = this.$store.state.reactionInfo.data[this.dataOrder].content
-        const length = arr.length
-        if (length > 1) {
-          for (let i = 1; i < length; i++) {
-            retArr.push(arr[i])
-          }
-        }
-        return retArr
+    title: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
       }
     },
-    readonlyreferencePath() {
-      return !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content[0]
+    tbody: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[1]
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [this.referencePath, newVal] })
+      }
     },
-    readyonlyHasFile() {
-      if (!this.$store.state.reactionInfo.data) {
-        return []
-      } else {
-        const retArr = []
-        const arr = this.$store.state.reactionInfo.data[this.dataOrder].content[0]
-        const length = arr.length
-        for (let i = 0; i < length; i++) {
-          if (arr[i] !== '') {
-            retArr.push(true)
-          } else {
-            retArr.push(false)
-          }
-        }
-        return retArr
+    referencePath: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[0]
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [newVal, this.tbody] })
       }
     }
   },
   watch: {
-    readonlyTbody(newVal) {
-      this.tbody = newVal
-    },
-    readonlyreferencePath: {
-      handler(newVal) {
-        this.referencePath = newVal
-      }
-    },
-    readyonlyHasFile: {
-      handler(newVal) {
-        this.hasFile = newVal
-      },
-      immediate: true
-    },
-    tbody: {
-      handler(newVal) {
-        this.row = newVal.length + 1
-      },
-      immediate: true
-    },
     isSubmit(newVal) {
       if (newVal) {
         this.serialize()

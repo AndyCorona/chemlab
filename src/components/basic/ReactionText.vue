@@ -1,9 +1,9 @@
 <template>
   <div class="reaction-text">
-    <reaction-module-title placeholder="文字" @input="gotTitle" :moduleOrder="moduleOrder"
-      :dataOrder="dataOrder"></reaction-module-title>
+    <reaction-module-title placeholder="文字" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
     <div class="container">
-      <textarea v-model="text"></textarea>
+      <textarea v-model="text" @focusout="this.$store.commit('saveDraggable', true)"
+        @focusin="this.$store.commit('saveDraggable', false)"></textarea>
     </div>
   </div>
 </template>
@@ -16,20 +16,11 @@ export default {
     { ReactionModuleTitle },
   props: {
     moduleOrder: Number,
-    dataOrder: Number
+    showBlock: Boolean
   },
   inject: ['isSubmit'],
   emits: ['success', 'fail'],
-  data() {
-    return {
-      title: '',
-      text: !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].content
-    }
-  },
   methods: {
-    gotTitle(value) {
-      this.title = value
-    },
     // 当文本模块有内容时进行序列化
     serialize() {
       let isBlank = true
@@ -38,10 +29,10 @@ export default {
         isBlank = false
       }
       // 文本内容不为空
-      if (isBlank && this.text.trim() !== '') {
+      if (isBlank && this.text && this.text.trim()) {
         isBlank = false
       }
-      // 如果是空白表格
+      // 标题为空、文本内容为空 => 该模块不需要保存
       if (isBlank) {
         this.$emit('success', null)
         return
@@ -49,20 +40,30 @@ export default {
       const data = {
         type: 'text',
         title: this.title,
-        content: this.text
+        content: [this.text]
       }
       this.$emit('success', data)
     }
   },
   computed: {
-    readonlyText() {
-      return !this.$store.state.reactionInfo.data ? '' : this.$store.state.reactionInfo.data[this.dataOrder].content
+    title: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
+      }
+    },
+    text: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].content[0]
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [newVal] })
+      }
     }
   },
   watch: {
-    readonlyText(newVal) {
-      this.text = newVal
-    },
     isSubmit(newVal) {
       if (newVal) {
         this.serialize()

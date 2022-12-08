@@ -200,7 +200,7 @@ Mock.mock('/true/api/group', 'post', {
   status: 200,
   data: {
     groupUUID: '1234567899',
-    groupDesc: '欢迎来到我的课题组',
+    groupSlogon: '欢迎来到我的课题组',
     groupName: 'xxx课题组',
     isAdmin: true,
     members: [
@@ -225,7 +225,7 @@ Mock.mock('/true/api/group', 'get', {
   status: 200,
   data: {
     groupUUID: '1234567899',
-    groupDesc: '欢迎来到我的课题组',
+    groupSlogon: '欢迎来到我的课题组',
     groupName: 'xxx课题组',
     isAdmin: true,
     members: [
@@ -254,7 +254,7 @@ Mock.mock('/true/api/group', 'put', {
   status: 200,
   data: {
     groupUUID: '1234567899',
-    groupDesc: '欢迎来到我的课题组',
+    groupSlogon: '欢迎来到我的课题组',
     groupName: 'xxx课题组',
     isAdmin: false,
     members: [
@@ -284,7 +284,7 @@ Mock.mock('/true/api/group/addMember', 'put', {
   status: 200,
   data: {
     groupUUID: '1234567899',
-    groupDesc: '欢迎来到我的课题组',
+    groupSlogon: '欢迎来到我的课题组',
     groupName: 'xxx课题组',
     isAdmin: true,
     members: [
@@ -319,7 +319,7 @@ Mock.mock('/true/api/group', 'delete', {
   status: 200,
   data: {
     groupUUID: '1234567899',
-    groupDesc: '欢迎来到我的课题组',
+    groupSlogon: '欢迎来到我的课题组',
     groupName: 'xxx课题组',
     isAdmin: true,
     members: [
@@ -426,6 +426,19 @@ Mock.mock('/false/api/reaction', 'delete', {
   msg: '删除失败'
 })
 
+// 分享反应接口-成功
+Mock.mock('/true/api/reaction/share', 'post', {
+  status: 200,
+  data: {},
+  msg: '分享成功'
+})
+
+// 分享反应接口-失败
+Mock.mock('/false/api/reaction/share', 'post', {
+  status: 500,
+  msg: '分享失败'
+})
+
 // 获取一个反应下的具体内容接口-成功
 Mock.mock('/true/api/reaction', 'get', {
   status: 200,
@@ -435,11 +448,11 @@ Mock.mock('/true/api/reaction', 'get', {
     date: '2022-12-12',
     tags: ['正则重中之重重中之重', '正则重中之重重中之重', '正则重中之重重中之重'],
     data: [
-      { type: 'scheme', title: '这是一个图片模块', content: '/imgs/登录页/产品图标.png' },
-      { type: 'text', title: '这是一个文本模块', content: '11111111' },
-      { type: 'table', title: '这是一个表格模块', content: [[228, 228, 228, 228, 228], ['名称', '分子量', '质量', '产率', '备注'], ['苯甲酸', '191.3g/mol', '13g', '25%', '无'], ['苯甲酸2', '191.3g/mol', '13g', '25%', '无']] },
-      { type: 'data', title: '这是一个数据模块', content: [[['222.zip', 'url1'], ['', '']], ['NMR', '谱图测试', '2022-12-12'], ['NMR', '谱图测试', '2022-12-12']] },
-      { type: 'reference', title: '这是一个引用模块', content: [['https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', 'https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', ''], ['2022', 'Science', '这是一个题目'], ['2022', 'Science111111', '这是一个题目'], ['2022', '', '这是一个题目']] }
+      { type: 'scheme', title: '这是一个图片模块', content: ['', '/imgs/登录页/产品图标.png'] },
+      { type: 'text', title: '这是一个文本模块', content: ['11111111'] },
+      { type: 'table', title: '这是一个表格模块', content: [[228, 228, 228, 228, 228], ['名称', '分子量', '质量', '产率', '备注'], [['苯甲酸', '191.3g/mol', '13g', '25%', '无'], ['苯甲酸2', '191.3g/mol', '13g', '25%', '无']]] },
+      { type: 'data', title: '这是一个数据模块', content: [[['222.zip', 'url1', ''], ['', '', '']], [['NMR', '谱图测试', '2022-12-12'], ['NMR', '谱图测试', '2022-12-12']]] },
+      { type: 'reference', title: '这是一个引用模块', content: [['https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', 'https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', ''], [['2022', 'Science', '这是一个题目'], ['2022', 'Science111111', '这是一个题目'], ['2022', '', '这是一个题目']]] }
     ],
     versions: [
       {
@@ -486,4 +499,78 @@ Mock.mock('/true/api/reaction', 'get', {
 Mock.mock('/false/api/reaction', 'get', {
   status: 500,
   msg: '获取失败'
+})
+
+// 保存模版接口-成功
+Mock.mock('/true/api/template', 'post', {
+  status: 200,
+  data: [
+    {
+      templateId: 1,
+      templateName: '模版1',
+      data: ['scheme']
+    },
+    {
+      templateId: 1,
+      templateName: '模版2',
+      data: ['scheme', 'text']
+    },
+    {
+      templateId: 1,
+      templateName: '模版3',
+      data: ['scheme', 'text', 'table']
+    },
+    {
+      templateId: 1,
+      templateName: '模版3',
+      data: ['scheme', 'text', 'table', 'table', 'table']
+    }
+  ],
+  msg: '创建成功'
+})
+
+// 保存模版接口-失败
+Mock.mock('/false/api/template', 'post', {
+  status: 500,
+  msg: '保存失败'
+})
+
+// 选择模版接口-成功
+Mock.mock('/true/api/template', 'get', {
+  status: 200,
+  data: [
+    {
+      templateId: 1,
+      templateName: '模版1',
+      data: ['scheme']
+    },
+    {
+      templateId: 1,
+      templateName: '模版2',
+      data: ['scheme', 'text']
+    },
+    {
+      templateId: 1,
+      templateName: '模版3',
+      data: ['scheme', 'text', 'table']
+    }
+  ],
+  msg: '获取成功'
+})
+
+// 选择模版接口-失败
+Mock.mock('/false/api/template', 'get', {
+  status: 500,
+  msg: '获取失败'
+})
+// 删除模版接口-成功
+Mock.mock('/true/api/template', 'delete', {
+  status: 500,
+  msg: '删除成功'
+})
+
+// 删除模版接口-失败
+Mock.mock('/false/api/template', 'delete', {
+  status: 500,
+  msg: '删除失败'
 })

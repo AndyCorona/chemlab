@@ -1,29 +1,34 @@
 <template>
   <div class="reaction-table" :style="`user-select:${userSelect}`"
-    @mouseup="(this.mouseX = 0, this.firstDeltaMouseMove = false, this.contenteditable = true, this.userSelect = 'auto')"
-    @mousemove="resize($event)">
-    <reaction-module-title placeholder="表格" @input="gotTitle" :moduleOrder="moduleOrder" :dataOrder="dataOrder"></reaction-module-title>
+    @mouseup="(mouseX = 0, firstDeltaMouseMove = false, contenteditable = true, userSelect = 'auto', this.$store.commit('saveDraggable', true))"
+    @mouseleave="(this.$store.commit('saveDraggable', true), mouseX = 0, firstDeltaMouseMove = false)"
+    @mousemove="resize($event, resizeIndex)">
+    <reaction-module-title placeholder="表格" :moduleOrder="moduleOrder"
+      :showBlock="showBlock"></reaction-module-title>
     <div class="container">
       <div class="thead">
         <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
           <div class="data" :style="`width:${tWidth[index] - 20}px`" :contenteditable="contenteditable"
+            @focusout="this.$store.commit('saveDraggable', true)" @focusin="this.$store.commit('saveDraggable', false)"
             @input="synThead($event, index)">
             {{ item }}
           </div>
-          <img src="/imgs/用户主页/删除项目.svg" @click="deleteCol(index)" v-show="(this.thead.length > 1)">
+          <img src="/imgs/用户主页/删除项目.svg" @click="deleteCol(index)" v-show="(thead.length > 1)">
           <div
-            @mousedown="(this.userSelect = 'none', this.firstDeltaMouseMove = true, this.mouseX = $event.pageX, this.contenteditable = false, this.index = index)"
-            @mousemove="resize($event)" class="slider" v-show="(index != thead.length - 1)"></div>
+            @mousedown="(userSelect = 'none', firstDeltaMouseMove = true, mouseX = $event.pageX, resizeIndex = index, contenteditable = false, this.$store.commit('saveDraggable', false))"
+            @mousemove="resize($event, resizeIndex)" class="slider" v-show="(index != thead.length - 1)"></div>
         </div>
         <img src="/imgs/用户主页/添加项目.svg" v-show="thead.length < 10" @click="addCol">
       </div>
       <div class="tbody" v-for="(row, i) in tbody" :key="i">
         <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
-          <div :style="`width:${tWidth[j]}px`" contenteditable="true" @input="synTbody($event, i, j)">{{ item }}</div>
+          <div :style="`width:${tWidth[j]}px`" contenteditable="true" @input="synTbody($event, i, j)"
+            @focusout="this.$store.commit('saveDraggable', true)" @focusin="this.$store.commit('saveDraggable', false)">
+            {{ item }}</div>
         </div>
         <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)">
       </div>
-      <div class="NewRow" contenteditable="false" @click="addRow" v-show="(this.tbody.length < 500)">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-show="(tbody.length < 500)">+</div>
     </div>
   </div>
 </template>
@@ -36,32 +41,23 @@ export default {
     { ReactionModuleTitle },
   props: {
     moduleOrder: Number,
-    dataOrder: Number
+    showBlock: Boolean
   },
   inject: ['isSubmit'],
   emits: ['success', 'fail'],
   data() {
     return {
-      title: '',
-      thead: !this.$store.state.reactionInfo.data ? ['默认'] : this.$store.state.reactionInfo.data[this.dataOrder].content[1],
-      tbody: !this.$store.state.reactionInfo.data ? [] : this.$store.state.reactionInfo.data[this.dataOrder].content.slice(2),
-      tWidth: !this.$store.state.reactionInfo.data ? ['1120'] : this.$store.state.reactionInfo.data[this.dataOrder].content[0],
-      col: null,
-      row: null,
       mouseX: 0,
       lastMouseX: 0,
       firstDeltaMouseMove: false,
       contenteditable: true,
-      index: null,
+      resizeIndex: null,
       userSelect: 'auto'
     }
   },
   methods: {
-    gotTitle(value) {
-      this.title = value
-    },
     addCol() {
-      this.thead.push(`列${this.col + 1}`)
+      this.thead.push(`列${this.thead.length + 1}`)
       this.tbody.forEach(item => {
         item.push('')
       })
@@ -87,11 +83,9 @@ export default {
       })
       retArr.push(114)
       this.tWidth = retArr
-      this.col++
     },
     // 分摊法，将删除的宽度按照权重分摊到所有列上
     deleteCol(index) {
-      this.col--
       this.thead.splice(index, 1)
       this.tbody.forEach(item => {
         item.splice(index, 1)
@@ -119,9 +113,8 @@ export default {
     },
     // 最多添加到 500 行
     addRow() {
-      this.row++
       const arr = []
-      arr.push(`行${this.row}`)
+      arr.push(`行${this.tbody.length + 1}`)
       for (let i = 1; i < this.thead.length; i++) {
         arr.push('')
       }
@@ -129,15 +122,14 @@ export default {
     },
     deleteRow(index) {
       this.tbody.splice(index, 1)
-      this.row--
     },
     // 给表头双向绑定
     synThead(event, index) {
-      this.thead[index] = event.target.innerHTML
+      this.thead[index] = event.target.innerHTML.trim()
     },
     // 给表体双向绑定
     synTbody(event, i, j) {
-      this.tbody[i][j] = event.target.innerHTML
+      this.tbody[i][j] = event.target.innerHTML.trim()
     },
     normalize(arr) {
       let sum = 0
@@ -155,11 +147,10 @@ export default {
         arr[i] = newVal
         withoutLastSum += newVal
       }
-
       arr[arr.length - 1] = 1 - withoutLastSum
       return arr
     },
-    resize(event) {
+    resize(event, index) {
       if (this.mouseX === 0) {
         return
       }
@@ -170,14 +161,14 @@ export default {
       }
       const deltaX = event.pageX - this.lastMouseX
       // 如果左边列宽已经小于最小值或右边列宽已经大于最大值，禁止向左边调整
-      if ((this.tWidth[this.index] <= 114 || this.tWidth[this.index + 1] >= 1140) && deltaX < 0) {
+      if ((this.tWidth[index] <= 114 || this.tWidth[index + 1] >= 1140) && deltaX < 0) {
         return
-      } else if ((this.tWidth[this.index] >= 1140 || this.tWidth[this.index + 1] <= 114) && deltaX > 0) {
+      } else if ((this.tWidth[index] >= 1140 || this.tWidth[index + 1] <= 114) && deltaX > 0) {
         return
       }
       // 若果左边列宽已经超过最大值或者右边列宽已经小于最小值，禁止向右边调整
-      this.tWidth[this.index] += deltaX * modifier
-      this.tWidth[this.index + 1] -= deltaX * modifier
+      this.tWidth[index] += deltaX * modifier
+      this.tWidth[index + 1] -= deltaX * modifier
       this.lastMouseX = event.pageX
       this.firstDeltaMouseMove = false
     },
@@ -207,7 +198,7 @@ export default {
           }
         }
       }
-      // 如果是空白表格
+      // 标题为空、所有表头为空、所有表体为空 => 该模块不需要保存
       if (isBlank) {
         this.$emit('success', null)
         return
@@ -215,59 +206,46 @@ export default {
       const data = {
         type: 'table',
         title: this.title,
-        content: [this.tWidth, this.thead]
+        content: [this.tWidth, this.thead, this.tbody]
       }
-      this.tbody.forEach(item => {
-        data.content.push(item)
-      })
       this.$emit('success', data)
     }
   },
   computed: {
-    readonlyThead() {
-      return !this.$store.state.reactionInfo.data ? ['默认'] : this.$store.state.reactionInfo.data[this.dataOrder].content[1]
-    },
-    readonlyTbody() {
-      if (!this.$store.state.reactionInfo.data) {
-        return []
-      } else {
-        const retArr = []
-        const arr = this.$store.state.reactionInfo.data[this.dataOrder].content
-        const length = arr.length
-        if (length > 2) {
-          for (let i = 2; i < length; i++) {
-            retArr.push(arr[i])
-          }
-        }
-        return retArr
+    title: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
       }
     },
-    readonlyTwidth() {
-      return !this.$store.state.reactionInfo.data ? [1120] : this.$store.state.reactionInfo.data[this.dataOrder].content[0]
+    thead: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? ['默认'] : this.$store.state.reactionInfo.data[this.moduleOrder].content[1]
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [this.tWidth, newVal, this.tbody] })
+      }
+    },
+    tbody: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[2]
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [this.tWidth, this.thead, newVal] })
+      }
+    },
+    tWidth: {
+      get() {
+        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? ['1120'] : this.$store.state.reactionInfo.data[this.moduleOrder].content[0]
+      },
+      set(newVal) {
+        this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [newVal, this.thead, this.tbody] })
+      }
     }
   },
   watch: {
-    readonlyThead(newVal) {
-      this.thead = newVal
-    },
-    readonlyTbody(newVal) {
-      this.tbody = newVal
-    },
-    readonlyTwidth(newVal) {
-      this.tWidth = newVal
-    },
-    thead: {
-      handler(newVal) {
-        this.col = newVal.length
-      },
-      immediate: true
-    },
-    tbody: {
-      handler(newVal) {
-        this.row = newVal.length + 1
-      },
-      immediate: true
-    },
     isSubmit(newVal) {
       if (newVal) {
         this.serialize()
@@ -311,7 +289,7 @@ export default {
 
         .slider {
           height: 30px;
-          line-height:30px;
+          line-height: 30px;
           cursor: col-resize;
           width: 4px;
           opacity: 0;

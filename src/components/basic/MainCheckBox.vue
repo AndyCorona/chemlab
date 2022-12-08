@@ -14,7 +14,7 @@ export default {
   emits: ['change'],
   data() {
     return {
-      randomNum: 1
+      randomNum: Math.random()
     }
   },
   methods: {
@@ -24,9 +24,6 @@ export default {
   },
   props: {
     reactionId: Number
-  },
-  mounted() {
-    this.randomNum = Math.random()
   }
 }
 </script>

@@ -1,26 +1,23 @@
 <template>
-  <!-- @wheel.prevent="" -->
   <div class="common-modal" @wheel="preventWheel($event, prevent)">
-    <div class="mask" :class="open" @click="closeAndEmitNo()" :style="
+    <div class="mask" :class="open" @keyup.enter="closeAndEmitNo" @click="closeAndEmitNo" :style="
     `height:${this.$store.state.height}px`">
     </div>
     <div class="modal" :class="open"
       :style="`top:${this.open === 'open' ? this.$store.state.scrollTop + 350 : -100}px`">
       <div class="modal-header" :style="`box-shadow: ${!hasBorder ? 'none' : '0 4px 4px 0 rgba(0, 0, 0, 0.35)'}`">
-        <img v-show="hasImg" :src="imgPath">
+        <img v-if="hasImg" :src="imgPath">
         <span>{{ showTitle }}</span>
       </div>
       <div class="modal-body">
         <slot :name="name"></slot>
       </div>
       <div class="modal-footer">
-        <button :style="`width:${buttonWidth} `" @mousedown="pressYes = 'press'" @mouseup="(pressYes = '')"
-          @mouseleave="(pressYes = '')" @click.prevent="closeAndEmitOk(autoClose)" :class="[`${pressYes} confirm`]">{{
-              buttonOk
-          }}</button>
-        <button v-show="showNoButton" @mousedown="pressNo = 'press'" @mouseup="(pressNo = '')"
-          @mouseleave="(pressNo = '')" :style="`width: ${buttonWidth}`" @click.prevent="closeAndEmitNo(autoClose)"
-          :class="[`${pressNo} cancle`]">{{
+        <button :style="`width:${buttonWidth} `" @click.prevent="closeAndEmitOk(autoClose)" class="greenButton">{{
+            buttonOk
+        }}</button>
+        <button v-if="showNoButton" :style="`width: ${buttonWidth}`" @click.prevent="closeAndEmitNo"
+          class="whiteButton">{{
     buttonNo
           }}</button>
       </div>
@@ -51,12 +48,6 @@ export default {
     prevent: {
       type: Boolean,
       default: true
-    }
-  },
-  data() {
-    return {
-      pressYes: '',
-      pressNo: ''
     }
   },
   computed: {
@@ -131,19 +122,6 @@ export default {
       margin-bottom: 30px;
       justify-content: space-around;
 
-      button {
-        box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.35);
-        cursor: pointer;
-        font-size: 20px;
-        font-weight: bold;
-        border-radius: 5px;
-        height: 40px;
-      }
-
-      .press {
-        box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.35), inset 0 4px 4px 0 rgba(0, 0, 0, 0.35);
-      }
-
       .small {
         width: 60px;
       }
@@ -154,18 +132,6 @@ export default {
 
       .large {
         width: 160px;
-      }
-
-      .cancle {
-        background-color: #FFFFFF;
-        border: 2px solid #638271;
-        color: #638271;
-      }
-
-      .confirm {
-        background-color: #638271;
-        border: 2px solid #638271;
-        color: #FFFFFF;
       }
     }
   }

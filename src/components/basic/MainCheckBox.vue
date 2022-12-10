@@ -2,7 +2,7 @@
   <div class="main-check-box">
     <!-- 防止点击复选框之后跳转页面 -->
     <div class="active" @click.stop="">
-      <input :reactionId="this.reactionId" type="checkbox" :id="`checkbox${randomNum}`" @change="changeFunc">
+      <input type="checkbox" :id="`checkbox${randomNum}`" @change="changeFunc">
       <label :for="`checkbox${randomNum}`"></label>
     </div>
   </div>
@@ -44,9 +44,9 @@ export default {
   }
 
   label {
+    border: 2px solid #FFFFFF;
     display: block;
-    margin: 2px;
-    padding: 0px;
+    margin: 0px;
     width: 12px;
     height: 12px;
     background-color: #19546f;

@@ -1,12 +1,14 @@
 <template>
   <div class="reaction-scheme">
     <reaction-module-title placeholder="图片" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
-    <div class="container" v-show="!imgPath">
+    <div class="container" v-show="!imgPath" @mouseenter="this.$store.commit('saveDraggable', false)"
+      @mouseleave="this.$store.commit('saveDraggable', true)">
       <label :for="`img${randomNum}`">+</label>
       <input ref="inputRef" :id="`img${randomNum}`" type="file" @change="previewImg($event)">
     </div>
-    <div class="container" v-show="imgPath">
-      <img :src="imgPath" @click="this.$refs.inputRef.click()">
+    <div class="container" v-if="imgPath" @mouseenter="this.$store.commit('saveDraggable', false)"
+      @mouseleave="this.$store.commit('saveDraggable', true)">
+      <img :src="imgPath" @click="changeImg($event)">
     </div>
   </div>
 </template>
@@ -22,8 +24,6 @@ export default {
     moduleOrder: Number,
     showBlock: Boolean
   },
-  inject: ['isSubmit'],
-  emits: ['success', 'fail'],
   data() {
     return {
       randomNum: Math.random()
@@ -57,42 +57,9 @@ export default {
       }, false)
       reader.readAsDataURL(file)
     },
-    serialize() {
-      const file = this.$store.state.reactionInfo.data[this.moduleOrder].content[0]
-      let isBlank = true
-      // 标题不为空
-      if (this.title.trim() !== '') {
-        isBlank = false
-      }
-      // 用户重新上传的图片
-      if (isBlank && file) {
-        isBlank = false
-      }
-      // 用户没有重新上传图片，但是原来图片路径还在
-      if (isBlank && this.imgPath) {
-        isBlank = false
-      }
-      // 标题为空、用户没有重新上传图片、原来的图片路径不存在 => 该模块不需要保存
-      if (isBlank) {
-        this.$emit('success', null)
-        return
-      }
-      // 如果没有更新图片，不用上传，否则将当前图片上传到服务器中，并返回图片的 url 地址。若上传成功则触发 success 事件，否则触发 fail 事件
-      // this.axios.post('')
-      const isUploaded = true
-      // 用户重新上传文件后替换之前的图片路径
-      if (file) {
-        this.imgPath = 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333'
-      }
-      if (isUploaded) {
-        const data = {
-          type: 'scheme',
-          title: this.title,
-          content: ['', this.imgPath]
-        }
-        this.$emit('success', data)
-      } else {
-        this.$emit('fail')
+    changeImg() {
+      if (!this.isGroup) {
+        this.$refs.inputRef.click()
       }
     }
   },
@@ -112,13 +79,9 @@ export default {
       set(newVal) {
         this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: ['', newVal] })
       }
-    }
-  },
-  watch: {
-    isSubmit(newVal) {
-      if (newVal) {
-        this.serialize()
-      }
+    },
+    isGroup() {
+      return this.$store.state.isGroup
     }
   }
 }
@@ -126,6 +89,8 @@ export default {
 
 <style lang="scss">
 .reaction-scheme {
+  cursor: grab;
+
   .container {
     cursor: pointer;
     width: 1200px;

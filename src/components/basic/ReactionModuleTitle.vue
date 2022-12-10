@@ -1,9 +1,9 @@
 <template>
   <div class="reaction-module-title">
-    <div class="block" v-show="showBlock">将放在这里</div>
-    <input type="text" :placeholder='placeholder' v-model="title" @focusout="this.$store.commit('saveDraggable', true)"
-      @focusin="this.$store.commit('saveDraggable', false)">
-    <img class="delete-reaction" src="/imgs/用户主页/删除项目.svg" @click="deleteModule(moduleOrder)">
+    <div class="block" v-if="showBlock">将放在这里</div>
+    <input :readonly="isGroup" type="text" :placeholder='placeholder' v-model="title"
+      @mouseenter="this.$store.commit('saveDraggable', false)" @mouseleave="this.$store.commit('saveDraggable', true)">
+    <img class="delete-reaction" src="/imgs/用户主页/删除项目.svg" @click="deleteModule(moduleOrder)" v-if="!isGroup">
   </div>
 </template>
 
@@ -28,6 +28,9 @@ export default {
       set(newVal) {
         this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
       }
+    },
+    isGroup() {
+      return this.$store.state.isGroup
     }
   }
 }
@@ -64,9 +67,10 @@ export default {
   }
 
   .block {
+    background-color: rgb(224, 238, 224);
     height: 100px;
     border-radius: 10px;
-    border: 1px dashed gray;
+    border: 1px dashed rgb(13, 117, 7);
     font-size: 50px;
     text-align: center;
     line-height: 100px;

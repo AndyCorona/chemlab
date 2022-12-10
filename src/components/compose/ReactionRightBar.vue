@@ -1,9 +1,9 @@
 <template>
   <div class="reaction-right-bar">
-    <reaction-right-bar-title title="修改历史" img="/imgs/实验内容/修改历史.svg"></reaction-right-bar-title>
+    <reaction-right-bar-title title="修改历史" img="/imgs/单个实验/修改历史.svg"></reaction-right-bar-title>
     <reaction-right-bar-history></reaction-right-bar-history>
-    <reaction-right-bar-title title="记录模块" img="/imgs/实验内容/记录模块.svg"></reaction-right-bar-title>
-    <reaction-right-bar-record></reaction-right-bar-record>
+    <reaction-right-bar-title title="记录模块" img="/imgs/单个实验/记录模块.svg" v-if="!isGroup"></reaction-right-bar-title>
+    <reaction-right-bar-record v-if="!isGroup"></reaction-right-bar-record>
   </div>
 </template>
 
@@ -17,6 +17,11 @@ export default {
     ReactionRightBarTitle,
     ReactionRightBarHistory,
     ReactionRightBarRecord
+  },
+  computed: {
+    isGroup() {
+      return this.$store.state.isGroup
+    }
   }
 }
 </script>

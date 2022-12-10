@@ -1,12 +1,12 @@
 <template>
   <div class="main-left-bar-list">
-    <div class="wrapper" v-show="noGroup">
+    <div class="wrapper" v-if="noGroup">
       <div class="left-wrapper" @click="createGroup">
         <img src="/imgs/左边栏/创建.svg">
         <span>创建课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="noGroup">
+    <div class="wrapper" v-if="noGroup">
       <div class="left-wrapper" @click="joinGroup">
         <img src="/imgs/左边栏/加入.svg">
         <span>加入课题组</span>
@@ -18,25 +18,25 @@
         <span>{{ item.name }}</span>
       </div>
       <div class="right-wrapper">
-        <img src="/imgs/左边栏/组长.svg" v-show="item.isAdmin">
-        <img src="/imgs/左边栏/成员.svg" v-show="!item.isAdmin">
+        <img src="/imgs/左边栏/组长.svg" v-if="item.isAdmin" title="这是组长">
+        <img src="/imgs/左边栏/成员.svg" v-if="!item.isAdmin" title="这是成员">
         <!-- 群主不能删除自己 -->
-        <img @click="deleteMember(item.name)" src="/imgs/左边栏/删除成员.svg" v-show="isAdmin && !item.isAdmin">
+        <img @click="deleteMember(item.name)" src="/imgs/左边栏/删除成员.svg" v-if="isAdmin && !item.isAdmin">
       </div>
     </div>
-    <div class="wrapper" v-show="(!noGroup && isAdmin && this.$store.state.groupInfo.members.length < 20)">
+    <div class="wrapper" v-if="(!noGroup && isAdmin && this.$store.state.groupInfo.members.length < 20)">
       <div class="left-wrapper" @click="addMember">
         <img src="/imgs/左边栏/添加成员.svg">
         <span>添加成员</span>
       </div>
     </div>
-    <div class="wrapper" v-show="(!noGroup && isAdmin)">
+    <div class="wrapper" v-if="(!noGroup && isAdmin)">
       <div class="left-wrapper" @click="quit(1)">
         <img src="/imgs/左边栏/解散群组.svg">
         <span>解散课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="(!noGroup && !isAdmin)">
+    <div class="wrapper" v-if="(!noGroup && !isAdmin)">
       <div class="left-wrapper" @click="quit(0)">
         <img src="/imgs/左边栏/解散群组.svg">
         <span>退出课题组</span>
@@ -59,13 +59,13 @@ export default {
     // 校验类型[群名、群简介、群UUID、用户名、邮箱]
     validate(type) {
       if (type === 0) {
-        if (!this.usernameExp.test(this.groupName)) {
+        if (!this.usernameExp.test(this.name)) {
           this.$store.commit('toast', { text: '请输入有效的群名' })
           return false
         }
         return true
       } else if (type === 1) {
-        if (!/^[A-Za-z0-9\u4e00-\u9fa5]{0,80}$/.test(this.groupSlogon)) {
+        if (!/^[A-Za-z0-9\u4e00-\u9fa5]{0,80}$/.test(this.slogon)) {
           this.$store.commit('toast', { text: '请输入有效的简介' })
           return false
         }
@@ -89,7 +89,7 @@ export default {
         }
         return true
       } else {
-        return false
+        throw new Error('the type is between 0 - 4')
       }
     },
     // state 标识是解散还是退出，0 代表退出， 1 代表解散
@@ -125,20 +125,17 @@ export default {
     },
     createGroup() {
       this.$store.commit('modal', { slotType: 2 })
+      this.$store.commit('clearCreateGroup')
       this.$store.commit('bindOkEvent', this.confirmCreateGroup)
     },
 
     confirmCreateGroup() {
       // 对群组名进行校验
       if (this.validate(0) && this.validate(1)) {
-        if (this.groupSlogon === '') {
-          this.groupSlogon = '可以申请加入一个群组'
-        }
         this.axios.post('/group', {
-          groupName: this.groupName,
-          groupSlogon: this.groupSlogon
+          name: this.name,
+          slogon: this.slogon
         }).then((data) => {
-          console.log(data)
           this.$store.dispatch('toast', { text: '创建成功', state: 0 })
           this.$store.dispatch('saveGroupInfo', data)
           // 创建成功后手动关闭模态框
@@ -150,6 +147,7 @@ export default {
     },
     joinGroup() {
       this.$store.commit('modal', { slotType: 1 })
+      this.$store.commit('clearGroupInfo')
       this.$store.commit('bindOkEvent', this.confirmJoinGroup)
     },
     confirmJoinGroup() {
@@ -168,6 +166,7 @@ export default {
     },
     addMember() {
       this.$store.commit('modal', { slotType: 3 })
+      this.$store.dispatch('clearLoginInfo')
       this.$store.commit('bindOkEvent', this.confirmAddMember)
     },
     confirmAddMember(autoClose = true) {
@@ -186,7 +185,6 @@ export default {
       }).then((data) => {
         this.$store.dispatch('toast', { text: '添加成功', state: 0 })
         this.$store.dispatch('saveGroupInfo', data)
-        this.usernameOrEmail = ''
         // 添加成功后手动关闭模态框
         if (autoClose) {
           this.$store.dispatch('modal', { showModal: false })
@@ -205,21 +203,21 @@ export default {
     isAdmin() {
       return this.$store.state.groupInfo.isAdmin
     },
-    groupName() {
-      return this.$store.state.groupInfo.groupName
+    name() {
+      return this.$store.state.createGroup.name
     },
-    groupSlogon() {
-      return this.$store.state.groupInfo.groupSlogon
+    slogon() {
+      return this.$store.state.createGroup.slogon
     },
     groupUUID() {
-      return this.$store.state.groupInfo.groupUUID
+      return this.$store.state.groupInfo.UUID
     },
     usernameOrEmail: {
       get() {
-        return this.$store.state.loginInfo[0]
+        return this.$store.state.loginInfo.username
       },
       set(newVal) {
-        this.$store.commit('saveLoginInfo', { index: 0, content: newVal })
+        this.$store.commit('saveLoginInfo', { username: newVal })
       }
     }
   }

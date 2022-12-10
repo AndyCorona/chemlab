@@ -12,7 +12,7 @@ export default {
   name: 'MainLeftBarTitle',
   computed: {
     title() {
-      return !this.$store.state.groupInfo.groupName ? '暂未加入' : this.$store.state.groupInfo.groupName
+      return !this.$store.state.groupInfo.name ? '暂未加入' : this.$store.state.groupInfo.name
     }
   }
 }

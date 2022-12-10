@@ -4,12 +4,12 @@
       <img class="project-img" src="/imgs/用户主页/项目图片3.png">
       <div class="project-text">
         <p class="project-title word-wrap">{{ item.name }}</p>
-        <img v-show="(!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin))" @click.stop="deleteProject(item)"
+        <img v-if="(!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin))" @click.stop="deleteProject(item)"
           class="delete-project" src="/imgs/用户主页/删除项目.svg">
       </div>
     </div>
     <div @click="addProject" class="wrapper"
-      v-show="((!isGroup && projectList.length < 8) || (isGroup && projectList.length < 50 && this.$store.state.groupInfo.isAdmin && projectList.length !== 0))">
+      v-if="((!isGroup && projectList.length < 8) || (isGroup && projectList.length < 50 && this.$store.state.groupInfo.isAdmin && projectList.length !== 0))">
       <div class="new-project">
         <img src="/imgs/用户主页/添加项目.svg">
         <span>添加项目</span>
@@ -30,8 +30,8 @@ export default {
   methods: {
     init() {
       // 根据当前路径决定访问群组还是个人项目
-      this.axios.get('/main/project', {
-        params: { isGroup: this.isGroup }
+      this.axios.post('/main/project', {
+        isGroup: this.isGroup
       }).then((data) => {
         this.projectList = data
       }).catch((resp) => {
@@ -41,8 +41,10 @@ export default {
     toProject(id) {
       // 获取一个项目具体内容
       this.axios.get('/project', {
-        projectId: id,
-        isGroup: this.isGroup
+        params: {
+          projectId: id,
+          isGroup: this.isGroup
+        }
       }).then(() => {
         sessionStorage.setItem('projectId', id)
         // 成功则进行跳转
@@ -118,7 +120,7 @@ export default {
     }
 
     .project-text {
-      margin: 0 10px;
+      margin-left: 10px;
       line-height: 30px;
       display: flex;
       align-items: center;
@@ -130,6 +132,7 @@ export default {
       }
 
       .delete-project {
+        padding: 7px;
         opacity: 0;
       }
     }

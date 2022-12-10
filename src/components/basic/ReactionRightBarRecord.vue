@@ -1,28 +1,29 @@
 <template>
   <div class="reaction-right-bar-record">
+    <img src="/imgs/登录页/产品图标.png" ref="img" style="position: absolute; top: -1000px;width: 100px;height:100px">
     <div class="wrapper" draggable="true" @dragstart="dragStart($event, 'scheme')" :style="`cursor: ${dragCursor}`"
       @drag="dragCursor = 'grabbing'" @dragend="dragCursor = 'grab', this.$store.commit('saveIsDragging', false)">
-      <img src="/imgs/实验内容/模块-图片.svg">
+      <img src="/imgs/单个实验/模块-图片.svg">
       <span>图片</span>
     </div>
     <div class="wrapper" draggable="true" @dragstart="dragStart($event, 'table')" :style="`cursor: ${dragCursor}`"
       @drag="dragCursor = 'grabbing'" @dragend="dragCursor = 'grab', this.$store.commit('saveIsDragging', false)">
-      <img src="/imgs/实验内容/模块-表格.svg">
+      <img src="/imgs/单个实验/模块-表格.svg">
       <span>表格</span>
     </div>
     <div class="wrapper" draggable="true" @dragstart="dragStart($event, 'text')" :style="`cursor: ${dragCursor}`"
       @drag="dragCursor = 'grabbing'" @dragend="dragCursor = 'grab', this.$store.commit('saveIsDragging', false)">
-      <img src="/imgs/实验内容/模块-文本.svg">
+      <img src="/imgs/单个实验/模块-文本.svg">
       <span>文本</span>
     </div>
     <div class="wrapper" draggable="true" @dragstart="dragStart($event, 'data')" :style="`cursor: ${dragCursor}`"
       @drag="dragCursor = 'grabbing'" @dragend="dragCursor = 'grab', this.$store.commit('saveIsDragging', false)">
-      <img src="/imgs/实验内容/模块-数据.svg">
+      <img src="/imgs/单个实验/模块-数据.svg">
       <span>数据</span>
     </div>
     <div class="wrapper" draggable="true" @dragstart="dragStart($event, 'reference')" :style="`cursor: ${dragCursor}`"
       @drag="dragCursor = 'grabbing'" @dragend="(dragCursor = 'grab', this.$store.commit('saveIsDragging', false))">
-      <img src="/imgs/实验内容/模块-引文.svg">
+      <img src="/imgs/单个实验/模块-引文.svg">
       <span>引文</span>
     </div>
   </div>
@@ -40,12 +41,11 @@ export default {
     dragStart(event, moduleName) {
       // 启动拖拽事件，让表单元素禁止
       this.$store.commit('saveIsDragging', true)
-      const img = document.createElement('img')
-      img.src = '/imgs/登录页/产品图标.png'
       // 设置传输的数据
       event.dataTransfer.setData('text/plain', moduleName)
       // 设置拖动时的图片效果
-      event.dataTransfer.setDragImage(img, 200, 200)
+      event.dataTransfer.setDragImage(this.$refs.img, 50, 50)
+      event.dataTransfer.effectAllowed = 'move'
     }
   }
 }

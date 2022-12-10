@@ -11,16 +11,17 @@
             <div class="home-login">
               <home-input :state="0" type="text" placeholder="请输入用户名" label="用户名">
               </home-input>
-              <home-input :state="2" type="password" placeholder="请输入密码" label="密码"></home-input>
+              <home-input @keyup.enter="toUserSpace" :state="2" type="password" placeholder="请输入密码"
+                label="密码"></home-input>
               <div class="forgot-password-tips">
                 <img src="/imgs/登录页/忘记密码.svg">
                 <a href="/#/forgot-password">忘记密码</a>
               </div>
-              <home-button @btnClick="toUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="green">
+              <home-button @btnClick="toUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="greenButton">
               </home-button>
-              <home-button @btnClick="this.$router.push('/signup')" buttonText="注册" buttonStyle="white"></home-button>
+              <home-button @btnClick="this.$router.push('/signup')" buttonText="注册" buttonStyle="whiteButton"></home-button>
               <home-button @btnClick="this.$router.push('/error')" buttonText="出错了（测试）"
-                buttonStyle="gray"></home-button>
+                buttonStyle="grayButton"></home-button>
             </div>
           </template>
           <template v-slot:signup>
@@ -31,8 +32,8 @@
               <home-input @change="validate(2)" :state="2" type="password" placeholder="请输入6-20个字符的英文、数字或特殊字符"
                 label="密码"></home-input>
               <home-input :state="3" type="password" placeholder="请再次确认密码" label="二次确认"></home-input>
-              <home-button @btnClick="signup" buttonText="注册" buttonStyle="white"></home-button>
-              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录" buttonStyle="gray"></home-button>
+              <home-button @btnClick="signup" buttonText="注册" buttonStyle="whiteButton"></home-button>
+              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录" buttonStyle="grayButton"></home-button>
             </div>
           </template>
           <template v-slot:update-password>
@@ -41,22 +42,24 @@
               </home-input>
               <home-input :state="1" :readOnly="true" class="email" type="text" :placeholder="email" label="邮箱">
               </home-input>
-              <home-input @change="validate(2)" :state="2" type="password" placeholder="请输入6-20个字符的英文、数字或特殊字符"
-                label="密码"></home-input>
-              <home-input @change="validate(3)" :state="3" type="password" placeholder="请再次确认密码"
-                label="二次确认"></home-input>
-              <home-button @btnClick="confirmUpdate" buttonText="确认修改" buttonStyle="green"></home-button>
+              <home-input @change="validate(2)" @keyup.enter="confirmUpdate" :state="2" type="password"
+                placeholder="请输入6-20个字符的英文、数字或特殊字符" label="密码"></home-input>
+              <home-input @change="validate(3)" @keyup.enter="confirmUpdate" :state="3" type="password"
+                placeholder="请再次确认密码" label="二次确认"></home-input>
+              <home-button @btnClick="confirmUpdate" buttonText="确认修改" buttonStyle="greenButton"></home-button>
             </div>
           </template>
           <template v-slot:forgot-password>
             <div class="home-forgot-password">
-              <home-input @change="validate(1)" :state="1" type="email" placeholder="请输入你的邮箱" label="邮箱"></home-input>
-              <home-input @change="validate(4)" :state="4" type="text" placeholder="请输入验证码" label="验证码"></home-input>
+              <home-input @change="validate(1)" @keyup.enter="getCode" :state="1" type="email" placeholder="请输入你的邮箱"
+                label="邮箱"></home-input>
+              <home-input @change="validate(4)" @keyup.enter="toUpdatePassword" :state="4" type="text"
+                placeholder="请输入验证码" label="验证码"></home-input>
               <home-button :disabled="isSent" :style="'margin-top:20px'" @btnClick="getCode" :buttonText="buttonText"
-                buttonStyle="white">
+                buttonStyle="whiteButton">
               </home-button>
-              <home-button @btnClick="toUpdatePassword" buttonText="下一步" buttonStyle="green"></home-button>
-              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录" buttonStyle="gray"></home-button>
+              <home-button @btnClick="toUpdatePassword" buttonText="下一步" buttonStyle="greenButton"></home-button>
+              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录" buttonStyle="grayButton"></home-button>
             </div>
           </template>
           <template v-slot:register-success>
@@ -64,7 +67,7 @@
               <p>注册成功！</p>
               <p>请前往邮箱激活账号！</p>
               <home-button @click.prevent="this.$router.push('/login')" buttonText="返回登录"
-                buttonStyle="gray"></home-button>
+                buttonStyle="grayButton"></home-button>
             </div>
           </template>
           <template v-slot:activate-success>
@@ -72,7 +75,7 @@
               <p>激活成功！</p>
               <p>请使用用户名和密码登录！</p>
               <home-button @click.prevent="this.$router.push('/login')" buttonText="返回登录"
-                buttonStyle="gray"></home-button>
+                buttonStyle="grayButton"></home-button>
             </div>
           </template>
         </home-slot>
@@ -117,42 +120,42 @@ export default {
   computed: {
     username: {
       get() {
-        return this.$store.state.loginInfo[0]
+        return this.$store.state.loginInfo.username
       },
       set(newVal) {
-        this.$store.commit('saveLoginInfo', { index: 0, content: newVal })
+        this.$store.commit('saveLoginInfo', { username: newVal })
       }
     },
     email: {
       get() {
-        return this.$store.state.loginInfo[1]
+        return this.$store.state.loginInfo.email
       },
       set(newVal) {
-        this.$store.commit('saveLoginInfo', { index: 1, content: newVal })
+        this.$store.commit('saveLoginInfo', { email: newVal })
       }
     },
     password: {
       get() {
-        return this.$store.state.loginInfo[2]
+        return this.$store.state.loginInfo.password
       },
       set(newVal) {
-        this.$store.commit('saveLoginInfo', { index: 2, content: newVal })
+        this.$store.commit('saveLoginInfo', { password: newVal })
       }
     },
     confirmPassword: {
       get() {
-        return this.$store.state.loginInfo[3]
+        return this.$store.state.loginInfo.confirmPassword
       },
       set(newVal) {
-        this.$store.commit('saveLoginInfo', { index: 3, content: newVal })
+        this.$store.commit('saveLoginInfo', { confirmPassword: newVal })
       }
     },
     code: {
       get() {
-        return this.$store.state.loginInfo[4]
+        return this.$store.state.loginInfo.code
       },
       set(newVal) {
-        this.$store.comit('saveLoginInfo', { index: 4, content: newVal })
+        this.$store.comit('saveLoginInfo', { code: newVal })
       }
     }
   },
@@ -209,8 +212,8 @@ export default {
         this.axios.post('/home/verify', {
           code: this.code
         }).then((data) => {
-          this.username = data.username
-          this.email = data.email
+          sessionStorage.setItem('username', data.username)
+          sessionStorage.setItem('email', data.email)
           this.$router.push('/update-password')
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
@@ -219,10 +222,8 @@ export default {
     },
     getCode() {
       if (this.validate(1)) {
-        this.axios.get('/home/code', {
-          params: {
-            email: this.email
-          }
+        this.axios.post('/home/code', {
+          email: this.email
         }
         ).then(() => {
           this.$store.dispatch('toast', { text: '邮件已发送，请及时查收', state: 0 })
@@ -277,20 +278,18 @@ export default {
         })
       }
     },
-    gotConfirmPassword(value) {
+    gotconfirmPassword(value) {
       if (this.validate(3)) {
         this.confirmPassword = value
       }
     },
     signup() {
-      // 用户名、邮箱和密码都符合正则
       if (this.validate(0) && this.validate(1) && this.validate(2) && this.validate(3)) {
         this.axios.post('/home/register', {
           username: this.username,
           email: this.email,
           password: this.password
         }).then(() => {
-          // 清空之前注册留在 vuex  的信息
           this.$store.dispatch('clearLoginInfo')
           this.$router.push('/register-success')
         }).catch((resp) => {
@@ -324,10 +323,12 @@ export default {
 <style lang="scss">
 @import '../assets/scss/config.scss';
 @import '../assets/scss/base.scss';
+
 .home-view {
   position: relative;
   width: $min-width;
   margin: 0 auto;
+
   .container {
     // 放在页面的内联样式中，可以通过 js 动态替换背景图片
     background-size: cover;

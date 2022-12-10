@@ -16,29 +16,29 @@
         <label class="label">课题组ID</label>
         <div class="join-group-wrapper">
           <input type="text" class="input" placeholder="请输入群组ID" v-model="groupUUID">
-          <button @click.stop="$store.commit('modalStateChange', true)">加入</button>
+          <button class="greenButton" @click.stop="$store.commit('modalStateChange', true)">加入</button>
         </div>
       </template>
       <template v-slot:createGroup>
         <label class="label">课题组信息</label>
         <div class="create-group-wrapper">
           <label>名称</label>
-          <input type="text" class="input" placeholder="请输入文本" v-model="groupName">
+          <input type="text" class="input" placeholder="请输入文本" v-model="createName">
         </div>
         <div class="create-group-wrapper">
           <label>简介</label>
-          <textarea class="input" placeholder="请输入文本" v-model="groupSlogon"></textarea>
+          <textarea class="input" placeholder="请输入文本" v-model="createSlogon"></textarea>
         </div>
       </template>
       <template v-slot:addMember>
         <label class="label">邮箱/用户名</label>
         <div class="addMember-wrapper1">
           <input type="text" class="input" placeholder="请输入文本" v-model="usernameOrEmail">
-          <button @click.stop="$store.state.okEvent(false)">添加</button>
+          <button class="greenButton" @click.stop="$store.state.okEvent(false)">添加</button>
         </div>
         <label class="label">课题组ID</label>
         <div class="addMember-wrapper2">
-          <span>ID:{{ $store.state.groupInfo.groupUUID }}</span>
+          <span>ID:{{ $store.state.groupInfo.UUID }}</span>
           <img src="/imgs/左边栏/复制.svg">
         </div>
       </template>
@@ -47,9 +47,9 @@
         <div class="share-wrapper">
           <div>
             <input class="input" type="text" readonly placeholder="请选择要分享到的群组项目" v-model="dropdownTitle">
-            <img src="/imgs/反应/分享下拉箭头.svg" @click="(showDropdown = true)">
+            <img src="/imgs/实验列表/分享下拉箭头.svg" @click="(showDropdown = true)">
           </div>
-          <div class="share-dropdown" v-show="showDropdown">
+          <div class="share-dropdown" v-if="showDropdown">
             <div @click="shareReaction(item)" class="word-wrap" v-for="(item, index) in projectList" :key="index">{{
                 item.name
             }}</div>
@@ -65,16 +65,18 @@
         <div class="template-container">
           <button class="builtin" @click="toTemplateBuiltin(item.data)" v-for="(item, index) in templateBuiltin"
             :key="index">{{
-                item.templateName
+                item.name
             }}</button>
         </div>
         <div class="label" style="margin: 30px 50px;">自定义</div>
         <div class="template-container">
-          <button class="define" @click="toTemplateDefine(item.data)" v-for="(item, index) in templateDefine"
-            :key="index">{{
-                item.templateName
+          <div class="wrapper" v-for="(item, index) in templateDefine" :key="index">
+            <button class="define" @click="toTemplateDefine(item.data)">{{
+                item.name
             }}</button>
-          <button class="newTemplate" @click="addTemplate" v-show="templateDefine.length < 5">+</button>
+            <img src="/imgs/左边栏/删除成员.svg" @click.stop="deleteTemplate(index)">
+          </div>
+          <button class="newTemplate" @click="addTemplate" v-if="templateDefine.length < 5">+</button>
         </div>
       </template>
     </common-modal>
@@ -109,6 +111,7 @@ import ReactionForm from '../components/compose/ReactionForm.vue'
 import ReactionRightBar from '../components/compose/ReactionRightBar.vue'
 import MainSlot from '../components/basic/MainSlot.vue'
 import CommonModal from '@/components/basic/CommonModal.vue'
+import md5 from 'js-md5'
 export default {
   name: 'MainView',
   components: {
@@ -127,7 +130,7 @@ export default {
       // 是否要插入的模态框头部图片
       hasImg: [true, true, true, true, false, false, false],
       // 要插入的模态框头部图片
-      imgPath: ['/imgs/Dialog/提醒.svg', '/imgs/左边栏/加入.svg', '/imgs/左边栏/创建.svg', '/imgs/左边栏/添加成员.svg', '', '', ''],
+      imgPath: ['/imgs/弹窗/提醒.svg', '/imgs/左边栏/加入.svg', '/imgs/左边栏/创建.svg', '/imgs/左边栏/添加成员.svg', '', '', ''],
       // 模态框头部文字
       showTitle: ['提醒', '加入课题组', '创建课题组', '添加成员', '同步到群组', '保存模版', '实验模版'],
       // 模态框头部边框样式
@@ -178,18 +181,58 @@ export default {
       return retArr
     },
     toTemplateDefine(data) {
-      const retArr = this.moduleNameToContent(data)
-      this.$store.commit('saveReactionData', retArr)
-      this.$store.commit('modal', { showModal: false })
+      // 用户点击选择模版时，计算 hash 值，若 hash 值和上一次保存的值不同，则提醒用户应该先进行保存，否则直接进行模版跳转
+      const thisReactionHash = md5(JSON.stringify(this.$store.state.reactionInfo))
+      // 有实验内容还没保存，弹窗提醒用户先进行保存
+      if (thisReactionHash !== this.$store.state.lastReactionHash) {
+        this.$store.commit('modal', { text: '是否丢弃尚未保存的实验数据', title: '选择模版提醒', slotType: 0 })
+        // 绑定点击确认按钮事件
+        this.$store.commit('bindOkEvent', () => {
+          this.$store.commit('clearReactionInfo')
+        })
+      } else {
+        const retArr = this.moduleNameToContent(data)
+        this.$store.commit('clearReactionInfo')
+        this.$store.commit('saveReactionInfo', { data: retArr })
+        this.$store.commit('modal', { showModal: false })
+      }
     },
     toTemplateBuiltin(data) {
-      const retArr = this.moduleNameToContent(data)
-      this.$store.commit('saveReactionData', retArr)
-      this.$store.commit('modal', { showModal: false })
+      // 用户点击选择模版时，计算 hash 值，若 hash 值和上一次保存的值不同，则提醒用户应该先进行保存，否则直接进行模版跳转
+      const thisReactionHash = md5(JSON.stringify(this.$store.state.reactionInfo))
+      // 有实验内容还没保存，弹窗提醒用户先进行保存
+      if (thisReactionHash !== this.$store.state.lastReactionHash) {
+        this.$store.commit('modal', { text: '是否丢弃尚未保存的实验数据', title: '选择模版提醒', slotType: 0 })
+        // 绑定点击确认按钮事件
+        this.$store.commit('bindOkEvent', () => {
+          this.$store.commit('clearReactionInfo')
+        })
+      } else {
+        const retArr = this.moduleNameToContent(data)
+        this.$store.commit('clearReactionInfo')
+        this.$store.commit('saveReactionInfo', { data: retArr })
+        this.$store.commit('modal', { showModal: false })
+      }
     },
     addTemplate() {
-      this.$store.commit('saveReactionData', [])
-      this.$store.commit('modal', { showModal: false })
+      // 用户点击添加模版时，计算 hash 值，若 hash 值和上一次保存的值不同，则提醒用户应该先进行保存，否则直接进行模版跳转
+      const thisReactionHash = md5(JSON.stringify(this.$store.state.reactionInfo))
+      // 有实验内容还没保存，弹窗提醒用户先进行保存
+      if (thisReactionHash !== this.$store.state.lastReactionHash) {
+        this.$store.commit('modal', { text: '是否丢弃尚未保存的实验数据', title: '新建模版提醒', slotType: 0 })
+        // 绑定点击确认按钮事件
+        this.$store.commit('bindOkEvent', () => {
+          this.$store.commit('clearReactionInfo')
+        })
+      } else {
+        this.$store.commit('clearReactionInfo')
+        this.$store.commit('modal', { showModal: false })
+      }
+    },
+    deleteTemplate(index) {
+      const templateDefine = this.$store.state.templateDefine
+      templateDefine.splice(index, 1)
+      this.$store.commit('saveTemplateDefine', templateDefine)
     },
     shareReaction(item) {
       if (item.id === -1) {
@@ -225,9 +268,9 @@ export default {
       } else if (path === '/main/user') {
         return [{ name: '我的实验', path: '/#/main/user', disabled: true }]
       } else if (path === '/main/group') {
-        return [{ name: `${this.groupName}`, path: '/#/main/group', disabled: true }]
+        return [{ name: `${this.name}`, path: '/#/main/group', disabled: true }]
       } else if (path === '/main/group/project') {
-        return [{ name: `${this.groupName}`, path: '/#/main/group', disabled: false }, { name: this.projectName, path: '/#/main/group/project', disabled: true }]
+        return [{ name: `${this.name}`, path: '/#/main/group', disabled: false }, { name: this.projectName, path: '/#/main/group/project', disabled: true }]
       } else if (path === '/main/user/project') {
         return [{ name: '我的实验', path: '/#/main/user', disabled: false }, { name: this.projectName, path: '/#/main/user/project', disabled: true }]
       } else {
@@ -236,7 +279,7 @@ export default {
           projectName = '嗯哼？想干嘛?'
         }
         if (path === '/main/group/project/reaction') {
-          return [{ name: `${this.groupName}`, path: '/#/main/group', disabled: false }, { name: `${projectName}`, path: '/#/main/group/project', disabled: false }, { name: `${this.reactionName}`, path: '/#/main/group/project/reaction', disabled: true }]
+          return [{ name: `${this.name}`, path: '/#/main/group', disabled: false }, { name: `${projectName}`, path: '/#/main/group/project', disabled: false }, { name: `${this.reactionName}`, path: '/#/main/group/project/reaction', disabled: true }]
         } else if (path === '/main/user/project/reaction') {
           return [{ name: '我的实验', path: '/#/main/user', disabled: false }, { name: `${projectName}`, path: '/#/main/user/project', disabled: false }, { name: `${this.reactionName}`, path: '/#/main/user/project/reaction', disabled: true }]
         } else {
@@ -244,36 +287,42 @@ export default {
         }
       }
     },
-    groupName: {
+    createName: {
       get() {
-        return !this.$store.state.groupInfo.groupName ? '暂未加入' : this.$store.state.groupInfo.groupName
+        return this.$store.state.createGroup.name
       },
       set(newVal) {
-        this.$store.commit('saveGroupInfo', { groupName: newVal })
+        this.$store.commit('saveCreateGroup', { name: newVal })
       }
     },
-    groupSlogon: {
+    createSlogon: {
       get() {
-        return this.$store.state.groupInfo.groupSlogon
+        return this.$store.state.createGroup.slogon
       },
       set(newVal) {
-        this.$store.commit('saveGroupInfo', { groupSlogon: newVal })
+        this.$store.commit('saveCreateGroup', { slogon: newVal })
       }
+    },
+    name() {
+      return !this.$store.state.groupInfo.name ? '暂未加入' : this.$store.state.groupInfo.name
+    },
+    slogon() {
+      return this.$store.state.groupInfo.slogon
     },
     groupUUID: {
       get() {
-        return this.$store.state.groupInfo.groupUUID
+        return this.$store.state.groupInfo.UUID
       },
       set(newVal) {
-        this.$store.commit('saveGroupInfo', { groupUUID: newVal })
+        this.$store.commit('saveGroupInfo', { UUID: newVal })
       }
     },
     usernameOrEmail: {
       get() {
-        return this.$store.state.loginInfo[0]
+        return this.$store.state.loginInfo.username
       },
       set(newVal) {
-        this.$store.commit('saveLoginInfo', { index: 0, content: newVal })
+        this.$store.commit('saveLoginInfo', { username: newVal })
       }
     },
     templateDefine() {
@@ -283,13 +332,13 @@ export default {
       return this.$store.state.templateBuiltin
     },
     projectName() {
-      return this.$store.state.projectInfo.projectName
+      return this.$store.state.projectInfo.name
     },
     isGroup() {
       return this.$store.state.isGroup
     },
     reactionName() {
-      return !this.$store.state.reactionInfo.reactionName ? '未命名' : this.$store.state.reactionInfo.reactionName
+      return this.$store.state.reactionInfo.name
     },
     projectList() {
       const retArr = this.$store.state.projectList
@@ -308,6 +357,11 @@ export default {
     window.addEventListener('resize', () => {
       const height = document.body.clientHeight
       this.$store.dispatch('saveHeight', height)
+    })
+    window.addEventListener('keyup', () => {
+      if (event.keyCode === 27) {
+        this.$store.dispatch('modal', { showModal: false })
+      }
     })
     this.checkIsGroup()
   },
@@ -333,8 +387,9 @@ export default {
     margin-top: 12px;
     margin-bottom: 30px;
     text-align: center;
-    font-size: 16px;
-    width: 320px;
+    font-size: 18px;
+    padding: 0 20px;
+    width: 280px;
   }
 
   .label {
@@ -360,15 +415,7 @@ export default {
     }
 
     button {
-      cursor: pointer;
       width: 80px;
-      height: 40px;
-      border-radius: 5px;
-      background-color: #638271;
-      border: 1px solid #638271;
-      color: #FFFFFF;
-      font-size: 20px;
-      font-weight: bold
     }
   }
 
@@ -424,26 +471,47 @@ export default {
 
   .template-container {
     display: flex;
-    justify-content: space-between;
     margin: 0 70px;
 
     button {
-      cursor: pointer;
       width: 120px;
       height: 50px;
-      border-radius: 5px;
-
-      border: 1px solid #7F7F7F;
-      box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.35);
+      line-height: 50px;
+      border: none;
     }
 
     .builtin {
       background-color: #00BFBF;
+      margin-right: 15px;
     }
 
-    .define {
-      background-color: #ede9ec;
-      margin-bottom: 30px;
+    .wrapper {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-right: 15px;
+
+      .define {
+        background-color: #ede9ec;
+        margin-bottom: 30px;
+      }
+
+      img {
+        cursor: pointer;
+        width: 15px;
+        height: 15px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        opacity: 0;
+      }
+    }
+
+    .wrapper:hover {
+      img {
+        transition: opacity .3s;
+        opacity: 100%;
+      }
     }
 
     .newTemplate {
@@ -452,6 +520,7 @@ export default {
       font-size: 16px;
       font-weight: bold;
       box-shadow: none;
+      margin-bottom: 30px;
     }
   }
 

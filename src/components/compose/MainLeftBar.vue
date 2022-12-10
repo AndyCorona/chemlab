@@ -30,7 +30,6 @@ export default {
   methods: {
     init() {
       this.axios.get('/group').then((data) => {
-        console.log(data)
         this.$store.dispatch('saveGroupInfo', data)
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })

@@ -1,45 +1,33 @@
 <template>
   <div class="reaction-form-title">
-    <img src="/imgs/实验内容/实验标题.svg">
-    <input type="text" v-model="title" @change="valiDateTitle">
+    <img src="/imgs/单个实验/实验标题.svg">
+    <input type="text" v-model="title" @change="valiDateTitle" :readonly="isGroup">
   </div>
 </template>
 
 <script>
 export default {
   name: 'ReactionFormTitle',
-  inject: ['isSubmit'],
-  emits: ['success', 'fail'],
   methods: {
     valiDateTitle() {
       if (!/^.{0,30}$/.test(this.title)) {
         this.$store.commit('toast', { text: '实验标题不超过30个字', state: 2, durationTime: 3000 })
+        return false
       }
-    },
-    serialize() {
-      if (!/^.{0,30}$/.test(this.title)) {
-        this.$store.commit('toast', { text: '实验标题不超过30个字', state: 2, durationTime: 3000 })
-        this.$emit('fail')
-      } else {
-        this.$emit('success', this.title.trim() === '' ? '未命名' : this.title)
-      }
+      return true
     }
   },
   computed: {
     title: {
       get() {
-        return this.$store.state.reactionInfo.reactionName
+        return this.$store.state.reactionInfo.unSaveReactionName
       },
       set(newVal) {
-        this.$store.commit('saveReactionName', newVal)
+        this.$store.commit('saveUnSaveReactionName', newVal)
       }
-    }
-  },
-  watch: {
-    isSubmit(newVal) {
-      if (newVal) {
-        this.serialize()
-      }
+    },
+    isGroup() {
+      return this.$store.state.isGroup
     }
   }
 }

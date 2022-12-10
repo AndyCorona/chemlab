@@ -2,7 +2,7 @@
   <div class="main-project-and-reaction-title">
     <div :class="classType">
       <img src="/imgs/用户主页/项目列表.svg">
-      <input @change="this.$emit('change', name)" :readonly="readOnly" type="text" autocomplete="off" v-model="name">
+      <input @change="this.$emit('change', $store.state.unSaveProjectName)" :readonly="readOnly" type="text" autocomplete="off" v-model="name">
     </div>
   </div>
 </template>
@@ -21,10 +21,10 @@ export default {
   computed: {
     name: {
       get() {
-        return this.classType === 'project-title' ? '项目列表' : this.$store.state.projectInfo.projectName
+        return this.classType === 'project-title' ? '项目列表' : this.$store.state.projectInfo.name
       },
       set(newVal) {
-        this.$store.commit('saveProjectName', newVal)
+        this.$store.commit('saveUnSaveProjectName', newVal)
       }
     }
   }

@@ -6,7 +6,7 @@
       <p>
         <span class="word-wrap" v-for="(tag, j) in item.tags" :key="j">{{ tag }}</span>
       </p>
-      <main-check-box v-show="show" @change="selection" :ReactionId="item.id"></main-check-box>
+      <main-check-box v-if="show" @change="selection" :ReactionId="item.id"></main-check-box>
     </div>
   </div>
 </template>

@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import store from '@/store'
 import HomeView from '../views/HomeView.vue'
 import HomeProvacyPolicy from '../components/compose/HomePrivacyPolicy.vue'
 import HomeUserAgreement from '../components/compose/HomeUserAgreement.vue'
@@ -7,6 +8,7 @@ import MainDetails from '../components/compose/MainDetails.vue'
 import MainUserAndGroup from '../components/compose/MainUserAndGroup.vue'
 import MainProject from '../components/compose/MainProject.vue'
 import ErrorView from '../views/ErrorView.vue'
+import md5 from 'js-md5'
 const routes = [
   {
     path: '/',
@@ -109,6 +111,34 @@ const routes = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+
+router.beforeEach((to, from) => {
+  console.log(from.fullPath)
+  console.log(to.fullPath)
+  // 更新密码页面需要从 sessionStorage 中获取用户名和邮箱
+  if (to.fullPath === '/update-password') {
+    store.dispatch('saveLoginInfo', { username: sessionStorage.getItem('username'), email: sessionStorage.getItem('email') })
+  }
+  // 从实验页面跳转
+  if (from.fullPath === '/main/user/project/reaction') {
+    // 计算 hash 值，相同则放行，不同则弹窗提醒
+    const lastHash = store.state.lastReactionHash
+    const thisHash = md5(JSON.stringify(store.state.reactionInfo))
+    console.log(lastHash)
+    console.log(thisHash)
+    if (!store.state.leaveFromReaction && lastHash !== thisHash) {
+      // 弹窗
+      store.dispatch('modal', { text: '是否丢弃尚未保存的实验数据？', title: '退出实验页面提醒', slotType: 0 })
+      // 绑定点击确认按钮事件
+      store.dispatch('bindOkEvent', () => {
+        store.dispatch('saveLeaveFromReaction', true)
+        router.push(to)
+      })
+      return false
+    }
+  }
+  return true
 })
 
 export default router

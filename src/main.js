@@ -16,7 +16,6 @@ if (mock) {
 
 const app = createApp(App)
 app.component('ToastProps', ToastProps)
-
 app.config.globalProperties.$config = config
 app.config.unwrapInjectedRef = true
 app.use(store).use(router).use(VueAxios, axios).mount('#app')

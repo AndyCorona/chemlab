@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     logout() {
-      this.$store.commit('modal', { text: '是否退出?', title: '退出提醒', slotType: 0 })
+      this.$store.commit('modal', { text: '是否退出?', title: '退出登录提醒', slotType: 0 })
       this.$store.commit('bindOkEvent', this.confirmLogout)
     },
     confirmLogout() {
@@ -37,8 +37,6 @@ export default {
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })
-      // 无论成功与否，都要关闭模态框
-      this.$store.dispatch('modal', { showModal: false })
     }
   }
 }
@@ -52,8 +50,8 @@ export default {
   position: sticky;
   top: 0;
   background-color: #FFFFFF;
-  height: 61px;
   border-bottom: 1px solid #D7D7D7;
+  height: 61px;
 
   .left {
     width: 1500px;
@@ -88,7 +86,7 @@ export default {
 
     img {
       cursor: pointer;
-      margin: 14px 10px;
+      padding: 14px 10px 15px 10px;
     }
 
     .setting {

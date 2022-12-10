@@ -1,7 +1,7 @@
 <template>
   <div class="main-drop-list">
-    <img :src="src" @click="this.drop = 'drop'">
-    <div class="child" :id="drop">
+    <img :src="src" @mouseenter="show = 'block'">
+    <div class="child" id="drop" :style="`display:${show}`">
       <div @click="details">个人中心</div>
       <div @click="help">帮助</div>
     </div>
@@ -17,16 +17,16 @@ export default {
   },
   data() {
     return {
-      drop: 'close'
+      show: 'none'
     }
   },
   methods: {
     help() {
-      this.drop = 'close'
+      this.show = 'none'
       alert('帮助页面，还没做')
     },
     details() {
-      this.drop = 'close'
+      this.show = 'none'
       this.$router.push('/main/details')
     }
   }
@@ -37,16 +37,21 @@ export default {
 .main-drop-list {
   position: relative;
 
-  #drop {
-    top: 62px;
+  img:hover~#drop {
     display: block;
-
+    border-top: 1px solid #D7D7D7;
+    top: 61px;
   }
 
-  #close {
+  #drop:hover {
+    display: block;
+    border-top: 1px solid #D7D7D7;
+    top: 61px;
+  }
+
+  #drop {
     display: none;
     top: -100px;
-
   }
 
   .child {

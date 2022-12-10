@@ -4,35 +4,42 @@
     <div class="container">
       <div class="thead">
         <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
-          <div :style="`width:${tWidth[index]}px`" @focusout="this.$store.commit('saveDraggable', true)"
-            @focusin="this.$store.commit('saveDraggable', false)">
+          <div :style="`width:${tWidth[index]}px`">
             {{ item }}
           </div>
         </div>
-        <img draggable="false" src="/imgs/用户主页/添加项目.svg" @click.prevent="">
+        <img draggable="false" src="/imgs/用户主页/添加项目.svg" @click.prevent="" v-if="!isGroup">
       </div>
       <div class="tbody" v-for="(row, i) in tbody" :key="i">
         <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
-          <div :style="`width:${tWidth[j]}px`" contenteditable="true" @input="synTbody($event, i, j)"
-            @focusout="this.$store.commit('saveDraggable', true)" @focusin="this.$store.commit('saveDraggable', false)">
+          <div :style="`width:${tWidth[j]}px`" :contenteditable="!isGroup" @input="synTbody($event, i, j)"
+            @mouseenter="this.$store.commit('saveDraggable', false)"
+            @mouseleave="this.$store.commit('saveDraggable', true)">
             {{ item
             }}</div>
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-input"
-          v-show="(!dataFileAndUrl[i][0] && !dataFileAndUrl[i][1])">
-          <label :for="`img${randomNum * (i + 1)}`" draggable="false">上传文件</label>
-          <input :id="`img${randomNum * (i + 1)}`" type="file" @change="uploadFile($event, i)">
+        <div :style="`width:${tWidth[3]}px`" class="show-input" v-if="(!dataFileAndUrl[i][0] && !dataFileAndUrl[i][1])"
+          @mouseenter="this.$store.commit('saveDraggable', false)"
+          @mouseleave="this.$store.commit('saveDraggable', true)">
+          <label :for="`img${randomNum * (i + 1)}`" draggable="false" :style="`border:${!isGroup ? '' : 'none'}`">{{
+              !isGroup
+                ? '上传文件' : '无文件'
+          }}</label>
+          <input :id="`img${randomNum * (i + 1)}`" type="file" @change="uploadFile($event, i)" v-if="!isGroup">
         </div>
         <div :style="`width:${tWidth[3]}px`" class="show-file-name"
-          v-show="(dataFileAndUrl[i][0] || dataFileAndUrl[i][1])">
+          v-if="(dataFileAndUrl[i][0] || dataFileAndUrl[i][1])" @mouseenter="this.$store.commit('saveDraggable', false)"
+          @mouseleave="this.$store.commit('saveDraggable', true)">
           <div @click="downloadFile(dataFileAndUrl[i][1])" draggable="false">{{ !dataFileAndUrl[i][0] ? '找不到文件名' :
               dataFileAndUrl[i][0]
           }}
           </div>
         </div>
-        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)">
+        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
       </div>
-      <div class="NewRow" contenteditable="false" @click="addRow" v-show="(tbody.length < 10)">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 10 && !isGroup)"
+        @mouseenter="this.$store.commit('saveDraggable', false)"
+        @mouseleave="this.$store.commit('saveDraggable', true)">+</div>
     </div>
   </div>
 </template>
@@ -48,8 +55,6 @@ export default {
     moduleOrder: Number,
     showBlock: Boolean
   },
-  inject: ['isSubmit'],
-  emits: ['success', 'fail'],
   data() {
     return {
       thead: ['仪器', '测试类型', '日期', '文件'],
@@ -84,6 +89,9 @@ export default {
       alert('下载成功')
     },
     uploadFile(event, row) {
+      if (this.isGroup) {
+        return
+      }
       const file = event.target.files[0]
       if (!file) {
         return
@@ -94,70 +102,6 @@ export default {
       }
       // 改变文件之后，将文件暂时存放在 dataFileAndUrl 第三项中，将文件名存放在第一项中
       this.dataFileAndUrl.splice(row, 0, [file.name, '', file])
-    },
-    serialize() {
-      // 只有一列，不需要上传
-      if (this.tbody.length === 0) {
-        this.$emit('success', null)
-        return
-      }
-      let isBlank = true
-      // 标题不为空
-      if (this.title.trim() !== '') {
-        isBlank = false
-      }
-      // 单元格内容不为空
-      if (isBlank) {
-        for (let i = 0; i < this.tbody.length - 1; i++) {
-          for (let j = 0; j < this.tbody[0].length; j++) {
-            if (this.tbody[i][j].trim() !== '') {
-              isBlank = false
-              break
-            }
-          }
-        }
-      }
-      // 是否有文件需要上传
-      if (isBlank) {
-        for (let i = 0; i < this.dataFileAndUrl.length; i++) {
-          if (this.dataFileAndUrl[i][2] instanceof Object) {
-            isBlank = false
-            break
-          }
-        }
-      }
-      // 之前上传的文件路径是否还存在
-      if (isBlank) {
-        for (let i = 0; i < this.dataFileAndUrl.length; i++) {
-          if (this.dataFileAndUrl[i][1] !== '') {
-            isBlank = false
-            break
-          }
-        }
-      }
-      // 标题为空、所有单元格内容为空、没有文件需要上传、之前上传的文件路径都不存在 => 该模块不需要保存
-      if (isBlank) {
-        this.$emit('success', null)
-        return
-      }
-      // 将当前所有文件上传到服务器中，并返回所有文件的 url 地址。若上传成功则触发 success 事件，否则触发 fail 事件
-      // this.axios.post('')
-      // dataFileAndUrl 的第二项应该填充 url，第三列应该将文件清除
-      this.dataFileAndUrl.forEach(item => {
-        item[2] = ''
-        item[1] = 'https://eshare.shanghaitech.edu.cn/lims/error/401'
-      })
-      const isUploaded = true
-      if (isUploaded) {
-        const data = {
-          type: 'data',
-          title: this.title,
-          content: [this.dataFileAndUrl, this.tbody]
-        }
-        this.$emit('success', data)
-      } else {
-        this.$emit('fail')
-      }
     }
   },
   computed: {
@@ -184,13 +128,9 @@ export default {
       set(newVal) {
         this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [newVal, this.tbody] })
       }
-    }
-  },
-  watch: {
-    isSubmit(newVal) {
-      if (newVal) {
-        this.serialize()
-      }
+    },
+    isGroup() {
+      return this.$store.state.isGroup
     }
   }
 }
@@ -198,6 +138,8 @@ export default {
 
 <style lang="scss">
 .reaction-data {
+  cursor: grab;
+
   .container {
     box-sizing: border-box;
     font-size: 16px;
@@ -247,6 +189,14 @@ export default {
           display: inline-block;
           width: 508px;
           font-size: 16px;
+        }
+      }
+    }
+
+    .tbody {
+      .wrapper {
+        div {
+          cursor: text;
         }
       }
     }

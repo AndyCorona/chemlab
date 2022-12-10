@@ -9,22 +9,21 @@
         </div>
         <div class="wrapper" :class="basitStyle">
           <label>用户名：</label>
-          <input @change="validateUsername" type="text" :readonly="basicToggle" v-model="username"
-            :placeholder="username">
+          <input @change="validate(0)" type="text" :readonly="basicToggle" v-model="username" :placeholder="username">
         </div>
         <div class="wrapper" :class="basitStyle">
           <label>密码：</label>
-          <input @change="validatePassword" type="password" :readonly="basicToggle" v-model="password"
+          <input @change="validate(1)" type="password" :readonly="basicToggle" v-model="password"
             :placeholder="password">
         </div>
         <div class="wrapper" :class="basitStyle" :style="`opacity:${basicToggle ? '0' : '100%'}`">
           <label>确认密码：</label>
-          <input @change="validateConfirmPassword" type="password" :readonly="basicToggle" v-model="confirmPassword"
+          <input @change="validate(2)" type="password" :readonly="basicToggle" v-model="confirmPassword"
             :placeholder="confirmPassword">
         </div>
         <div class="wrapper">
-          <button class="save" @click.prevent="saveBasic">保存</button>
-          <button class="toggle" @click.prevent="basicToggle = !basicToggle">修改</button>
+          <button class="greenButton" @click.prevent="saveBasic">保存</button>
+          <button class="grayButton" @click.prevent="basicToggle = false">修改</button>
         </div>
       </div>
     </div>
@@ -33,22 +32,19 @@
       <div class="personal-details">
         <div class="wrapper" :class="personalStyle">
           <label>学校：</label>
-          <input @change="validateSchool" type="text" :readonly="personalToggle" v-model="school"
-            :placeholder="school">
+          <input @change="validate(3)" type="text" :readonly="personalToggle" v-model="school" :placeholder="school">
         </div>
         <div class="wrapper" :class="personalStyle">
           <label>专业：</label>
-          <input @change="validateMajor" type="text" :readonly="personalToggle" v-model="major"
-            :placeholder="major">
+          <input @change="validate(4)" type="text" :readonly="personalToggle" v-model="major" :placeholder="major">
         </div>
         <div class="wrapper" :class="personalStyle">
           <label>研究领域：</label>
-          <input @change="validateField" type="text" :readonly="personalToggle" v-model="field"
-            :placeholder="field">
+          <input @change="validate(5)" type="text" :readonly="personalToggle" v-model="field" :placeholder="field">
         </div>
         <div class="wrapper">
-          <button class="save" @click.prevent="savePersonal">保存</button>
-          <button class="toggle" @click.prevent="personalToggle = !personalToggle">修改</button>
+          <button class="greenButton" @click.prevent="savePersonal">保存</button>
+          <button class="grayButton" @click.prevent="personalToggle = false">修改</button>
         </div>
       </div>
     </div>
@@ -61,6 +57,10 @@ export default {
   name: 'MainDetails',
   data() {
     return {
+      usernameExp: /^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/,
+      emailExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
+      passwordExp: /^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/,
+      personalExp: /^[A-Za-z\u4e00-\u9fa5]{0,20}$/,
       username: '',
       email: '',
       password: '111111',
@@ -75,80 +75,94 @@ export default {
     }
   },
   methods: {
-    validateUsername() {
-      if (!this.validate(/^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/, this.username)) {
-        this.$store.commit('toast', { text: '请输入有效的用户名' })
-      } else {
+    init() {
+      // 获取基本信息和个人信息
+      this.axios.get('/main/info').then((data) => {
+        this.username = data.username
+        this.email = data.email
+        this.school = data.school
+        this.major = data.major
+        this.field = data.field
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { text: resp.msg })
+      })
+    },
+    validate(type) {
+      // 校验用户名
+      if (type === 0) {
+        if (!this.usernameExp.test(this.username)) {
+          this.$store.commit('toast', { text: '请输入有效的用户名' })
+          return false
+        }
         return true
-      }
-    },
-    validatePassword() {
-      if (!this.validate(/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/, this.password)) {
-        this.$store.commit('toast', { text: '请输入有效的密码' })
-      } else {
+        // 校验密码
+      } else if (type === 1) {
+        if (!this.passwordExp.test(this.password)) {
+          this.$store.commit('toast', { text: '请输入有效的密码' })
+          return false
+        }
         return true
-      }
-    },
-    validateConfirmPassword() {
-      if (!this.validate(/^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/, this.confirmPassword)) {
-        this.$store.commit('toast', { text: '请输入有效的密码' })
-      } else if (this.password !== this.confirmPassword) {
-        this.$store.commit('toast', { text: '两次输入密码不一致' })
-      } else {
+        // 校验确认密码
+      } else if (type === 2) {
+        if (this.confirmPassword !== this.password) {
+          this.$store.commit('toast', { text: '两次输入密码不一致' })
+          return false
+        }
+        if (!this.passwordExp.test(this.confirmPassword)) {
+          this.$store.commit('toast', { text: '请输入有效的密码' })
+          return false
+        }
         return true
-      }
-    },
-    validateSchool() {
-      if (!this.validate(/^[A-Za-z\u4e00-\u9fa5]{0,20}$/, this.school)) {
-        this.$store.commit('toast', { text: '请输入有效的学校名称' })
-      } else {
+        // 校验学校名称
+      } else if (type === 3) {
+        if (!this.personalExp.test(this.school)) {
+          this.$store.commit('toast', { text: '请输入有效的学校名称' })
+          return false
+        }
         return true
-      }
-    },
-    validateMajor() {
-      if (!this.validate(/^[A-Za-z\u4e00-\u9fa5]{0,20}$/, this.major)) {
-        this.$store.commit('toast', { text: '请输入有效的专业名称' })
-      } else {
+        // 校验专业
+      } else if (type === 4) {
+        if (!this.personalExp.test(this.major)) {
+          this.$store.commit('toast', { text: '请输入有效的专业' })
+          return false
+        }
         return true
-      }
-    },
-    validateField() {
-      if (!this.validate(/^[A-Za-z\u4e00-\u9fa5]{0,20}$/, this.field)) {
-        this.$store.commit('toast', { text: '请输入有效的研究方向' })
-      } else {
+        // 校验研究方向
+      } else if (type === 5) {
+        if (!this.personalExp.test(this.field)) {
+          this.$store.commit('toast', { text: '请输入有效的研究方向' })
+          return false
+        }
         return true
+      } else {
+        throw new Error('the type is between 0 - 5')
       }
-    },
-    validate(validateExpression, value) {
-      return validateExpression.test(value)
-    },
-    init({ username, email, school, major, field }) {
-      this.username = username
-      this.email = email
-      this.school = school
-      this.major = major
-      this.field = field
     },
     saveBasic() {
-      if (this.validateUsername() && this.validatePassword() && this.validateConfirmPassword()) {
-        this.axios.post('/main/update-basic', {
+      if (this.validate(0) && this.validate(1) && this.validate(2)) {
+        this.axios.post('/main/basic', {
           username: this.username,
           password: this.password
         }).then(() => {
           this.$store.dispatch('toast', { text: '修改成功', state: 0 })
+          this.basicToggle = !this.basicToggle
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })
       }
     },
     savePersonal() {
-      if (this.validateSchool() && this.validateMajor() && this.validateField()) {
-        this.axios.post('/main/update-me', {
-          school: this.school === '' ? '门头沟大学' : this.school,
-          major: this.major === '' ? '化学' : this.major,
-          field: this.field === '' ? '有机' : this.field
+      if (this.validate(3) && this.validate(4) && this.validate(5)) {
+        this.school = !this.school ? '门头沟大学' : this.school
+        this.major = !this.major ? '化学' : this.major
+        this.field = !this.field ? '有机' : this.field
+        this.axios.post('/main/me', {
+          school: this.school,
+          major: this.major,
+          field: this.field
         }).then(() => {
           this.$store.dispatch('toast', { text: '修改成功', state: 0 })
+          this.personalToggle = !this.personalToggle
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })
@@ -156,12 +170,7 @@ export default {
     }
   },
   mounted() {
-    // 获取基本信息和个人信息
-    this.axios.get('/main/info').then((data) => {
-      this.init(data)
-    }).catch((resp) => {
-      this.$store.dispatch('toast', { text: resp.msg })
-    })
+    this.init()
   },
   computed: {
     basitStyle() {
@@ -238,30 +247,13 @@ export default {
         }
 
         button {
-          font-size: 20px;
-          font-weight: bold;
           width: 80px;
-          height: 40px;
-          border-radius: 5px;
-          color: #FFFFFF;
           border: none;
           padding: 4px;
-          box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.35);
-          cursor: pointer;
         }
 
         button:first-child {
           margin-left: 100px;
-        }
-
-        .save {
-          background-color: #638271;
-          border: 1px solid #638271;
-        }
-
-        .toggle {
-          background-color: #D7D7D7;
-          border: 1px solid #AAAAAA;
         }
       }
 

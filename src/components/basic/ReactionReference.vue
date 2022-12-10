@@ -9,25 +9,34 @@
             {{ item }}
           </div>
         </div>
-        <img draggable="false" src="/imgs/用户主页/添加项目.svg" @click.prevent="">
+        <img draggable="false" src="/imgs/用户主页/添加项目.svg" @click.prevent="" v-if="!isGroup">
       </div>
-      <div class="tbody" v-for="(row, i) in tbody" :key="i">
+      <div class="tbody" v-for="(row, i) in tbody" :key="i" @mouseenter="this.$store.commit('saveDraggable', false)"
+        @mouseleave="this.$store.commit('saveDraggable', true)">
         <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
-          <div :style="`width:${tWidth[j]}px`" contenteditable="true" @input="synTbody($event, i, j)"
+          <div :style="`width:${tWidth[j]}px`" :contenteditable="!isGroup" @input="synTbody($event, i, j)"
             @focusout="this.$store.commit('saveDraggable', true)" @focusin="this.$store.commit('saveDraggable', false)">
             {{ item
             }}</div>
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-input" v-show="!referencePath[i]">
-          <label :for="`img${randomNum * (i + 1)}`" draggable="false">解析文件</label>
-          <input :id="`img${randomNum * (i + 1)}`" type="file" @change="resolveFile($event, i)">
+        <div :style="`width:${tWidth[3]}px`" class="show-input" v-if="!referencePath[i]"
+          @mouseenter="this.$store.commit('saveDraggable', false)"
+          @mouseleave="this.$store.commit('saveDraggable', true)">
+          <label :for="`img${randomNum * (i + 1)}`" draggable="false" :style="`border:${!isGroup ? '' : 'none'}`">{{
+              !isGroup ? '解析文件' : '无链接'
+          }}</label>
+          <input v-if="!isGroup" :id="`img${randomNum * (i + 1)}`" type="file" @change="resolveFile($event, i)">
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-reference" v-show="referencePath[i]">
+        <div :style="`width:${tWidth[3]}px`" class="show-reference" v-if="referencePath[i]"
+          @mouseenter="this.$store.commit('saveDraggable', false)"
+          @mouseleave="this.$store.commit('saveDraggable', true)">
           <a class="word-wrap" target="_blank" :href="referencePath[i]" draggable="false">{{ referencePath[i] }}</a>
         </div>
-        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)">
+        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
       </div>
-      <div class="NewRow" contenteditable="false" @click="addRow" v-show="(tbody.length < 10)">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 10) && !isGroup"
+        @mouseenter="this.$store.commit('saveDraggable', false)"
+        @mouseleave="this.$store.commit('saveDraggable', true)">+</div>
     </div>
   </div>
 </template>
@@ -43,8 +52,6 @@ export default {
     moduleOrder: Number,
     showBlock: Boolean
   },
-  inject: ['isSubmit'],
-  emits: ['success', 'fail'],
   data() {
     return {
       thead: ['日期', '期刊', '标题', '链接'],
@@ -79,42 +86,6 @@ export default {
       this.referencePath[row] = 'https://www.baidu.com'
       // 解析文件并进行填充单元格
       // TODO
-    },
-    serialize() {
-      // 只有一列，不需要上传
-      if (this.row === 1) {
-        this.$emit('success', null)
-        return
-      }
-      let isBlank = true
-      // 标题不为空
-      if (this.title.trim() !== '') {
-        isBlank = false
-      }
-      // 单元格内容不为空
-      if (isBlank) {
-        for (let i = 0; i < this.row; i++) {
-          for (let j = 0; j < this.col; j++) {
-            if (this.tbody[i][j].trim() !== '') {
-              isBlank = false
-              break
-            }
-          }
-        }
-      }
-      // 标题为空、所有单元格内容为空 => 该模块不需要保存
-      if (isBlank) {
-        this.$emit('success', null)
-        return
-      }
-      // this.axios.post('')
-      this.referencePath = ['https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333', 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333', 'https://img0.baidu.com/it/u=3971440307,1631408802&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=333']
-      const data = {
-        type: 'data',
-        title: this.title,
-        content: [this.referencePath, this.tbody]
-      }
-      this.$emit('success', data)
     }
   },
   computed: {
@@ -141,13 +112,9 @@ export default {
       set(newVal) {
         this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [newVal, this.tbody] })
       }
-    }
-  },
-  watch: {
-    isSubmit(newVal) {
-      if (newVal) {
-        this.serialize()
-      }
+    },
+    isGroup() {
+      return this.$store.state.isGroup
     }
   }
 }
@@ -155,6 +122,8 @@ export default {
 
 <style lang="scss">
 .reaction-reference {
+  cursor: grab;
+
   .container {
     box-sizing: border-box;
     font-size: 16px;
@@ -211,6 +180,14 @@ export default {
           display: inline-block;
           width: 508px;
           font-size: 16px;
+        }
+      }
+    }
+
+    .tbody {
+      .wrapper {
+        div {
+          cursor: text;
         }
       }
     }

@@ -1,34 +1,38 @@
 <template>
   <div class="reaction-table" :style="`user-select:${userSelect}`"
-    @mouseup="(mouseX = 0, firstDeltaMouseMove = false, contenteditable = true, userSelect = 'auto', this.$store.commit('saveDraggable', true))"
+    @mouseup="(mouseX = 0, firstDeltaMouseMove = false, contenteditable = !isGroup, userSelect = 'auto')"
     @mouseleave="(this.$store.commit('saveDraggable', true), mouseX = 0, firstDeltaMouseMove = false)"
     @mousemove="resize($event, resizeIndex)">
-    <reaction-module-title placeholder="表格" :moduleOrder="moduleOrder"
-      :showBlock="showBlock"></reaction-module-title>
+    <reaction-module-title placeholder="表格" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
     <div class="container">
       <div class="thead">
-        <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
-          <div class="data" :style="`width:${tWidth[index] - 20}px`" :contenteditable="contenteditable"
-            @focusout="this.$store.commit('saveDraggable', true)" @focusin="this.$store.commit('saveDraggable', false)"
-            @input="synThead($event, index)">
+        <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index"
+          @mouseenter="this.$store.commit('saveDraggable', false)"
+          @mouseleave="this.$store.commit('saveDraggable', true)">
+          <div class="data" :style="`width:${tWidth[index] - (!isGroup ? 20 : 0)}px`"
+            :contenteditable="contenteditable && !isGroup" @input="synThead($event, index)">
             {{ item }}
           </div>
-          <img src="/imgs/用户主页/删除项目.svg" @click="deleteCol(index)" v-show="(thead.length > 1)">
+          <img src="/imgs/用户主页/删除项目.svg" @click="deleteCol(index)" v-if="(thead.length > 1 && !isGroup)">
           <div
             @mousedown="(userSelect = 'none', firstDeltaMouseMove = true, mouseX = $event.pageX, resizeIndex = index, contenteditable = false, this.$store.commit('saveDraggable', false))"
-            @mousemove="resize($event, resizeIndex)" class="slider" v-show="(index != thead.length - 1)"></div>
+            @mouseenter="resize($event, resizeIndex)" class="slider" v-if="(index != thead.length - 1 && !isGroup)">
+          </div>
         </div>
-        <img src="/imgs/用户主页/添加项目.svg" v-show="thead.length < 10" @click="addCol">
+        <img src="/imgs/用户主页/添加项目.svg" v-if="thead.length < 10 && !isGroup" @click="addCol">
       </div>
       <div class="tbody" v-for="(row, i) in tbody" :key="i">
-        <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
-          <div :style="`width:${tWidth[j]}px`" contenteditable="true" @input="synTbody($event, i, j)"
-            @focusout="this.$store.commit('saveDraggable', true)" @focusin="this.$store.commit('saveDraggable', false)">
+        <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j"
+          @mouseenter="this.$store.commit('saveDraggable', false)"
+          @mouseleave="this.$store.commit('saveDraggable', true)">
+          <div :style="`width:${tWidth[j]}px`" :contenteditable="!isGroup" @input="synTbody($event, i, j)">
             {{ item }}</div>
         </div>
-        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)">
+        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
       </div>
-      <div class="NewRow" contenteditable="false" @click="addRow" v-show="(tbody.length < 500)">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 500 && !isGroup)"
+        @mouseenter="this.$store.commit('saveDraggable', false)"
+        @mouseleave="this.$store.commit('saveDraggable', true)">+</div>
     </div>
   </div>
 </template>
@@ -43,8 +47,6 @@ export default {
     moduleOrder: Number,
     showBlock: Boolean
   },
-  inject: ['isSubmit'],
-  emits: ['success', 'fail'],
   data() {
     return {
       mouseX: 0,
@@ -171,44 +173,6 @@ export default {
       this.tWidth[index + 1] -= deltaX * modifier
       this.lastMouseX = event.pageX
       this.firstDeltaMouseMove = false
-    },
-    // 当表格有内容时进行序列化
-    serialize() {
-      let isBlank = true
-      // 标题不为空
-      if (this.title.trim() !== '') {
-        isBlank = false
-      } else {
-        // 表头不为空
-        for (let i = 0; i < this.thead.length; i++) {
-          if (this.thead[i].trim() !== '') {
-            isBlank = false
-            break
-          }
-        }
-        // 表体不为空
-        if (isBlank) {
-          for (let i = 0; i < this.tbody.length; i++) {
-            for (let j = 0; j < this.tbody[i].length; j++) {
-              if (this.tbody[i][j].trim() !== '') {
-                isBlank = false
-                break
-              }
-            }
-          }
-        }
-      }
-      // 标题为空、所有表头为空、所有表体为空 => 该模块不需要保存
-      if (isBlank) {
-        this.$emit('success', null)
-        return
-      }
-      const data = {
-        type: 'table',
-        title: this.title,
-        content: [this.tWidth, this.thead, this.tbody]
-      }
-      this.$emit('success', data)
     }
   },
   computed: {
@@ -243,19 +207,17 @@ export default {
       set(newVal) {
         this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [newVal, this.thead, this.tbody] })
       }
-    }
-  },
-  watch: {
-    isSubmit(newVal) {
-      if (newVal) {
-        this.serialize()
-      }
+    },
+    isGroup() {
+      return this.$store.state.isGroup
     }
   }
 }
 </script>
 <style lang="scss">
 .reaction-table {
+  cursor: grab;
+
   .container {
     box-sizing: border-box;
     font-size: 16px;
@@ -273,13 +235,14 @@ export default {
       align-items: center;
 
       .wrapper {
+        cursor: text;
         display: flex;
         align-items: center;
+        border: 1px solid #FFFFFF;
 
         div {
           min-height: 30px;
           line-height: 30px;
-          border: 1px solid #FFFFFF;
         }
 
         .slider:hover {
@@ -306,9 +269,7 @@ export default {
     .thead:hover,
     .tbody:hover {
       .wrapper {
-        div {
-          border: 1px solid #D7D7D7;
-        }
+        border: 1px solid #D7D7D7;
 
         .slider {
           border: none;
@@ -316,6 +277,7 @@ export default {
       }
 
       img {
+        cursor: pointer;
         opacity: 100%;
       }
     }
@@ -339,13 +301,13 @@ export default {
     }
 
     .NewRow {
+      cursor: pointer;
       box-sizing: border-box;
       border-radius: 5px;
       border: 1px dashed #000000;
       height: 30px;
       line-height: 28px;
       width: 1180px;
-      cursor: pointer;
       text-align: center;
     }
   }

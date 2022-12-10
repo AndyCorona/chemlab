@@ -5,8 +5,8 @@
     <div class="title">{{ title }}</div>
     <div class="subtitle">{{ subtitle }}</div>
     <div class="container">
-      <button class="flush" @click.prevent="this.count++;this.showModal = true">刷新试试</button>
-      <button class="index" @click.prevent="this.$router.push('/')">返回首页</button>
+      <button class="whiteButton " @click.prevent="this.count++; this.showModal = true">刷新试试</button>
+      <button class="whiteButton" @click.prevent="this.$router.push('/')">返回首页</button>
     </div>
   </div>
 </template>
@@ -28,6 +28,7 @@ export default {
 
 <style lang="scss">
 @import '../assets/scss/config.scss';
+
 .error-view {
   position: relative;
   text-align: center;
@@ -55,14 +56,11 @@ export default {
     justify-content: space-between;
 
     button {
-      cursor: pointer;
-      background-color: #638271;
-      border: 1px solid #FFFFFF;
       border-radius: 50px;
       width: 300px;
       height: 100px;
+      line-height: 100px;
       font-size: 32px;
-      color: #FFFFFF;
     }
 
   }

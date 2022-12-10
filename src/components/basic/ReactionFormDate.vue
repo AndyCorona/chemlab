@@ -1,16 +1,16 @@
 <template>
   <div class="reaction-form-date">
-    <input type="date" v-model="date">
+    <input :readonly="isGroup" type="date" v-model="date">
     <div class="tags">
       <div class="tag" v-for="(item, index) in tags" :key="index">
-        <span title="没有文字的标签不会被保存" :ref="`tag${index}`" contenteditable="true" :id="`tag${index + 1}`"
+        <span title="没有文字的标签不会被保存" :ref="`tag${index}`" :contenteditable="!isGroup" :id="`tag${index + 1}`"
           @input="this.tags[index] = $event.target.innerHTML" @focusout="validateTag($event, index)">{{
               item
           }}
         </span>
-        <img src="/imgs/左边栏/删除成员.svg" @click.stop="deleteTag(index)">
+        <img src="/imgs/左边栏/删除成员.svg" @click.stop="deleteTag(index)" v-if="!isGroup">
       </div>
-      <span id="addTag" v-show="(this.tags.length < 3)" @click="addTag">+</span>
+      <span id="addTag" v-if="(this.tags.length < 3 && !isGroup)" @click="addTag">+</span>
     </div>
   </div>
 </template>
@@ -18,8 +18,6 @@
 <script>
 export default {
   name: 'ReactionFormDate',
-  inject: ['isSubmit'],
-  emits: ['success', 'fail'],
   data() {
     return {
       // 点击添加标签按钮才触发 focus 事件
@@ -48,20 +46,6 @@ export default {
       if (event.target.innerHTML.trim() === '') {
         this.$store.commit('toast', { text: '没有内容的标签将不会被保存', state: 2, durationTime: 3000 })
       }
-    },
-    serialize() {
-      let isValid = true
-      this.tags.forEach((item, index) => {
-        if (!/^.{0,10}$/.test(item)) {
-          this.$store.commit('toast', { text: `标签${index}的字数超过 10 个`, state: 2, durationTime: 3000 })
-          isValid = false
-        }
-      })
-      if (isValid) {
-        this.$emit('success', this.date, this.tags)
-      } else {
-        this.$emit('fail')
-      }
     }
   },
   computed: {
@@ -70,7 +54,7 @@ export default {
         return this.$store.state.reactionInfo.date
       },
       set(newVal) {
-        this.$store.commit('saveReactionDate', newVal)
+        this.$store.commit('saveReactionInfo', { date: newVal })
       }
     },
     tags: {
@@ -78,15 +62,11 @@ export default {
         return this.$store.state.reactionInfo.tags
       },
       set(newVal) {
-        return this.$store.commit('saveReactionTags', newVal)
+        return this.$store.commit('saveReactionInfo', { tags: newVal })
       }
-    }
-  },
-  watch: {
-    isSubmit(newVal) {
-      if (newVal) {
-        this.serialize()
-      }
+    },
+    isGroup() {
+      return this.$store.state.isGroup
     }
   }
 }

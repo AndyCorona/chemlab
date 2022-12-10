@@ -3,11 +3,11 @@
     <main-project-and-reaction-title classType="reaction-title" :readOnly="readOnly" @change="rename">
     </main-project-and-reaction-title>
     <div class="wrapper">
-      <img @click="addReaction" src="/imgs/反应/添加.svg"
-        v-show="(!isGroup && this.$store.state.projectInfo.reactions.length < 50)">
-      <img @click="shareReaction" src="/imgs/反应/分享.svg" v-show="!isGroup">
-      <img @click="deleteReaction" src="/imgs/反应/删除.svg"
-        v-show="!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin)">
+      <img @click="addReaction" src="/imgs/实验列表/添加.svg"
+        v-if="(!isGroup && this.$store.state.projectInfo.reactions.length < 50)">
+      <img @click="shareReaction" src="/imgs/实验列表/分享.svg" v-if="!isGroup">
+      <img @click="deleteReaction" src="/imgs/实验列表/删除.svg"
+        v-if="!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin)">
     </div>
   </div>
   <main-reaction :show="!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin)"
@@ -36,27 +36,26 @@ export default {
         return
       }
       this.axios.post('/project', {
-        // 当用户故意删除 sessionStorage 中的数据时，会修改一个不存在的项目，最终返回错误
-        projectId: sessionStorage.getItem('projectId') === null ? '-1' : sessionStorage.getItem('projectId'),
+        projectId: sessionStorage.getItem('projectId'),
         projectName: value,
         isGroup: this.isGroup
       }).then(() => {
         sessionStorage.setItem('projectName', value)
         this.$store.dispatch('toast', { text: '修改成功', state: 0 })
+        this.$store.dispatch('saveProjectInfo', { name: value })
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
     },
     init() {
-      // 当用户故意删除 sessionStorage 中的数据时，会查询一个不存在的项目列表，最终返回错误
-      const projectId = sessionStorage.getItem('projectId') === null ? '-1' : sessionStorage.getItem('projectId')
       // 获取一个项目具体内容
       this.axios.get('/project', {
-        projectId: projectId,
+        projectId: sessionStorage.getItem('projectId'),
         isGroup: this.isGroup
       }).then((data) => {
-        this.projectName = data.projectName
-        sessionStorage.setItem('projectName', data.projectName)
+        console.log(data)
+        this.projectName = data.name
+        sessionStorage.setItem('projectName', data.name)
         this.$store.dispatch('saveProjectInfo', data)
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
@@ -96,10 +95,9 @@ export default {
         return
       }
       // 获取该用户所在群组中的项目列表
-      this.axios.get('/main/project', {
-        params: { isGroup: this.isGroup }
+      this.axios.post('/main/project', {
+        isGroup: this.isGroup
       }).then((data) => {
-        console.log(data)
         this.$store.dispatch('saveProjectList', data)
         // 打开模态框
         this.$store.commit('modal', { slotType: 4 })

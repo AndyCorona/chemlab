@@ -26,10 +26,25 @@ export default {
   computed: {
     value: {
       get() {
-        return this.$store.state.loginInfo[this.state]
+        return this.$store.state.loginInfo[this.data]
       },
       set(newVal) {
-        this.$store.commit('saveLoginInfo', { index: this.state, content: newVal })
+        this.$store.commit('saveLoginInfo', { [this.data]: newVal })
+      }
+    },
+    data() {
+      if (this.state === 0) {
+        return 'username'
+      } else if (this.state === 1) {
+        return 'email'
+      } else if (this.state === 2) {
+        return 'password'
+      } else if (this.state === 3) {
+        return 'confirmPassword'
+      } else if (this.state === 4) {
+        return 'code'
+      } else {
+        throw new Error('the state is between 0 - 4')
       }
     }
   }

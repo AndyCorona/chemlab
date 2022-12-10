@@ -2,8 +2,8 @@
   <div class="reaction-text">
     <reaction-module-title placeholder="文字" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
     <div class="container">
-      <textarea v-model="text" @focusout="this.$store.commit('saveDraggable', true)"
-        @focusin="this.$store.commit('saveDraggable', false)"></textarea>
+      <textarea :readonly="isGroup" v-model="text" @mouseenter="this.$store.commit('saveDraggable', false)"
+        @mouseleave="this.$store.commit('saveDraggable', true)"></textarea>
     </div>
   </div>
 </template>
@@ -17,33 +17,6 @@ export default {
   props: {
     moduleOrder: Number,
     showBlock: Boolean
-  },
-  inject: ['isSubmit'],
-  emits: ['success', 'fail'],
-  methods: {
-    // 当文本模块有内容时进行序列化
-    serialize() {
-      let isBlank = true
-      // 标题不为空
-      if (this.title.trim() !== '') {
-        isBlank = false
-      }
-      // 文本内容不为空
-      if (isBlank && this.text && this.text.trim()) {
-        isBlank = false
-      }
-      // 标题为空、文本内容为空 => 该模块不需要保存
-      if (isBlank) {
-        this.$emit('success', null)
-        return
-      }
-      const data = {
-        type: 'text',
-        title: this.title,
-        content: [this.text]
-      }
-      this.$emit('success', data)
-    }
   },
   computed: {
     title: {
@@ -61,21 +34,20 @@ export default {
       set(newVal) {
         this.$store.commit('saveReactionDataContent', { index: this.moduleOrder, content: [newVal] })
       }
-    }
-  },
-  watch: {
-    isSubmit(newVal) {
-      if (newVal) {
-        this.serialize()
-      }
+    },
+    isGroup() {
+      return this.$store.state.isGroup
     }
   }
 }
 </script>
 <style lang="scss">
 .reaction-text {
+  cursor: grab;
   .container {
     textarea {
+      cursor: text;
+      box-sizing: border-box;
       font-size: 16px;
       width: 1200px;
       min-height: 150px;

@@ -1,78 +1,72 @@
 import { createStore } from 'vuex'
-function dateFormat(fmt, date) {
-  let ret
-  const opt = {
-    // 年
-    'Y+': date.getFullYear().toString(),
-    // 月
-    'm+': (date.getMonth() + 1).toString(),
-    // 日
-    'd+': date.getDate().toString(),
-    // 时
-    'H+': date.getHours().toString(),
-    // 分
-    'M+': date.getMinutes().toString(),
-    // 秒
-    'S+': date.getSeconds().toString()
-    // 有其他格式化字符需求可以继续添加，必须转化成字符串
-  }
-  for (const k in opt) {
-    ret = new RegExp('(' + k + ')').exec(fmt)
-    if (ret) {
-      fmt = fmt.replace(ret[1], (ret[1].length === 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, '0')))
-    }
-  }
-  return fmt
-}
 
 export default createStore({
 
   state: {
-    isGroup: null,
-    // 登录时的信息, [用户名、邮箱、密码、确认密码、验证码]
-    loginInfo: ['', '', '', '', ''],
+    isGroup: false,
+    // 登录页面信息
+    loginInfo: {
+      username: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      code: ''
+    },
     // 群组信息
     groupInfo: {
-      groupSlogon: '',
-      groupName: '',
-      groupUUID: '',
+      slogon: '',
+      name: '',
+      UUID: '',
       isAdmin: false,
       members: []
     },
+    // 用户创建群组时输入的群组名和群组简介
+    createGroup: {
+      name: '',
+      slogon: ''
+    },
+    // 用户尚未保存的项目名
+    unSaveProjectName: '',
     // 项目信息
     projectInfo: {
       isGroup: false,
-      projectId: null,
-      projectName: '未命名',
+      id: 0,
+      name: '',
       reactions: []
     },
     // 用户打开分享实验模态框时的群组项目数据
     projectList: [],
     // 用户决定将实验分享到的具体项目 id
-    shareProjectId: null,
+    shareProjectId: 0,
     // 反应信息
     reactionInfo: {
-      reactionId: null,
-      reactionName: '未命名',
-      date: dateFormat('YYYY-mm-dd', new Date()),
+      id: 0,
+      name: '',
+      date: '',
       tags: [],
       data: [],
-      versions: []
+      versions: [],
+      // 用户尚未保存的实验名
+      unSaveReactionName: ''
     },
+    // router 中是否对用户从实验页面跳转行为进行判断
+    leaveFromReaction: false,
+    // 初始化实验页面或上一次保存之后的 hash 值
+    lastReactionHash: '',
     // 模版信息
     templateDefine: [],
     // 内置的模版信息
     templateBuiltin: [
-      { templateId: 1, templateName: '模版1', data: ['scheme', 'table'] }, { templateId: 2, templateName: '模版2', data: ['scheme', 'table'] }, { templateId: 3, templateName: '模版3', data: ['scheme', 'table'] }, { templateId: 4, templateName: '模版4', data: ['scheme', 'table'] }, { templateId: 5, templateName: '模版5', data: ['scheme', 'table'] }
+      { id: 1, name: '模版1', data: ['scheme', 'table'] }, { id: 2, name: '模版2', data: ['scheme', 'table'] }, { id: 3, name: '模版3', data: ['scheme', 'table'] }, { id: 4, name: '模版4', data: ['scheme', 'table'] }, { id: 5, name: '模版5', data: ['scheme', 'table'] }
     ],
     // toast 默认值
-    toastState: null,
-    toastText: null,
-    showToast: null,
-    toastDurationTime: null,
+    toastState: 0,
+    toastText: '',
+    showToast: false,
+    toastDurationTime: 0,
     // modal 默认值
-    modalText: null,
-    modalTitle: null,
+    modalText: '',
+    modalTitle: '',
     showModal: false,
     // 绑定到模态框的事件
     okEvent: null,
@@ -90,20 +84,40 @@ export default createStore({
   },
   mutations: {
     saveLoginInfo(state, payload) {
-      state.loginInfo[payload.index] = payload.content
+      if (payload.username) {
+        state.loginInfo.username = payload.username
+      }
+      if (payload.email) {
+        state.loginInfo.email = payload.email
+      }
+      if (payload.password) {
+        state.loginInfo.password = payload.password
+      }
+      if (payload.confirmPassword) {
+        state.loginInfo.confirmPassword = payload.confirmPassword
+      }
+      if (payload.code) {
+        state.loginInfo.code = payload.code
+      }
     },
     clearLoginInfo(state) {
-      state.loginInfo = ['', '', '', '', '']
+      state.loginInfo = {
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        code: ''
+      }
     },
     saveGroupInfo(state, payload) {
-      if (payload.groupSlogon) {
-        state.groupInfo.groupSlogon = payload.groupSlogon
+      if (payload.slogon) {
+        state.groupInfo.slogon = payload.slogon
       }
-      if (payload.groupName) {
-        state.groupInfo.groupName = payload.groupName
+      if (payload.name) {
+        state.groupInfo.name = payload.name
       }
-      if (payload.groupUUID) {
-        state.groupInfo.groupUUID = payload.groupUUID
+      if (payload.UUID) {
+        state.groupInfo.UUID = payload.UUID
       }
       if (payload.isAdmin) {
         state.groupInfo.isAdmin = payload.isAdmin
@@ -114,9 +128,9 @@ export default createStore({
     },
     clearGroupInfo(state) {
       state.groupInfo = {
-        groupName: '暂未加入',
-        groupSlogon: '可以申请加入一个群组',
-        groupUUID: '',
+        name: '',
+        slogon: '',
+        UUID: '',
         isAdmin: false,
         members: []
       }
@@ -124,20 +138,84 @@ export default createStore({
     saveIsGroup(state, payload) {
       state.isGroup = payload
     },
+    saveCreateGroup(state, payload) {
+      if (payload.name) {
+        state.createGroup.name = payload.name
+      }
+      if (payload.slogon) {
+        state.createGroup.slogon = payload.slogon
+      }
+    },
+    clearCreateGroup(state) {
+      state.createGroup = {
+        name: '',
+        slogon: ''
+      }
+    },
     saveProjectList(state, payload) {
       state.projectList = payload
     },
     saveProjectInfo(state, payload) {
-      state.projectInfo = payload
+      if (payload.isGroup) {
+        state.projectInfo.isGroup = payload.isGroup
+      }
+      if (payload.id) {
+        state.projectInfo.id = payload.id
+      }
+      if (payload.name) {
+        state.projectInfo.name = payload.name
+      }
+      if (payload.reactions) {
+        state.projectInfo.reactions = payload.reactions
+      }
     },
-    saveProjectName(state, payload) {
-      state.projectInfo.projectName = payload
+    saveUnSaveProjectName(state, payload) {
+      state.unSaveProjectName = payload
+    },
+    saveUnSaveReactionName(state, payload) {
+      state.reactionInfo.unSaveReactionName = payload
     },
     saveShareProjectId(state, payload) {
       state.shareProjectId = payload
     },
     saveReactionInfo(state, payload) {
-      state.reactionInfo = payload
+      if (payload.id) {
+        state.reactionInfo.id = payload.id
+      }
+      if (payload.name) {
+        state.reactionInfo.name = payload.name
+      }
+      if (payload.date) {
+        state.reactionInfo.date = payload.date
+      }
+      if (payload.tags) {
+        state.reactionInfo.tags = payload.tags
+      }
+      if (payload.data) {
+        state.reactionInfo.data = payload.data
+      }
+      if (payload.versions) {
+        state.reactionInfo.versions = payload.versions
+      }
+      if (payload.unSaveReactionName) {
+        state.reactionInfo.unSaveReactionName = payload.unSaveReactionName
+      }
+    },
+    clearReactionInfo(state) {
+      state.reactionInfo = {
+        id: 0,
+        name: '',
+        date: '',
+        tags: [],
+        data: [],
+        versions: []
+      }
+    },
+    saveLeaveFromReaction(state, payload) {
+      state.leaveFromReaction = payload
+    },
+    saveLastReactionHash(state, payload) {
+      state.lastReactionHash = payload
     },
     saveScrollTop(state, payload) {
       state.scrollTop = payload
@@ -147,20 +225,20 @@ export default createStore({
     },
     toast(state, payload) {
       state.showToast = payload.showModal === undefined ? true : payload.showModal
-      state.toastText = payload.text === undefined ? '出 BUG !!!' : payload.text
+      state.toastText = !payload.text ? '未知错误' : payload.text
       state.toastState = payload.state === undefined ? 1 : payload.state
-      state.toastDurationTime = payload.durationTime === undefined ? 1500 : payload.durationTime
+      state.toastDurationTime = !payload.durationTime ? 1500 : payload.durationTime
     },
     modal(state, payload) {
-      state.modalText = payload.text === undefined ? '' : payload.text
-      state.modalTitle = payload.title === undefined ? '必须有标题!!!' : payload.title
+      state.modalText = !payload.text ? '' : payload.text
+      state.modalTitle = !payload.title ? '默认标题' : payload.title
       state.showModal = payload.showModal === undefined ? true : payload.showModal
       state.slotType = payload.slotType
     },
     modalStateChange(state, payload) {
       // 点击确认按钮时，自动执行绑定的事件
       if (payload) {
-        this.state.okEvent()
+        state.okEvent()
       }
     },
     bindOkEvent(state, payload) {
@@ -171,18 +249,6 @@ export default createStore({
     },
     saveDraggable(state, payload) {
       state.draggable = payload
-    },
-    saveReactionName(state, payload) {
-      state.reactionInfo.reactionName = payload
-    },
-    saveReactionDate(state, payload) {
-      state.reactionInfo.date = payload
-    },
-    saveReactionTags(state, payload) {
-      state.reactionInfo.tags = payload
-    },
-    saveReactionData(state, payload) {
-      state.reactionInfo.data = payload
     },
     saveReactionDataTitle(state, payload) {
       state.reactionInfo.data[payload.index].title = payload.content
@@ -213,20 +279,38 @@ export default createStore({
     saveIsGroup(context, payload) {
       context.commit('saveIsGroup', payload)
     },
+    saveCreateGroup(context, payload) {
+      context.commit('saveCreateGroup', payload)
+    },
+    clearCreateGroup(context) {
+      context.commit('clearCreateGroup')
+    },
     saveProjectInfo(context, payload) {
       context.commit('saveProjectInfo', payload)
     },
     saveProjectList(context, payload) {
       context.commit('saveProjectList', payload)
     },
-    saveProjectName(context, payload) {
-      context.commit('saveProjectName', payload)
+    saveUnSaveProjectName(context, payload) {
+      context.commit('saveUnSaveProjectName', payload)
+    },
+    saveUnSaveReactionName(context, payload) {
+      context.commit('saveUnSaveReactionName', payload)
     },
     saveShareProjectId(context, payload) {
       context.commit('saveShareProjectId', payload)
     },
     saveReactionInfo(context, payload) {
       context.commit('saveReactionInfo', payload)
+    },
+    clearReactionInfo(context) {
+      context.commit('clearReactionInfo')
+    },
+    saveLastReactionHash(context, payload) {
+      context.commit('saveLastReactionHash', payload)
+    },
+    saveLeaveFromReaction(context, payload) {
+      context.commit('saveLeaveFromReaction', payload)
     },
     saveScrollTop(context, payload) {
       context.commit('saveScrollTop', payload)
@@ -252,18 +336,6 @@ export default createStore({
     saveDraggable(context, payload) {
       context.commit('saveDraggable', payload)
     },
-    saveReactionName(context, payload) {
-      context.commit('saveReactionName', payload)
-    },
-    saveReactionDate(context, payload) {
-      context.commit('saveReactionDate', payload)
-    },
-    saveReactionTags(context, payload) {
-      context.commit('saveReactionTags', payload)
-    },
-    saveReactionData(context, payload) {
-      context.commit('saveReactionData', payload)
-    },
     saveReactionDataTitle(context, payload) {
       context.commit('saveReactionDataTitle', payload)
     },
@@ -272,6 +344,12 @@ export default createStore({
     },
     deleteReactionData(context, payload) {
       context.commit('deleteReactionData', payload)
+    },
+    saveSubmitInfo(context, payload) {
+      context.commit('saveSubmitInfo', payload)
+    },
+    clearSubmitInfo(context) {
+      context.commit('clearSubmitInfo')
     },
     saveTemplateDefine(context, payload) {
       context.commit('saveTemplateDefine', payload)

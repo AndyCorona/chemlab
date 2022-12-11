@@ -1,20 +1,22 @@
 <template>
-  <div class="reaction-form" @drop="drop($event, this.modules.length)" @dragenter.prevent="" @dragover.prevent="">
-    <img src="/imgs/登录页/产品图标.png" ref="img" style="position: absolute; top: -1000px;width: 100px;height:100px">
+  <div class="reaction-form" @drop="drop($event, modules.length)" @dragenter.prevent="" @dragover.prevent="">
+    <img draggable="false" src="/imgs/登录页/产品图标.png" ref="img"
+      style="position: absolute; top: -1000px;width: 100px;height:100px">
     <form>
       <reaction-form-title></reaction-form-title>
       <div class="tool" v-if="!isGroup">
-        <img src="/imgs/单个实验/保存实验.svg" @click="saveReaction">
-        <img src="/imgs/单个实验/保存模板.svg" @click="saveTemplate">
-        <img src="/imgs/单个实验/我的模板.svg" @click="selectTemplate">
+        <img draggable="false" src="/imgs/单个实验/保存实验.svg" @click="saveReaction">
+        <img draggable="false" src="/imgs/单个实验/保存模板.svg" @click="saveTemplate">
+        <img draggable="false" src="/imgs/单个实验/我的模板.svg" @click="selectTemplate">
       </div>
       <reaction-form-date></reaction-form-date>
       <div class="form-container">
-        <reaction-module-wrapper :draggable="isDraggable && !isGroup" v-for="(item, index) in modules" :key="index"
+        <reaction-module-wrapper :draggable="draggable && !isGroup" v-for="(item, index) in modules" :key="index"
           :moduleName="item.type" :moduleOrder="index" @dragover.prevent="" @dragstart="dragStart($event, index)"
-          @dragend="dragEnd($event, index)" @dragenter.prevent="dragEnter($event, index)"
+          :style="`cursor: ${dragCursor}`" @drag="dragCursor = 'grabbing'"
+          @dragend="dragCursor = '',dragEnd($event, index)" @dragenter.prevent="dragEnter($event, index)"
           @dragleave="dragLeave($event, index)" @drop.stop="drop($event, index)" :class="{ dragging: isDragging }"
-          :showBlock="showBlock[index]"></reaction-module-wrapper>
+          :showBlock="showBlock[index]" :showTitle="showTitle[index]"></reaction-module-wrapper>
       </div>
     </form>
   </div>
@@ -23,7 +25,6 @@
 import ReactionFormTitle from '../basic/ReactionFormTitle.vue'
 import ReactionFormDate from '../basic/ReactionFormDate.vue'
 import ReactionModuleWrapper from './ReactionModuleWrapper.vue'
-import md5 from 'js-md5'
 export default {
   name: 'ReactionForm',
   components: {
@@ -34,17 +35,17 @@ export default {
   data() {
     return {
       showBlock: [],
-      reactionName: '',
-      data: [],
-      date: '',
-      tags: []
+      showTitle: [],
+      // 被拖拽的模块索引
+      dragIndex: -1,
+      dragCursor: ''
     }
   },
   mounted() {
     this.init()
     // 用户点击刷新按钮时，检测页面内容是否修改，若修改则触发系统默认的弹窗
     window.onbeforeunload = () => {
-      const thisReactionHash = md5(JSON.stringify(this.$store.state.reactionInfo))
+      const thisReactionHash = this.$md5(JSON.stringify(this.$store.state.reactionInfo))
       if (thisReactionHash !== this.$store.state.lastReactionHash) {
         return ''
       }
@@ -52,6 +53,9 @@ export default {
   },
   methods: {
     dragEnter(event, index) {
+      if (this.dragIndex === index || this.dragIndex + 1 === index) {
+        return
+      }
       this.showBlock[index] = true
     },
     dragLeave(event, index) {
@@ -78,9 +82,21 @@ export default {
         // 如果是从已经有的模块进行拖拽的
       } else {
         // 获取被拖拽模块的之前位置
-        const module = this.modules.splice(parseInt(data), 1)
-        // 放置在实验内容的最后一个模块之后
-        this.modules.splice(index, 0, module[0])
+        const dragIndex = parseInt(data)
+        const dropIndex = index
+        if (dragIndex === dropIndex) {
+          return
+        }
+        if (dragIndex > dropIndex) {
+          const module = this.modules.splice(dragIndex, 1)
+          this.modules.splice(index, 0, module[0])
+        } else {
+          if (dragIndex + 1 === dropIndex) {
+            return
+          }
+          const module = this.modules.splice(dragIndex, 1)
+          this.modules.splice(index - 1, 0, module[0])
+        }
       }
     },
     dragStart(event, index) {
@@ -88,29 +104,32 @@ export default {
       this.$store.commit('saveIsDragging', true)
       // 设置传输的数据
       event.dataTransfer.setData('text/plain', index)
+      this.dragIndex = index
+      this.showTitle[index] = true
       // 设置拖动时的图片效果
       event.dataTransfer.setDragImage(this.$refs.img, 50, 50)
       event.dataTransfer.effectAllowed = 'move'
     },
     dragEnd() {
+      this.dragIndex = -1
+      this.showTitle = []
+      this.$store.commit('saveDraggable', false)
       this.$store.commit('saveIsDragging', false)
     },
     init() {
-      if (!sessionStorage.getItem('reactionId')) {
-        this.$store.commit('toast', { text: '保存失败，请不要修改反应 id' })
-        return
-      }
-      const reactionId = JSON.parse(sessionStorage.getItem('reactionId'))
       // 获取一个项目具体内容
       this.axios.get('/reaction', {
-        reactionId: reactionId,
-        isGroup: this.isGroup
+        params: {
+          reactionId: sessionStorage.getItem('reactionId'),
+          isGroup: this.isGroup
+        }
       }).then((data) => {
+        this.$store.dispatch('saveVersoinId', data.vid)
         data.unSaveReactionName = data.name
         this.$store.dispatch('saveReactionInfo', data)
         // 计算本次获取的实验内容的 hash 值
-        this.$store.dispatch('saveLastReactionHash', md5(JSON.stringify(this.$store.state.reactionInfo)))
-        this.$store.dispatch('saveLeaveFromReaction', false)
+        this.$store.dispatch('saveLastReactionHash', this.$md5(JSON.stringify(this.$store.state.reactionInfo)))
+        this.$store.dispatch('saveUncheckLeaveReaction', true)
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
@@ -148,7 +167,7 @@ export default {
     },
     saveReaction() {
       // 计算与上一次保存的 hash 值，没有改变则提醒用户不需要保存
-      const thisReactionHash = md5(JSON.stringify(this.$store.state.reactionInfo))
+      const thisReactionHash = this.$md5(JSON.stringify(this.$store.state.reactionInfo))
       console.log(thisReactionHash)
       if (thisReactionHash === this.$store.state.lastReactionHash) {
         this.$store.commit('modal', { text: '您的数据没有修改，仍然要保存吗?', title: '无需保存提醒', slotType: 0 })
@@ -158,86 +177,194 @@ export default {
       }
     },
     confirmSaveReaction() {
-      this.serialize().then(() => {
-        // 实验标题、实验日期、实验标签，图片模块所有文件上传成功，数据模块所有数据上传成功，不需要保存的模块删除成功后，
-        // 调用保存数据接口
+      this.serialize()
+      // this.serialize().then(() => {
+      //   // 实验标题、实验日期、实验标签，图片模块所有文件上传成功，数据模块所有数据上传成功，不需要保存的模块删除成功后，
+      //   // 调用保存数据接口
 
-      }).catch((resp) => {
-        console.log(resp)
-      })
+      // }).catch((resp) => {
+      //   console.log(resp)
+      // })
       // 序列化，对每个模块获取信息
       // 对所有图片模块进行校验，所有图片必须都上传成功，获取所有图片的后台 url 地址
       // 对所有文件模块进行校验，所有文件必须都上传成功，获取所有文件的后台 url 地址
       // 对所有模块按约定格式序列化
-      if (sessionStorage.getItem('reactionId') === null) {
-        return
-      }
-      const reactionId = JSON.parse(sessionStorage.getItem('reactionId'))
-      // 用户没有传入名字，默认为未命名
-      const reactionName = !this.unSaveName ? '未命名' : this.unSaveName
-      this.axios.post('/reaction', {
-        id: reactionId,
-        name: reactionName,
-        // 如果用户没传入日期，默认为当天日期
-        date: !this.date ? this.dateFormat('YYYY-mm-dd', new Date()) : this.date,
-        tags: this.tags,
-        data: this.data,
-        isGroup: this.isGroup
-      }).then((data) => {
-        // 将实验名称更改为保存后的名称
-        this.$store.dispatch('saveReactionInfo', { name: reactionName })
-        // 保存成功，更新上次实验内容的 hash 值
-        this.$store.commit('saveLastReactionHash', md5(JSON.stringify(this.$store.state.reactionInfo)))
-        // 后端传回更新后的版本
-        if (data.id) {
-          // 获取后端传回来的数据，并对数组最后一个版本进行删除，在数组头部添加最新的版本
-          const versions = this.$store.state.reactionInfo.versions
-          // 删除最后一个版本
-          versions.splice(versions.length - 1, 1)
-          // 在数组头部添加最新的版本
-          versions.shift(data)
-        }
-        // 保存成功后，将传递给子组件的保存信号重置
-        this.$store.commit('toast', { text: '保存成功', state: 0 })
-      }).catch((resp) => {
-        this.$store.dispatch('toast', { text: resp.msg })
-      })
+      // if (sessionStorage.getItem('reactionId') === null) {
+      //   return
+      // }
+      // const reactionId = JSON.parse(sessionStorage.getItem('reactionId'))
+      // // 用户没有传入名字，默认为未命名
+      // const reactionName = !this.unSaveName ? '未命名' : this.unSaveName
+      // this.axios.post('/reaction', {
+      //   id: reactionId,
+      //   name: reactionName,
+      //   // 如果用户没传入日期，默认为当天日期
+      //   date: !this.date ? this.dateFormat('YYYY-mm-dd', new Date()) : this.date,
+      //   tags: this.tags,
+      //   data: this.data,
+      //   isGroup: this.isGroup
+      // }).then((data) => {
+      //   // 将实验名称更改为保存后的名称
+      //   this.$store.dispatch('saveReactionInfo', { name: reactionName })
+      //   // 保存成功，更新上次实验内容的 hash 值
+      //   this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.$store.state.reactionInfo)))
+      //   // 后端传回更新后的版本
+      //   if (data.id) {
+      //     // 获取后端传回来的数据，并对数组最后一个版本进行删除，在数组头部添加最新的版本
+      //     const versions = this.$store.state.reactionInfo.versions
+      //     // 删除最后一个版本
+      //     versions.splice(versions.length - 1, 1)
+      //     // 在数组头部添加最新的版本
+      //     versions.shift(data)
+      //   }
+      //   // 保存成功后，将传递给子组件的保存信号重置
+      //   this.$store.commit('toast', { text: '保存成功', state: 0 })
+      // }).catch((resp) => {
+      //   this.$store.dispatch('toast', { text: resp.msg })
+      // })
     },
     async serialize() {
-
+      // const isTitlevalid = this.serializeFormTitle()
+      // const isTagsValid = this.serializeTags()
+      const isImgUploaded = await this.uploadImgs()
+      const isFileUploaded = await this.uploadFiles()
+      console.log('imgupload' + isImgUploaded)
+      console.log('fileupload' + isFileUploaded)
     },
     serializeFormTitle() {
+      let isValid = true
+      if (!/^.{0,30}$/.test(this.unSaveName)) {
+        this.$store.commit('toast', { text: '保存失败：实验标题超过30个字', durationTime: 3000 })
+        isValid = false
+      }
+      return isValid
+    },
+    serializeTags() {
+      let isAllValidate = true
+      for (let i = 0; i < this.reactionInfo.tags.length; i++) {
+        if (!/^.{0,10}$/.test(this.reactionInfo.tags[i])) {
+          this.$store.commit('toast', { text: `保存失败：标签${i + 1}的字数超过 10 个`, durationTime: 3000 })
+          isAllValidate = false
+          break
+        }
+      }
+      return isAllValidate
+    },
 
+    async uploadFiles() {
+      let hasFile = false
+      let isUploaded = true
+      const formData = new FormData()
+      // 获取所有数据模块中的 file 文件
+      this.modules.forEach(item => {
+        if (item.type === 'data') {
+          item.content[0].forEach((arr) => {
+            if (arr[2]) {
+              hasFile = true
+              formData.append('files', arr[2])
+            }
+          })
+        }
+      })
+      // 所有数据文件上传成功返回 true，有上传失败返回 false
+      if (hasFile) {
+        // 同步等待后端返回数据
+        const response = await this.axios.post('/file', {
+          reactionId: this.reactionInfo.id,
+          data: formData,
+          headers: {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }
+        })
+        if (response.status !== 200) {
+          isUploaded = false
+          this.$store.commit('toast', { text: response.msg, durationTime: 3000 })
+        } else {
+          // 将所有上传了文件的数据模块的 file 清空，填写 fileId
+          let count = 0
+          this.modules.forEach(item => {
+            if (item.type === 'data') {
+              item.content[0].forEach((arr, index) => {
+                if (arr[2]) {
+                  item.content[0][index][1] = response.data[count++]
+                  arr[2] = ''
+                }
+              })
+            }
+          })
+        }
+      }
+      return new Promise((resolve) => { return resolve(isUploaded) })
+    },
+    async uploadImgs() {
+      let hasImgFile = false
+      let isUploaded = true
+      const formData = new FormData()
+      // 获取所有图片模块中的 file 文件
+      this.modules.forEach(item => {
+        if (item.type === 'scheme' && item.content[0]) {
+          hasImgFile = true
+          formData.append('imgs', item.content[0])
+        }
+      })
+      // 所有图片上传成功返回 true，有图片上传失败返回 false
+      if (hasImgFile) {
+        // 同步等待后端返回数据
+        const response = await this.axios.post('/img', {
+          reactionId: this.reactionInfo.id,
+          data: formData,
+          headers: {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          }
+        })
+        if (response.status !== 200) {
+          isUploaded = false
+          this.$store.commit('toast', { text: response.msg, durationTime: 3000 })
+        } else {
+          let count = 0
+          // 将所有上传了图片的模块的 file 清空，url 进行替换
+          this.modules.forEach((item, index) => {
+            if (item.type === 'scheme' && item.content[0] !== '') {
+              this.$store.dispatch('saveReactionDataContent', { index: index, content: ['', response.data[count++]] })
+            }
+          })
+        }
+      }
+      return new Promise((resolve) => { return resolve(isUploaded) })
     },
     saveTemplate() {
+      this.$store.dispatch('saveTemplateName', '')
       this.$store.commit('modal', { slotType: 5 })
       this.$store.commit('bindOkEvent', this.confirmSaveTemplate)
     },
     confirmSaveTemplate() {
-      this.axios.post('/template', {
-        name: '模版1',
-        data: ['scheme', 'table', 'text']
+      const templateName = this.$store.state.templateName
+      if (!/^.{1,30}$/.test(templateName)) {
+        this.$store.commit('toast', { text: '模版名限制在1-30个字符', state: 2 })
+        return
+      }
+      const data = []
+      this.modules.forEach((item) => {
+        data.push(item.type)
+      })
+      this.axios.put('/template', {
+        name: templateName,
+        data: data
       }).then((data) => {
-        this.$store.dispatch('toast', { text: '保存成功', state: 0 })
         // 将数据保存到 vuex 中
-        this.$store.dispatch('saveTemplateDefine', data)
+        const templateDefineArray = this.$store.state.templateDefine
+        templateDefineArray.push(data)
+        this.$store.dispatch('saveTemplateDefine', templateDefineArray)
         // 手动关闭模态框
         this.$store.dispatch('modal', { showModal: false })
+        this.$store.dispatch('toast', { text: '保存成功', state: 0 })
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
     },
     selectTemplate() {
       this.$store.commit('modal', { slotType: 6 })
-      this.$store.commit('bindOkEvent', this.confirmSelectTemplate)
-    },
-    confirmSelectTemplate() {
-      this.axios.get('/template', {
-        template: ''
-      }).then((data) => {
-      }).catch((resp) => {
-        this.$store.dispatch('toast', { text: resp.msg })
-      })
+      this.$store.commit('bindOkEvent', () => { this.$store.dispatch('modal', { showModal: false }) })
     }
   },
   computed: {
@@ -247,16 +374,19 @@ export default {
     isDragging() {
       return this.$store.state.isDragging
     },
-    isDraggable() {
-      return this.$store.state.draggable
-    },
-    modules: {
+    draggable: {
       get() {
-        return this.$store.state.reactionInfo.data
+        return this.$store.state.draggable
       },
       set(newVal) {
-        this.$store.commit('saveReactionInfo', { data: newVal })
+        this.$store.commit('saveDraggable', newVal)
       }
+    },
+    reactionInfo() {
+      return this.$store.state.reactionInfo
+    },
+    modules() {
+      return this.$store.state.reactionInfo.data
     },
     unSaveName() {
       return this.$store.state.reactionInfo.unSaveReactionName
@@ -296,7 +426,7 @@ export default {
       margin: 0 60px 20px 60px;
       width: 1200px;
 
-      // 防止在拖拽过程中，模块内部数据对拖拽的影星啊
+      // 防止在拖拽过程中，模块内部数据对拖拽的影响
       .dragging *:not(.picture, .rText, .rTable, .rData, .rReference) {
         pointer-events: none;
       }

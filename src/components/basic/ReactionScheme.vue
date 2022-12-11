@@ -1,14 +1,12 @@
 <template>
   <div class="reaction-scheme">
-    <reaction-module-title placeholder="图片" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
-    <div class="container" v-show="!imgPath" @mouseenter="this.$store.commit('saveDraggable', false)"
-      @mouseleave="this.$store.commit('saveDraggable', true)">
+    <reaction-module-title placeholder="图片" :moduleOrder="moduleOrder" :showBlock="showBlock" :showTitle="showTitle"></reaction-module-title>
+    <div class="container" v-show="!imgPath">
       <label :for="`img${randomNum}`">+</label>
       <input ref="inputRef" :id="`img${randomNum}`" type="file" @change="previewImg($event)">
     </div>
-    <div class="container" v-if="imgPath" @mouseenter="this.$store.commit('saveDraggable', false)"
-      @mouseleave="this.$store.commit('saveDraggable', true)">
-      <img :src="imgPath" @click="changeImg($event)">
+    <div class="container" v-if="imgPath">
+      <img draggable="false" :src="imgPath" @click="changeImg($event)">
     </div>
   </div>
 </template>
@@ -22,7 +20,8 @@ export default {
   },
   props: {
     moduleOrder: Number,
-    showBlock: Boolean
+    showBlock: Boolean,
+    showTitle: Boolean
   },
   data() {
     return {
@@ -64,14 +63,6 @@ export default {
     }
   },
   computed: {
-    title: {
-      get() {
-        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
-      },
-      set(newVal) {
-        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
-      }
-    },
     imgPath: {
       get() {
         return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].content[1]
@@ -89,7 +80,6 @@ export default {
 
 <style lang="scss">
 .reaction-scheme {
-  cursor: grab;
 
   .container {
     cursor: pointer;

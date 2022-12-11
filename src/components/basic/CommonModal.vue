@@ -6,7 +6,7 @@
     <div class="modal" :class="open"
       :style="`top:${this.open === 'open' ? this.$store.state.scrollTop + 350 : -100}px`">
       <div class="modal-header" :style="`box-shadow: ${!hasBorder ? 'none' : '0 4px 4px 0 rgba(0, 0, 0, 0.35)'}`">
-        <img v-if="hasImg" :src="imgPath">
+        <img draggable="false" v-if="hasImg" :src="imgPath">
         <span>{{ showTitle }}</span>
       </div>
       <div class="modal-body">

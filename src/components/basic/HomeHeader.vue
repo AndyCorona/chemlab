@@ -1,7 +1,7 @@
 <template>
   <div class="home-header">
     <div class="wrapper">
-      <img :src="productIcon">
+      <img draggable="false" :src="productIcon">
       <p class="welcome-text">{{ welcomeText }}</p>
     </div>
   </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="reaction-right-bar-title">
-    <img :src="img">
+    <img draggable="false" :src="img">
     <span>{{title}}</span>
   </div>
 </template>

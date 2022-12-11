@@ -168,10 +168,7 @@ Mock.mock('/false/api/project', 'delete', {
 Mock.mock('/true/api/project', 'put', {
   status: 200,
   data: {
-    id: 1,
-    name: '未命名',
-    isGroup: false,
-    reactions: []
+    id: 1
   },
   msg: '创建成功'
 })
@@ -192,19 +189,19 @@ Mock.mock(/\/true\/api\/project.*/, 'get', {
     reactions: [
       {
         id: 1,
-        name: '正则重中之重重中之重正则重中之重重中之重正则重中之重重中之重',
+        name: '实验1',
         updateDate: '2022-12-12',
         tags: ['正则重中之重重中之重', '正则重中之重重中之重']
       },
       {
         id: 2,
-        name: '111111111122222222223333333333',
+        name: '实验2',
         updateDate: '2022-12-12',
         tags: ['正则重中之重重中之重', '正则重中之重重中之重', '正则重中之重重中之重']
       },
       {
         id: 3,
-        name: 'aaaaaaaaaazzzzzzzzzzoooooooooo',
+        name: '实验3',
         updateDate: '2022-12-12',
         tags: ['正则重中之重重中之重']
       },
@@ -227,8 +224,8 @@ Mock.mock(/\/true\/api\/project.*/, 'get', {
         tags: []
       },
       {
-        id: 6,
-        name: '实验6',
+        id: 7,
+        name: '实验7',
         updateDate: '2022-12-12',
         tags: ['1', '2', '3']
       }
@@ -387,7 +384,26 @@ Mock.mock('/false/api/group', 'delete', {
 // 删除反应接口-成功
 Mock.mock('/true/api/reaction', 'delete', {
   status: 200,
-  data: {},
+  data: [
+    {
+      id: 1,
+      name: '正则重中之重重中之重正则重中之重重中之重正则重中之重重中之重',
+      updateDate: '2022-12-12',
+      tags: ['正则重中之重重中之重', '正则重中之重重中之重']
+    },
+    {
+      id: 2,
+      name: '111111111122222222223333333333',
+      updateDate: '2022-12-12',
+      tags: ['正则重中之重重中之重', '正则重中之重重中之重', '正则重中之重重中之重']
+    },
+    {
+      id: 3,
+      name: 'aaaaaaaaaazzzzzzzzzzoooooooooo',
+      updateDate: '2022-12-12',
+      tags: ['正则重中之重重中之重']
+    }
+  ],
   msg: '删除成功'
 })
 
@@ -439,10 +455,11 @@ Mock.mock('/false/api/reaction/share', 'post', {
 })
 
 // 获取一个反应下的具体内容接口-成功
-Mock.mock(/\true\/api\/reaction.*/, 'get', {
+Mock.mock(/\/true\/api\/reaction.*/, 'get', {
   status: 200,
   data: {
     id: 1,
+    vid: 1,
     name: '正则重中之重重中之重正则重中之重重中之重正则重中之重重中之重',
     date: '2022-12-12',
     tags: ['正则重中之重重中之重', '正则重中之重重中之重', '正则重中之重重中之重'],
@@ -450,8 +467,9 @@ Mock.mock(/\true\/api\/reaction.*/, 'get', {
       { type: 'scheme', title: '这是一个图片模块', content: ['', '/imgs/登录页/产品图标.png'] },
       { type: 'text', title: '这是一个文本模块', content: ['11111111'] },
       { type: 'table', title: '这是一个表格模块', content: [[228, 228, 228, 228, 228], ['名称', '分子量', '质量', '产率', '备注'], [['苯甲酸', '191.3g/mol', '13g', '25%', '无'], ['苯甲酸2', '191.3g/mol', '13g', '25%', '无']]] },
-      { type: 'data', title: '这是一个数据模块', content: [[['222.zip', 'url1', ''], ['', '', '']], [['NMR', '谱图测试', '2022-12-12'], ['NMR', '谱图测试', '2022-12-12']]] },
+      { type: 'data', title: '这是一个数据模块', content: [[['222.zip', 'uuiduudiuudiuudiuudiuuuiduuiduuiduudi', ''], ['', '', '']], [['NMR', '谱图测试', '2022-12-12'], ['NMR', '谱图测试', '2022-12-12']]] },
       { type: 'reference', title: '这是一个引用模块', content: [['https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', 'https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', ''], [['2022', 'Science', '这是一个题目'], ['2022', 'Science111111', '这是一个题目'], ['2022', '', '这是一个题目']]] }
+
     ],
     versions: [
       {
@@ -492,7 +510,7 @@ Mock.mock(/\true\/api\/reaction.*/, 'get', {
 })
 
 // 获取一个反应下的具体内容接口-失败
-Mock.mock(/\false\/api\/reaction.*/, 'get', {
+Mock.mock(/\/false\/api\/reaction.*/, 'get', {
   status: 500,
   msg: '获取失败'
 })
@@ -544,7 +562,7 @@ Mock.mock('/false/api/template', 'get', {
 })
 // 删除模版接口-成功
 Mock.mock('/true/api/template', 'delete', {
-  status: 500,
+  status: 200,
   data: {},
   msg: '删除成功'
 })
@@ -555,20 +573,19 @@ Mock.mock('/false/api/template', 'delete', {
   msg: '删除失败'
 })
 // ########## 版本页面
-// 获取所有版本接口-成功
-Mock.mock(/\/true\/api\/reaction.*/, 'get', {
+// 获取一个版本接口-成功
+Mock.mock(/\/true\/api\/version.*/, 'get', {
   status: 200,
   data: {
     id: 1,
-    name: '正则重中之重重中之重正则重中之重重中之重正则重中之重重中之重',
+    vid: 2,
+    name: '版本2',
     date: '2022-12-12',
-    tags: ['正则重中之重重中之重', '正则重中之重重中之重', '正则重中之重重中之重'],
+    tags: ['2', '1', '3'],
     data: [
       { type: 'scheme', title: '这是一个图片模块', content: ['', '/imgs/登录页/产品图标.png'] },
       { type: 'text', title: '这是一个文本模块', content: ['11111111'] },
-      { type: 'table', title: '这是一个表格模块', content: [[228, 228, 228, 228, 228], ['名称', '分子量', '质量', '产率', '备注'], [['苯甲酸', '191.3g/mol', '13g', '25%', '无'], ['苯甲酸2', '191.3g/mol', '13g', '25%', '无']]] },
-      { type: 'data', title: '这是一个数据模块', content: [[['222.zip', 'url1', ''], ['', '', '']], [['NMR', '谱图测试', '2022-12-12'], ['NMR', '谱图测试', '2022-12-12']]] },
-      { type: 'reference', title: '这是一个引用模块', content: [['https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', 'https://www.baidu.com/s?tn=02003390_19_hao_pg&ie=utf-8&wd=baidu', ''], [['2022', 'Science', '这是一个题目'], ['2022', 'Science111111', '这是一个题目'], ['2022', '', '这是一个题目']]] }
+      { type: 'table', title: '这是一个表格模块', content: [[228, 228, 228, 228, 228], ['名称', '分子量', '质量', '产率', '备注'], [['苯甲酸', '191.3g/mol', '13g', '25%', '无'], ['苯甲酸2', '191.3g/mol', '13g', '25%', '无']]] }
     ],
     versions: [
       {
@@ -608,8 +625,39 @@ Mock.mock(/\/true\/api\/reaction.*/, 'get', {
   msg: '获取成功'
 })
 
-// 获取所有版本接口-失败
-Mock.mock(/\/false\/api\/reaction.*/, 'get', {
+// 获取一个版本接口-失败
+Mock.mock(/\/false\/api\/version.*/, 'get', {
   status: 500,
   msg: '获取失败'
+})
+
+// ########## 上传功能
+// 上传图片接口-成功
+Mock.mock('/true/api/img', 'post', {
+  status: 200,
+  data: ['https://img2.baidu.com/it/u=1858159654,3667320335&fm=253&fmt=auto&app=138&f=JPEG?w=600&h=496', 'https://img2.baidu.com/it/u=1858159654,3667320335&fm=253&fmt=auto&app=138&f=JPEG?w=600&h=496'],
+  msg: '上传成功'
+})
+// 上传图片接口-失败
+Mock.mock('/false/api/img', 'post', {
+  status: 500,
+  msg: '上传失败'
+})
+
+// 上传文件接口-成功
+Mock.mock('/true/api/file', 'post', {
+  status: 200,
+  data: ['uuiduudiuudiuudiuudiuuuiduuiduuiduudi1', 'uuiduudiuudiuudiuudiuuuiduuiduuiduudi2', 'uuiduudiuudiuudiuudiuuuiduuiduuiduudi1'],
+  msg: '上传成功'
+})
+// 上传文件接口-失败
+Mock.mock('/false/api/file', 'post', {
+  status: 500,
+  msg: '上传失败'
+})
+
+// ########## 下载功能
+// 下载文件接口
+Mock.mock('/true/api/download', 'post', {
+  // 二进制文件流
 })

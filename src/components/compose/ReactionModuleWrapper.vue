@@ -1,15 +1,20 @@
 <template>
   <div class="reaction-module-wrapper">
     <reaction-scheme @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'scheme'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-scheme>
+      v-if="moduleName === 'scheme'" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-scheme>
     <reaction-table @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'table'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-table>
+      v-if="moduleName === 'table'" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-table>
     <reaction-text @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'text'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-text>
+      v-if="moduleName === 'text'" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-text>
     <reaction-data @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'data'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-data>
+      v-if="moduleName === 'data'" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-data>
     <reaction-reference @success="(value) => this.$emit('success', value)" @fail="(value) => this.$emit('fail', value)"
-      v-if="moduleName === 'reference'" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-reference>
+      v-if="moduleName === 'reference'" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-reference>
   </div>
 </template>
 <script>
@@ -31,7 +36,8 @@ export default {
   props: {
     moduleName: String,
     moduleOrder: Number,
-    showBlock: Boolean
+    showBlock: Boolean,
+    showTitle: Boolean
   }
 }
 </script>

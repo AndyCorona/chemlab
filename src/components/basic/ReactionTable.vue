@@ -1,38 +1,31 @@
 <template>
   <div class="reaction-table" :style="`user-select:${userSelect}`"
     @mouseup="(mouseX = 0, firstDeltaMouseMove = false, contenteditable = !isGroup, userSelect = 'auto')"
-    @mouseleave="(this.$store.commit('saveDraggable', true), mouseX = 0, firstDeltaMouseMove = false)"
-    @mousemove="resize($event, resizeIndex)">
-    <reaction-module-title placeholder="表格" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
+    @mouseleave="(mouseX = 0, firstDeltaMouseMove = false)" @mousemove="resize($event, resizeIndex)">
+    <reaction-module-title placeholder="表格" :moduleOrder="moduleOrder" :showBlock="showBlock" :showTitle="showTitle"></reaction-module-title>
     <div class="container">
       <div class="thead">
-        <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index"
-          @mouseenter="this.$store.commit('saveDraggable', false)"
-          @mouseleave="this.$store.commit('saveDraggable', true)">
+        <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
           <div class="data" :style="`width:${tWidth[index] - (!isGroup ? 20 : 0)}px`"
             :contenteditable="contenteditable && !isGroup" @input="synThead($event, index)">
             {{ item }}
           </div>
-          <img src="/imgs/用户主页/删除项目.svg" @click="deleteCol(index)" v-if="(thead.length > 1 && !isGroup)">
+          <img draggable="false" src="/imgs/用户主页/删除项目.svg" @click="deleteCol(index)" v-if="(thead.length > 1 && !isGroup)">
           <div
-            @mousedown="(userSelect = 'none', firstDeltaMouseMove = true, mouseX = $event.pageX, resizeIndex = index, contenteditable = false, this.$store.commit('saveDraggable', false))"
+            @mousedown="(userSelect = 'none', firstDeltaMouseMove = true, mouseX = $event.pageX, resizeIndex = index, contenteditable = false)"
             @mouseenter="resize($event, resizeIndex)" class="slider" v-if="(index != thead.length - 1 && !isGroup)">
           </div>
         </div>
-        <img src="/imgs/用户主页/添加项目.svg" v-if="thead.length < 10 && !isGroup" @click="addCol">
+        <img draggable="false" src="/imgs/用户主页/添加项目.svg" v-if="thead.length < 10 && !isGroup" @click="addCol">
       </div>
       <div class="tbody" v-for="(row, i) in tbody" :key="i">
-        <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j"
-          @mouseenter="this.$store.commit('saveDraggable', false)"
-          @mouseleave="this.$store.commit('saveDraggable', true)">
+        <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
           <div :style="`width:${tWidth[j]}px`" :contenteditable="!isGroup" @input="synTbody($event, i, j)">
             {{ item }}</div>
         </div>
-        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
+        <img draggable="false" src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
       </div>
-      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 500 && !isGroup)"
-        @mouseenter="this.$store.commit('saveDraggable', false)"
-        @mouseleave="this.$store.commit('saveDraggable', true)">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 500 && !isGroup)">+</div>
     </div>
   </div>
 </template>
@@ -45,7 +38,8 @@ export default {
     { ReactionModuleTitle },
   props: {
     moduleOrder: Number,
-    showBlock: Boolean
+    showBlock: Boolean,
+    showTitle: Boolean
   },
   data() {
     return {
@@ -116,8 +110,7 @@ export default {
     // 最多添加到 500 行
     addRow() {
       const arr = []
-      arr.push(`行${this.tbody.length + 1}`)
-      for (let i = 1; i < this.thead.length; i++) {
+      for (let i = 0; i < this.thead.length; i++) {
         arr.push('')
       }
       this.tbody.push(arr)
@@ -176,14 +169,6 @@ export default {
     }
   },
   computed: {
-    title: {
-      get() {
-        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
-      },
-      set(newVal) {
-        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
-      }
-    },
     thead: {
       get() {
         return !this.$store.state.reactionInfo.data[this.moduleOrder] ? ['默认'] : this.$store.state.reactionInfo.data[this.moduleOrder].content[1]
@@ -216,7 +201,6 @@ export default {
 </script>
 <style lang="scss">
 .reaction-table {
-  cursor: grab;
 
   .container {
     box-sizing: border-box;

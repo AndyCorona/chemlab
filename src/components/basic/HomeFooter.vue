@@ -2,9 +2,9 @@
   <div class="home-footer">
     <div class="wrapper">
       <p>登录或完成注册即代表你同意
-        <a href="/#/user-agreement">用户协议</a>
+        <a  draggable="false" href="/#/user-agreement">用户协议</a>
         和
-        <a href="/#/privacy-policy">隐私政策</a>
+        <a draggable="false" href="/#/privacy-policy">隐私政策</a>
       </p>
     </div>
   </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="reaction-data">
-    <reaction-module-title placeholder="数据" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
+    <reaction-module-title placeholder="数据" :moduleOrder="moduleOrder" :showBlock="showBlock" :showTitle="showTitle"></reaction-module-title>
     <div class="container">
       <div class="thead">
         <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
@@ -12,15 +12,11 @@
       </div>
       <div class="tbody" v-for="(row, i) in tbody" :key="i">
         <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
-          <div :style="`width:${tWidth[j]}px`" :contenteditable="!isGroup" @input="synTbody($event, i, j)"
-            @mouseenter="this.$store.commit('saveDraggable', false)"
-            @mouseleave="this.$store.commit('saveDraggable', true)">
+          <div :style="`width:${tWidth[j]}px`" :contenteditable="!isGroup" @input="synTbody($event, i, j)">
             {{ item
             }}</div>
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-input" v-if="(!dataFileAndUrl[i][0] && !dataFileAndUrl[i][1])"
-          @mouseenter="this.$store.commit('saveDraggable', false)"
-          @mouseleave="this.$store.commit('saveDraggable', true)">
+        <div :style="`width:${tWidth[3]}px`" class="show-input" v-if="(!dataFileAndUrl[i][0] && !dataFileAndUrl[i][1])">
           <label :for="`img${randomNum * (i + 1)}`" draggable="false" :style="`border:${!isGroup ? '' : 'none'}`">{{
               !isGroup
                 ? '上传文件' : '无文件'
@@ -28,18 +24,15 @@
           <input :id="`img${randomNum * (i + 1)}`" type="file" @change="uploadFile($event, i)" v-if="!isGroup">
         </div>
         <div :style="`width:${tWidth[3]}px`" class="show-file-name"
-          v-if="(dataFileAndUrl[i][0] || dataFileAndUrl[i][1])" @mouseenter="this.$store.commit('saveDraggable', false)"
-          @mouseleave="this.$store.commit('saveDraggable', true)">
-          <div @click="downloadFile(dataFileAndUrl[i][1])" draggable="false">{{ !dataFileAndUrl[i][0] ? '找不到文件名' :
+          v-if="(dataFileAndUrl[i][0] || dataFileAndUrl[i][1])">
+          <div @click="downloadFile(dataFileAndUrl[i])" draggable="false">{{ !dataFileAndUrl[i][0] ? '找不到文件名' :
               dataFileAndUrl[i][0]
           }}
           </div>
         </div>
-        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
+        <img draggable="false" src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
       </div>
-      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 10 && !isGroup)"
-        @mouseenter="this.$store.commit('saveDraggable', false)"
-        @mouseleave="this.$store.commit('saveDraggable', true)">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 10 && !isGroup)">+</div>
     </div>
   </div>
 </template>
@@ -53,7 +46,8 @@ export default {
   },
   props: {
     moduleOrder: Number,
-    showBlock: Boolean
+    showBlock: Boolean,
+    showTitle: Boolean
   },
   data() {
     return {
@@ -70,8 +64,7 @@ export default {
     // 最多添加 10 行
     addRow() {
       const arr = []
-      arr.push(`行${this.tbody.length + 1}`)
-      for (let i = 2; i < this.thead.length; i++) {
+      for (let i = 1; i < this.thead.length; i++) {
         arr.push('')
       }
       this.tbody.push(arr)
@@ -81,12 +74,32 @@ export default {
       this.tbody.splice(index, 1)
       this.dataFileAndUrl.splice(index, 1)
     },
-    downloadFile(url) {
-      if (url === '') {
+    downloadFile(item) {
+      if (!item[1]) {
         alert('找不到可以下载的文件')
       }
       // 使用 item 提供的 utl 进行下载
-      alert('下载成功')
+      this.axios.post('/download', { fileId: item[1] }, { responseType: 'blob' })
+        .then((res) => {
+          const { data, headers } = res
+          console.log(res)
+          const blob = new Blob([data], { type: headers['content-type'] })
+          const downloadElement = document.createElement('a')
+          // 创建下载的链接
+          const href = window.URL.createObjectURL(blob)
+          downloadElement.href = href
+          // 下载后文件名
+          downloadElement.download = item[0]
+          document.body.appendChild(downloadElement)
+          // 点击下载
+          downloadElement.click()
+          // 下载完成移除元素
+          document.body.removeChild(downloadElement)
+          // 释放掉blob对象
+          window.URL.revokeObjectURL(href)
+        }).catch(() => {
+          this.$store.commit('toast', { text: '下载失败' })
+        })
     },
     uploadFile(event, row) {
       if (this.isGroup) {
@@ -101,18 +114,10 @@ export default {
         return
       }
       // 改变文件之后，将文件暂时存放在 dataFileAndUrl 第三项中，将文件名存放在第一项中
-      this.dataFileAndUrl.splice(row, 0, [file.name, '', file])
+      this.dataFileAndUrl.splice(row, 1, [file.name, '', file])
     }
   },
   computed: {
-    title: {
-      get() {
-        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
-      },
-      set(newVal) {
-        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
-      }
-    },
     tbody: {
       get() {
         return !this.$store.state.reactionInfo.data[this.moduleOrder] ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[1]
@@ -138,7 +143,6 @@ export default {
 
 <style lang="scss">
 .reaction-data {
-  cursor: grab;
 
   .container {
     box-sizing: border-box;

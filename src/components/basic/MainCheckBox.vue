@@ -2,7 +2,7 @@
   <div class="main-check-box">
     <!-- 防止点击复选框之后跳转页面 -->
     <div class="active" @click.stop="">
-      <input type="checkbox" :id="`checkbox${randomNum}`" @change="changeFunc">
+      <input :checked="this.checked" type="checkbox" :id="`checkbox${randomNum}`" @change="changeFunc">
       <label :for="`checkbox${randomNum}`"></label>
     </div>
   </div>
@@ -14,16 +14,14 @@ export default {
   emits: ['change'],
   data() {
     return {
+      checked: false,
       randomNum: Math.random()
     }
   },
   methods: {
     changeFunc(event) {
-      this.$emit('change', this.reactionId, event.target.checked)
+      this.$emit('change', event.target.checked)
     }
-  },
-  props: {
-    reactionId: Number
   }
 }
 </script>

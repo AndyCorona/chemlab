@@ -1,7 +1,7 @@
 <template>
   <div class="main-left-bar-title">
     <div class="wrapper">
-      <img src="/imgs/左边栏/群组.svg">
+      <img draggable="false" src="/imgs/左边栏/群组.svg">
       <span class="word-wrap">{{ title }}</span>
     </div>
   </div>

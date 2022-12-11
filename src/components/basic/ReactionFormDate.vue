@@ -8,7 +8,7 @@
               item
           }}
         </span>
-        <img src="/imgs/左边栏/删除成员.svg" @click.stop="deleteTag(index)" v-if="!isGroup">
+        <img draggable="false" src="/imgs/左边栏/删除成员.svg" @click.stop="deleteTag(index)" v-if="!isGroup">
       </div>
       <span id="addTag" v-if="(this.tags.length < 3 && !isGroup)" @click="addTag">+</span>
     </div>

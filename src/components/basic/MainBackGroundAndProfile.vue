@@ -1,7 +1,7 @@
 <template>
   <div class="main-background-and-profile">
-    <img class="background" :src="background">
-    <img class="logo" :src="logo">
+    <img draggable="false" class="background" :src="background">
+    <img draggable="false" class="logo" :src="logo">
   </div>
 </template>
 

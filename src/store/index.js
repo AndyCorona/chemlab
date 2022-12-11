@@ -25,19 +25,25 @@ export default createStore({
       name: '',
       slogon: ''
     },
-    // 用户尚未保存的项目名
-    unSaveProjectName: '',
     // 项目信息
     projectInfo: {
       isGroup: false,
       id: 0,
       name: '',
+      // 用户尚未保存的项目名
+      unSaveProjectName: '',
       reactions: []
     },
-    // 用户打开分享实验模态框时的群组项目数据
+    // 用户空间、群组空间的项目集合、用户分享实验时获取的群组项目集合
     projectList: [],
-    // 用户决定将实验分享到的具体项目 id
-    shareProjectId: 0,
+    // 用户分享实验模态框的控制参数
+    shareProjectInfo: {
+      id: 0,
+      showDropdown: false,
+      dropdownTitle: ''
+    },
+    // 是否关闭鼠标事件
+    pointerEvent: false,
     // 反应信息
     reactionInfo: {
       id: 0,
@@ -49,8 +55,10 @@ export default createStore({
       // 用户尚未保存的实验名
       unSaveReactionName: ''
     },
+    // 当前处于的版本 id
+    versionId: 0,
     // router 中是否对用户从实验页面跳转行为进行判断
-    leaveFromReaction: false,
+    uncheckLeaveReaction: false,
     // 初始化实验页面或上一次保存之后的 hash 值
     lastReactionHash: '',
     // 模版信息
@@ -59,6 +67,7 @@ export default createStore({
     templateBuiltin: [
       { id: 1, name: '模版1', data: ['scheme', 'table'] }, { id: 2, name: '模版2', data: ['scheme', 'table'] }, { id: 3, name: '模版3', data: ['scheme', 'table'] }, { id: 4, name: '模版4', data: ['scheme', 'table'] }, { id: 5, name: '模版5', data: ['scheme', 'table'] }
     ],
+    templateName: '',
     // toast 默认值
     toastState: 0,
     toastText: '',
@@ -77,7 +86,7 @@ export default createStore({
     height: 1080,
     // 监听右边栏是否有拖动事件发生
     isDragging: false,
-    // 用来禁止模块的拖拽行为
+    // 是否启用模块的拖拽行为
     draggable: false
   },
   getters: {
@@ -152,31 +161,43 @@ export default createStore({
         slogon: ''
       }
     },
+    saveProjectInfo(state, payload) {
+      if (payload.isGroup !== undefined) {
+        state.projectInfo.isGroup = payload.isGroup
+      }
+      if (payload.id !== undefined) {
+        state.projectInfo.id = payload.id
+      }
+      if (payload.name !== undefined) {
+        state.projectInfo.name = payload.name
+      }
+      if (payload.reactions !== undefined) {
+        state.projectInfo.reactions = payload.reactions
+      }
+      if (payload.unSaveProjectName !== undefined) {
+        state.projectInfo.unSaveProjectName = payload.unSaveProjectName
+      }
+    },
     saveProjectList(state, payload) {
       state.projectList = payload
     },
-    saveProjectInfo(state, payload) {
-      if (payload.isGroup) {
-        state.projectInfo.isGroup = payload.isGroup
+    saveShareProjectInfo(state, payload) {
+      if (payload.id !== undefined) {
+        state.shareProjectInfo.id = payload.id
       }
-      if (payload.id) {
-        state.projectInfo.id = payload.id
+      if (payload.showDropdown !== undefined) {
+        state.shareProjectInfo.showDropdown = payload.showDropdown
       }
-      if (payload.name) {
-        state.projectInfo.name = payload.name
-      }
-      if (payload.reactions) {
-        state.projectInfo.reactions = payload.reactions
+      if (payload.dropdownTitle) {
+        state.shareProjectInfo.dropdownTitle = payload.dropdownTitle
       }
     },
-    saveUnSaveProjectName(state, payload) {
-      state.unSaveProjectName = payload
-    },
-    saveUnSaveReactionName(state, payload) {
-      state.reactionInfo.unSaveReactionName = payload
-    },
-    saveShareProjectId(state, payload) {
-      state.shareProjectId = payload
+    clearShareProjectInfo(state) {
+      state.shareProjectInfo = {
+        id: 0,
+        showDropdown: false,
+        dropdownTitle: ''
+      }
     },
     saveReactionInfo(state, payload) {
       if (payload.id) {
@@ -211,8 +232,8 @@ export default createStore({
         versions: []
       }
     },
-    saveLeaveFromReaction(state, payload) {
-      state.leaveFromReaction = payload
+    saveUncheckLeaveReaction(state, payload) {
+      state.uncheckLeaveReaction = payload
     },
     saveLastReactionHash(state, payload) {
       state.lastReactionHash = payload
@@ -261,6 +282,15 @@ export default createStore({
     },
     saveTemplateDefine(state, payload) {
       state.templateDefine = payload
+    },
+    saveTemplateName(state, payload) {
+      state.templateName = payload
+    },
+    saveVersoinId(state, payload) {
+      state.versionId = payload
+    },
+    savePointerEvent(state, payload) {
+      state.pointerEvent = payload
     }
   },
   actions: {
@@ -291,14 +321,11 @@ export default createStore({
     saveProjectList(context, payload) {
       context.commit('saveProjectList', payload)
     },
-    saveUnSaveProjectName(context, payload) {
-      context.commit('saveUnSaveProjectName', payload)
+    saveShareProjectInfo(context, payload) {
+      context.commit('saveShareProjectInfo', payload)
     },
-    saveUnSaveReactionName(context, payload) {
-      context.commit('saveUnSaveReactionName', payload)
-    },
-    saveShareProjectId(context, payload) {
-      context.commit('saveShareProjectId', payload)
+    clearShareProjectInfo(context) {
+      context.commit('clearShareProjectInfo')
     },
     saveReactionInfo(context, payload) {
       context.commit('saveReactionInfo', payload)
@@ -309,8 +336,8 @@ export default createStore({
     saveLastReactionHash(context, payload) {
       context.commit('saveLastReactionHash', payload)
     },
-    saveLeaveFromReaction(context, payload) {
-      context.commit('saveLeaveFromReaction', payload)
+    saveUncheckLeaveReaction(context, payload) {
+      context.commit('saveUncheckLeaveReaction', payload)
     },
     saveScrollTop(context, payload) {
       context.commit('saveScrollTop', payload)
@@ -345,14 +372,17 @@ export default createStore({
     deleteReactionData(context, payload) {
       context.commit('deleteReactionData', payload)
     },
-    saveSubmitInfo(context, payload) {
-      context.commit('saveSubmitInfo', payload)
-    },
-    clearSubmitInfo(context) {
-      context.commit('clearSubmitInfo')
-    },
     saveTemplateDefine(context, payload) {
       context.commit('saveTemplateDefine', payload)
+    },
+    saveTemplateName(context, payload) {
+      context.commit('saveTemplateName', payload)
+    },
+    saveVersoinId(context, payload) {
+      context.commit('saveVersoinId', payload)
+    },
+    savePointerEvent(context, payload) {
+      context.commit('savePointerEvent', payload)
     }
   },
   modules: {

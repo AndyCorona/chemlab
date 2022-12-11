@@ -1,8 +1,9 @@
 <template>
-  <div class="main-project-and-reaction-title">
+  <div class="main-project-and-reaction-title" style="pointer-events:all">
     <div :class="classType">
-      <img src="/imgs/用户主页/项目列表.svg">
-      <input @change="this.$emit('change', $store.state.unSaveProjectName)" :readonly="readOnly" type="text" autocomplete="off" v-model="name">
+      <img draggable="false" src="/imgs/用户主页/项目列表.svg">
+      <input @focusout="rename" :readonly="readOnly" type="text" @focusin="$store.commit('savePointerEvent', true)"
+        autocomplete="off" v-model="name">
     </div>
   </div>
 </template>
@@ -10,7 +11,7 @@
 <script>
 export default {
   name: 'MainProjectAndReactionTitle',
-  emits: ['change'],
+  emits: ['focusout'],
   props: {
     classType: String,
     readOnly: {
@@ -18,13 +19,22 @@ export default {
       type: Boolean
     }
   },
+  methods: {
+    rename() {
+      if (this.name === this.$store.state.projectInfo.name) {
+        return
+      }
+      this.$emit('focusout', this.name)
+      this.$store.commit('savePointerEvent', false)
+    }
+  },
   computed: {
     name: {
       get() {
-        return this.classType === 'project-title' ? '项目列表' : this.$store.state.projectInfo.name
+        return this.classType === 'project-title' ? '项目列表' : this.$store.state.projectInfo.unSaveProjectName
       },
       set(newVal) {
-        this.$store.commit('saveUnSaveProjectName', newVal)
+        this.$store.commit('saveProjectInfo', { unSaveProjectName: newVal })
       }
     }
   }

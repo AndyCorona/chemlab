@@ -1,44 +1,44 @@
 <template>
   <div class="main-left-bar-list">
-    <div class="wrapper" v-if="noGroup">
+    <div class="wrapper" v-if="!members.length">
       <div class="left-wrapper" @click="createGroup">
-        <img src="/imgs/左边栏/创建.svg">
+        <img draggable="false" src="/imgs/左边栏/创建.svg">
         <span>创建课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-if="noGroup">
+    <div class="wrapper" v-if="!members.length">
       <div class="left-wrapper" @click="joinGroup">
-        <img src="/imgs/左边栏/加入.svg">
+        <img draggable="false" src="/imgs/左边栏/加入.svg">
         <span>加入课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-show="!noGroup" v-for="(item, index) in this.$store.state.groupInfo.members" :key="index">
+    <div class="wrapper" v-show="!!members.length" v-for="(item, index) in members" :key="index">
       <div class="left-wrapper">
-        <img :src="item.logo">
+        <img draggable="false" :src="item.logo">
         <span>{{ item.name }}</span>
       </div>
       <div class="right-wrapper">
-        <img src="/imgs/左边栏/组长.svg" v-if="item.isAdmin" title="这是组长">
-        <img src="/imgs/左边栏/成员.svg" v-if="!item.isAdmin" title="这是成员">
+        <img draggable="false" src="/imgs/左边栏/组长.svg" v-if="item.isAdmin" title="这是组长">
+        <img draggable="false" src="/imgs/左边栏/成员.svg" v-if="!item.isAdmin" title="这是成员">
         <!-- 群主不能删除自己 -->
-        <img @click="deleteMember(item.name)" src="/imgs/左边栏/删除成员.svg" v-if="isAdmin && !item.isAdmin">
+        <img draggable="false" @click="deleteMember(item.name, index)" src="/imgs/左边栏/删除成员.svg" v-if="isAdmin && !item.isAdmin">
       </div>
     </div>
-    <div class="wrapper" v-if="(!noGroup && isAdmin && this.$store.state.groupInfo.members.length < 20)">
+    <div class="wrapper" v-if="(!!members.length && isAdmin && members.length < 20)">
       <div class="left-wrapper" @click="addMember">
-        <img src="/imgs/左边栏/添加成员.svg">
+        <img draggable="false" src="/imgs/左边栏/添加成员.svg">
         <span>添加成员</span>
       </div>
     </div>
-    <div class="wrapper" v-if="(!noGroup && isAdmin)">
+    <div class="wrapper" v-if="(!!members.length && isAdmin)">
       <div class="left-wrapper" @click="quit(1)">
-        <img src="/imgs/左边栏/解散群组.svg">
+        <img draggable="false" src="/imgs/左边栏/解散群组.svg">
         <span>解散课题组</span>
       </div>
     </div>
-    <div class="wrapper" v-if="(!noGroup && !isAdmin)">
+    <div class="wrapper" v-if="(!!members.length && !isAdmin)">
       <div class="left-wrapper" @click="quit(0)">
-        <img src="/imgs/左边栏/解散群组.svg">
+        <img draggable="false" src="/imgs/左边栏/解散群组.svg">
         <span>退出课题组</span>
       </div>
     </div>
@@ -52,7 +52,8 @@ export default {
     return {
       usernameExp: /^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/,
       emailExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
-      deleteUserName: ''
+      deleteUserName: '',
+      deleteIndex: 0
     }
   },
   methods: {
@@ -99,26 +100,26 @@ export default {
     },
     confirmQuit() {
       this.axios.delete('/group/quit').then(() => {
-        this.$store.dispatch('toast', { text: '操作成功', state: 0 })
         // 清空 vuex 中的群组信息
         this.$store.dispatch('clearGroupInfo')
-        // 用户可以在任何地方选择退出群组，所以退出后跳转到用户个人空间
+        this.$store.dispatch('toast', { text: '操作成功', state: 0 })
         this.$router.push('/main')
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
     },
-    deleteMember(name) {
+    deleteMember(name, index) {
       this.$store.commit('modal', { text: `是否将${name}移除？`, title: '删除提醒', slotType: 0 })
       this.deleteUserName = name
+      this.deleteIndex = index
       this.$store.commit('bindOkEvent', this.confirmDeleteMember)
     },
     confirmDeleteMember() {
       this.axios.delete('/group', {
         deleteUserName: this.deleteUserName
-      }).then((data) => {
+      }).then(() => {
+        this.members.splice(this.deleteIndex, 1)
         this.$store.dispatch('toast', { text: '移除成功', state: 0 })
-        this.$store.dispatch('saveGroupInfo', data)
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
@@ -136,10 +137,10 @@ export default {
           name: this.name,
           slogon: this.slogon
         }).then((data) => {
-          this.$store.dispatch('toast', { text: '创建成功', state: 0 })
           this.$store.dispatch('saveGroupInfo', data)
           // 创建成功后手动关闭模态框
           this.$store.dispatch('modal', { showModal: false })
+          this.$store.dispatch('toast', { text: '创建成功', state: 0 })
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })
@@ -155,10 +156,10 @@ export default {
         this.axios.put('/group', {
           groupUUID: this.groupUUID
         }).then((data) => {
-          this.$store.dispatch('toast', { text: '加入成功', state: 0 })
           this.$store.dispatch('saveGroupInfo', data)
           // 加入成功后手动关闭模态框
           this.$store.dispatch('modal', { showModal: false })
+          this.$store.dispatch('toast', { text: '加入成功', state: 0 })
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })
@@ -183,12 +184,12 @@ export default {
         UsernameOrEmail: this.usernameOrEmail,
         isUsername: isUsername
       }).then((data) => {
-        this.$store.dispatch('toast', { text: '添加成功', state: 0 })
-        this.$store.dispatch('saveGroupInfo', data)
+        this.members.push(data)
         // 添加成功后手动关闭模态框
         if (autoClose) {
           this.$store.dispatch('modal', { showModal: false })
         }
+        this.$store.dispatch('toast', { text: '添加成功', state: 0 })
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
@@ -196,8 +197,13 @@ export default {
   },
   computed: {
     // 是否出现 "创建课题组" 和 "加入课题组"
-    noGroup() {
-      return !this.$store.state.groupInfo.members.length
+    members: {
+      get() {
+        return this.$store.state.groupInfo.members
+      },
+      set(newVal) {
+        this.$store.commit('saveGroupInfo', newVal)
+      }
     },
     // 当前用户是否为群主
     isAdmin() {
@@ -212,13 +218,8 @@ export default {
     groupUUID() {
       return this.$store.state.groupInfo.UUID
     },
-    usernameOrEmail: {
-      get() {
-        return this.$store.state.loginInfo.username
-      },
-      set(newVal) {
-        this.$store.commit('saveLoginInfo', { username: newVal })
-      }
+    usernameOrEmail() {
+      return this.$store.state.loginInfo.username
     }
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="main-left-bar-button">
     <div class="wrapper">
-      <img :src="img">
+      <img draggable="false" :src="img">
       <span>{{ text }}</span>
     </div>
   </div>

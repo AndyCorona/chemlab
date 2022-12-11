@@ -1,17 +1,17 @@
 <template>
   <div class="main-project-card">
     <div @click="toProject(item.id)" class="wrapper" v-for="(item, index) in projectList" :key="index">
-      <img class="project-img" src="/imgs/用户主页/项目图片3.png">
+      <img draggable="false" class="project-img" src="/imgs/用户主页/项目图片3.png">
       <div class="project-text">
         <p class="project-title word-wrap">{{ item.name }}</p>
-        <img v-if="(!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin))" @click.stop="deleteProject(item)"
-          class="delete-project" src="/imgs/用户主页/删除项目.svg">
+        <img draggable="false" v-if="(!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin))"
+          @click.stop="deleteProject(item, index)" class="delete-project" src="/imgs/用户主页/删除项目.svg">
       </div>
     </div>
     <div @click="addProject" class="wrapper"
       v-if="((!isGroup && projectList.length < 8) || (isGroup && projectList.length < 50 && this.$store.state.groupInfo.isAdmin && projectList.length !== 0))">
       <div class="new-project">
-        <img src="/imgs/用户主页/添加项目.svg">
+        <img draggable="false" src="/imgs/用户主页/添加项目.svg">
         <span>添加项目</span>
       </div>
     </div>
@@ -23,8 +23,8 @@ export default {
   name: 'MainProjectCard',
   data() {
     return {
-      projectList: [],
-      projectId: null
+      index: 0,
+      projectId: 0
     }
   },
   methods: {
@@ -33,39 +33,31 @@ export default {
       this.axios.post('/main/project', {
         isGroup: this.isGroup
       }).then((data) => {
-        this.projectList = data
+        this.$store.dispatch('saveProjectList', data)
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
     },
     toProject(id) {
-      // 获取一个项目具体内容
-      this.axios.get('/project', {
-        params: {
-          projectId: id,
-          isGroup: this.isGroup
-        }
-      }).then(() => {
-        sessionStorage.setItem('projectId', id)
-        // 成功则进行跳转
-        this.$router.push(`/main/${this.isGroup ? 'group' : 'user'}/project`)
-      }).catch((resp) => {
-        this.$store.dispatch('toast', { text: resp.msg })
-      })
+      sessionStorage.setItem('projectId', id)
+      // 成功则进行跳转
+      this.$router.push(`/main/${this.isGroup ? 'group' : 'user'}/project`)
     },
     addProject() {
       this.axios.put('/project', {
         isGroup: this.isGroup
       }).then((data) => {
-        sessionStorage.setItem('projectId', data.projectId)
+        sessionStorage.setItem('projectId', data.id)
+        this.$store.dispatch('toast', { text: '创建成功', state: 0 })
         // 成功则进行跳转
         this.$router.push(`/main/${this.isGroup ? 'group' : 'user'}/project`)
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
     },
-    deleteProject(item) {
+    deleteProject(item, index) {
       this.$store.commit('modal', { text: `是否删除${item.name}?该项目下的所有数据都将删除`, title: '删除提醒', slotType: 0 })
+      this.index = index
       this.projectId = item.id
       this.$store.commit('bindOkEvent', this.confirmDeleteProject)
     },
@@ -75,15 +67,10 @@ export default {
         isGroup: this.isGroup
       }).then(() => {
         this.$store.dispatch('toast', { text: '删除成功', state: 0 })
-        // 从数组中剔除被删除的项目
-        this.projectList = this.projectList.filter(item => {
-          return item.id !== this.projectId
-        })
+        this.projectList.splice(this.index, 1)
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
       })
-      // 无论成功与否，都需要关闭模态框
-      this.$store.dispatch('modal', { showModal: false })
     }
   },
   mounted() {
@@ -92,6 +79,14 @@ export default {
   computed: {
     isGroup() {
       return this.$store.state.isGroup
+    },
+    projectList: {
+      get() {
+        return this.$store.state.projectList
+      },
+      set(newVal) {
+        this.$store.commit('saveProjectList', newVal)
+      }
     }
   }
 }

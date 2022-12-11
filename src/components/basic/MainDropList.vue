@@ -1,6 +1,6 @@
 <template>
   <div class="main-drop-list">
-    <img :src="src" @mouseenter="show = 'block'">
+    <img draggable="false" :src="src" @mouseenter="show = 'block'">
     <div class="child" id="drop" :style="`display:${show}`">
       <div @click="details">个人中心</div>
       <div @click="help">帮助</div>

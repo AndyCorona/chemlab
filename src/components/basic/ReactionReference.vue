@@ -1,42 +1,34 @@
 <template>
   <div class="reaction-reference">
-    <reaction-module-title placeholder="引用" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
+    <reaction-module-title placeholder="引用" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-module-title>
     <div class="container">
       <div class="thead">
         <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">
-          <div :style="`width:${tWidth[index]}px`" @focusout="this.$store.commit('saveDraggable', true)"
-            @focusin="this.$store.commit('saveDraggable', false)">
+          <div :style="`width:${tWidth[index]}px`">
             {{ item }}
           </div>
         </div>
         <img draggable="false" src="/imgs/用户主页/添加项目.svg" @click.prevent="" v-if="!isGroup">
       </div>
-      <div class="tbody" v-for="(row, i) in tbody" :key="i" @mouseenter="this.$store.commit('saveDraggable', false)"
-        @mouseleave="this.$store.commit('saveDraggable', true)">
+      <div class="tbody" v-for="(row, i) in tbody" :key="i">
         <div class="wrapper" :style="`width:${tWidth[j]}px`" v-for="(item, j) in row" :key="j">
-          <div :style="`width:${tWidth[j]}px`" :contenteditable="!isGroup" @input="synTbody($event, i, j)"
-            @focusout="this.$store.commit('saveDraggable', true)" @focusin="this.$store.commit('saveDraggable', false)">
+          <div :style="`width:${tWidth[j]}px`" :contenteditable="!isGroup" @input="synTbody($event, i, j)">
             {{ item
             }}</div>
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-input" v-if="!referencePath[i]"
-          @mouseenter="this.$store.commit('saveDraggable', false)"
-          @mouseleave="this.$store.commit('saveDraggable', true)">
+        <div :style="`width:${tWidth[3]}px`" class="show-input" v-if="!referencePath[i]">
           <label :for="`img${randomNum * (i + 1)}`" draggable="false" :style="`border:${!isGroup ? '' : 'none'}`">{{
               !isGroup ? '解析文件' : '无链接'
           }}</label>
           <input v-if="!isGroup" :id="`img${randomNum * (i + 1)}`" type="file" @change="resolveFile($event, i)">
         </div>
-        <div :style="`width:${tWidth[3]}px`" class="show-reference" v-if="referencePath[i]"
-          @mouseenter="this.$store.commit('saveDraggable', false)"
-          @mouseleave="this.$store.commit('saveDraggable', true)">
+        <div :style="`width:${tWidth[3]}px`" class="show-reference" v-if="referencePath[i]">
           <a class="word-wrap" target="_blank" :href="referencePath[i]" draggable="false">{{ referencePath[i] }}</a>
         </div>
-        <img src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
+        <img draggable="false" src="/imgs/左边栏/删除成员.svg" @click="deleteRow(i)" v-if="!isGroup">
       </div>
-      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 10) && !isGroup"
-        @mouseenter="this.$store.commit('saveDraggable', false)"
-        @mouseleave="this.$store.commit('saveDraggable', true)">+</div>
+      <div class="NewRow" contenteditable="false" @click="addRow" v-if="(tbody.length < 10) && !isGroup">+</div>
     </div>
   </div>
 </template>
@@ -50,7 +42,8 @@ export default {
   },
   props: {
     moduleOrder: Number,
-    showBlock: Boolean
+    showBlock: Boolean,
+    showTitle: Boolean
   },
   data() {
     return {
@@ -66,8 +59,7 @@ export default {
     },
     addRow() {
       const arr = []
-      arr.push(`行${this.tbody.length + 1}`)
-      for (let i = 2; i < this.thead.length; i++) {
+      for (let i = 1; i < this.thead.length; i++) {
         arr.push('')
       }
       this.tbody.push(arr)
@@ -89,14 +81,6 @@ export default {
     }
   },
   computed: {
-    title: {
-      get() {
-        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
-      },
-      set(newVal) {
-        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
-      }
-    },
     tbody: {
       get() {
         return !this.$store.state.reactionInfo.data[this.moduleOrder] ? [] : this.$store.state.reactionInfo.data[this.moduleOrder].content[1]
@@ -122,7 +106,6 @@ export default {
 
 <style lang="scss">
 .reaction-reference {
-  cursor: grab;
 
   .container {
     box-sizing: border-box;

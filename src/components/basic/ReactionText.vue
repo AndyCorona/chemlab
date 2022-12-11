@@ -1,9 +1,8 @@
 <template>
   <div class="reaction-text">
-    <reaction-module-title placeholder="文字" :moduleOrder="moduleOrder" :showBlock="showBlock"></reaction-module-title>
+    <reaction-module-title placeholder="文字" :moduleOrder="moduleOrder" :showBlock="showBlock" :showTitle="showTitle"></reaction-module-title>
     <div class="container">
-      <textarea :readonly="isGroup" v-model="text" @mouseenter="this.$store.commit('saveDraggable', false)"
-        @mouseleave="this.$store.commit('saveDraggable', true)"></textarea>
+      <textarea :readonly="isGroup" v-model="text"></textarea>
     </div>
   </div>
 </template>
@@ -16,17 +15,10 @@ export default {
     { ReactionModuleTitle },
   props: {
     moduleOrder: Number,
-    showBlock: Boolean
+    showBlock: Boolean,
+    showTitle: Boolean
   },
   computed: {
-    title: {
-      get() {
-        return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].title
-      },
-      set(newVal) {
-        this.$store.commit('saveReactionDataTitle', { index: this.moduleOrder, content: newVal })
-      }
-    },
     text: {
       get() {
         return !this.$store.state.reactionInfo.data[this.moduleOrder] ? '' : this.$store.state.reactionInfo.data[this.moduleOrder].content[0]
@@ -43,7 +35,6 @@ export default {
 </script>
 <style lang="scss">
 .reaction-text {
-  cursor: grab;
   .container {
     textarea {
       cursor: text;

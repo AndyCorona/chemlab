@@ -14,8 +14,8 @@
               <home-input @keyup.enter="toUserSpace" :state="2" type="password" placeholder="请输入密码"
                 label="密码"></home-input>
               <div class="forgot-password-tips">
-                <img src="/imgs/登录页/忘记密码.svg">
-                <a href="/#/forgot-password">忘记密码</a>
+                <img draggable="false" src="/imgs/登录页/忘记密码.svg">
+                <a draggable="false" href="/#/forgot-password">忘记密码</a>
               </div>
               <home-button @btnClick="toUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="greenButton">
               </home-button>

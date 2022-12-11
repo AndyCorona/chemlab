@@ -1,6 +1,6 @@
 <template>
   <div class="reaction-form-title">
-    <img src="/imgs/单个实验/实验标题.svg">
+    <img draggable="false" src="/imgs/单个实验/实验标题.svg">
     <input type="text" v-model="title" @change="valiDateTitle" :readonly="isGroup">
   </div>
 </template>
@@ -23,7 +23,7 @@ export default {
         return this.$store.state.reactionInfo.unSaveReactionName
       },
       set(newVal) {
-        this.$store.commit('saveUnSaveReactionName', newVal)
+        this.$store.commit('saveReactionInfo', { unSaveReactionName: newVal })
       }
     },
     isGroup() {

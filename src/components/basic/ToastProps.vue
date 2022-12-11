@@ -2,7 +2,7 @@
   <div class="toast-props" :class="open"
     :style="`top:${this.open ==='open' ? this.$store.state.scrollTop + 200 :-100}px`">
     <div class="toast-container" :id="classState">
-      <img :src="icon">
+      <img draggable="false" :src="icon">
       <span>{{ text }}</span>
     </div>
   </div>

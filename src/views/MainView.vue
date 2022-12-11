@@ -1,5 +1,5 @@
 <template>
-  <div class="main-view">
+  <div class="main-view" :style="`pointer-events:${pointerEvent ? 'none' : 'all'}`">
     <toast-props :show="$store.state.showToast" :text="$store.state.toastText" :state="$store.state.toastState"
       :durationTime="$store.state.toastDurationTime" @close="closeToast">
     </toast-props>
@@ -39,7 +39,7 @@
         <label class="label">课题组ID</label>
         <div class="addMember-wrapper2">
           <span>ID:{{ $store.state.groupInfo.UUID }}</span>
-          <img src="/imgs/左边栏/复制.svg">
+          <img draggable="false" src="/imgs/左边栏/复制.svg">
         </div>
       </template>
       <template v-slot:share>
@@ -47,7 +47,7 @@
         <div class="share-wrapper">
           <div>
             <input class="input" type="text" readonly placeholder="请选择要分享到的群组项目" v-model="dropdownTitle">
-            <img src="/imgs/实验列表/分享下拉箭头.svg" @click="(showDropdown = true)">
+            <img draggable="false" src="/imgs/实验列表/分享下拉箭头.svg" @click="(showDropdown = true)">
           </div>
           <div class="share-dropdown" v-if="showDropdown">
             <div @click="shareReaction(item)" class="word-wrap" v-for="(item, index) in projectList" :key="index">{{
@@ -58,12 +58,12 @@
       </template>
       <template v-slot:save-template>
         <div class="save-template-title">模版名称</div>
-        <input class="input save-template-input" type="text" placeholder="请输入文本">
+        <input class="input save-template-input" type="text" placeholder="请输入文本" v-model="templateName">
       </template>
       <template v-slot:select-template>
         <div class="label" style="margin: 30px 50px;">内置模板</div>
         <div class="template-container">
-          <button class="builtin" @click="toTemplateBuiltin(item.data)" v-for="(item, index) in templateBuiltin"
+          <button class="builtin" @click="toTemplate(item.data)" v-for="(item, index) in templateBuiltin"
             :key="index">{{
                 item.name
             }}</button>
@@ -71,12 +71,12 @@
         <div class="label" style="margin: 30px 50px;">自定义</div>
         <div class="template-container">
           <div class="wrapper" v-for="(item, index) in templateDefine" :key="index">
-            <button class="define" @click="toTemplateDefine(item.data)">{{
+            <button class="define" @click="toTemplate(item.data)">{{
                 item.name
             }}</button>
-            <img src="/imgs/左边栏/删除成员.svg" @click.stop="deleteTemplate(index)">
+            <img draggable="false" src="/imgs/左边栏/删除成员.svg" @click.stop="deleteTemplate(index, item.id)">
           </div>
-          <button class="newTemplate" @click="addTemplate" v-if="templateDefine.length < 5">+</button>
+          <button class="newTemplate" @click="flushTemplate" v-if="templateDefine.length < 5">+</button>
         </div>
       </template>
     </common-modal>
@@ -111,7 +111,6 @@ import ReactionForm from '../components/compose/ReactionForm.vue'
 import ReactionRightBar from '../components/compose/ReactionRightBar.vue'
 import MainSlot from '../components/basic/MainSlot.vue'
 import CommonModal from '@/components/basic/CommonModal.vue'
-import md5 from 'js-md5'
 export default {
   name: 'MainView',
   components: {
@@ -143,10 +142,7 @@ export default {
       autoClose: [true, false, false, false, false, false, false],
       // 模态框尾部按钮的大小
       buttonWidth: ['60px', '160px', '160px', '160px', '295px', '80px', '160px'],
-      // 是否要展示分享实验下拉框
-      showDropdown: false,
-      // 分享实验下拉框展示的文字
-      dropdownTitle: '',
+      data: [],
       topBarSettingImg: this.$config.topBarSettingImg,
       topBarLogoutImg: this.$config.topBarLogoutImg
     }
@@ -180,67 +176,57 @@ export default {
       })
       return retArr
     },
-    toTemplateDefine(data) {
+    toTemplate(data) {
+      this.data = data
       // 用户点击选择模版时，计算 hash 值，若 hash 值和上一次保存的值不同，则提醒用户应该先进行保存，否则直接进行模版跳转
-      const thisReactionHash = md5(JSON.stringify(this.$store.state.reactionInfo))
+      const thisReactionHash = this.$md5(JSON.stringify(this.$store.state.reactionInfo))
       // 有实验内容还没保存，弹窗提醒用户先进行保存
       if (thisReactionHash !== this.$store.state.lastReactionHash) {
         this.$store.commit('modal', { text: '是否丢弃尚未保存的实验数据', title: '选择模版提醒', slotType: 0 })
         // 绑定点击确认按钮事件
-        this.$store.commit('bindOkEvent', () => {
-          this.$store.commit('clearReactionInfo')
-        })
+        this.$store.commit('bindOkEvent', this.confirmToTemplate)
       } else {
-        const retArr = this.moduleNameToContent(data)
-        this.$store.commit('clearReactionInfo')
-        this.$store.commit('saveReactionInfo', { data: retArr })
-        this.$store.commit('modal', { showModal: false })
+        this.confirmToTemplate()
       }
     },
-    toTemplateBuiltin(data) {
-      // 用户点击选择模版时，计算 hash 值，若 hash 值和上一次保存的值不同，则提醒用户应该先进行保存，否则直接进行模版跳转
-      const thisReactionHash = md5(JSON.stringify(this.$store.state.reactionInfo))
-      // 有实验内容还没保存，弹窗提醒用户先进行保存
-      if (thisReactionHash !== this.$store.state.lastReactionHash) {
-        this.$store.commit('modal', { text: '是否丢弃尚未保存的实验数据', title: '选择模版提醒', slotType: 0 })
-        // 绑定点击确认按钮事件
-        this.$store.commit('bindOkEvent', () => {
-          this.$store.commit('clearReactionInfo')
-        })
-      } else {
-        const retArr = this.moduleNameToContent(data)
-        this.$store.commit('clearReactionInfo')
-        this.$store.commit('saveReactionInfo', { data: retArr })
-        this.$store.commit('modal', { showModal: false })
-      }
+    confirmToTemplate() {
+      const retArr = this.moduleNameToContent(this.data)
+      this.$store.commit('saveReactionInfo', { data: retArr })
+      // 重新计算 hash 值
+      this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.$store.state.reactionInfo)))
+      this.$store.commit('modal', { showModal: false })
     },
-    addTemplate() {
+    flushTemplate() {
       // 用户点击添加模版时，计算 hash 值，若 hash 值和上一次保存的值不同，则提醒用户应该先进行保存，否则直接进行模版跳转
-      const thisReactionHash = md5(JSON.stringify(this.$store.state.reactionInfo))
+      const thisReactionHash = this.$md5(JSON.stringify(this.$store.state.reactionInfo))
       // 有实验内容还没保存，弹窗提醒用户先进行保存
       if (thisReactionHash !== this.$store.state.lastReactionHash) {
         this.$store.commit('modal', { text: '是否丢弃尚未保存的实验数据', title: '新建模版提醒', slotType: 0 })
         // 绑定点击确认按钮事件
         this.$store.commit('bindOkEvent', () => {
-          this.$store.commit('clearReactionInfo')
+          this.$store.commit('saveReactionInfo', { data: [] })
         })
       } else {
-        this.$store.commit('clearReactionInfo')
+        this.$store.commit('saveReactionInfo', { data: [] })
+        this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.$store.state.reactionInfo)))
         this.$store.commit('modal', { showModal: false })
       }
     },
-    deleteTemplate(index) {
-      const templateDefine = this.$store.state.templateDefine
-      templateDefine.splice(index, 1)
-      this.$store.commit('saveTemplateDefine', templateDefine)
+    deleteTemplate(index, id) {
+      this.axios.delete('/template', {
+        templateId: id
+      }).then(() => {
+        this.templateDefine.splice(index, 1)
+        this.$store.dispatch('toast', { text: '删除成功', state: 0 })
+      }).catch((resp) => {
+        this.$store.dispatch('toast', { text: resp.msg })
+      })
     },
     shareReaction(item) {
       if (item.id === -1) {
         return
       }
-      this.dropdownTitle = item.name
-      this.showDropdown = false
-      this.$store.commit('saveShareProjectId', item.id)
+      this.$store.commit('saveShareProjectInfo', { id: item.id, showDropdown: false, dropdownTitle: item.name })
     }
   },
   computed: {
@@ -270,9 +256,9 @@ export default {
       } else if (path === '/main/group') {
         return [{ name: `${this.name}`, path: '/#/main/group', disabled: true }]
       } else if (path === '/main/group/project') {
-        return [{ name: `${this.name}`, path: '/#/main/group', disabled: false }, { name: this.projectName, path: '/#/main/group/project', disabled: true }]
+        return [{ name: `${this.name}`, path: '/#/main/group', disabled: this.pointerEvent }, { name: this.projectName, path: '/#/main/group/project', disabled: true }]
       } else if (path === '/main/user/project') {
-        return [{ name: '我的实验', path: '/#/main/user', disabled: false }, { name: this.projectName, path: '/#/main/user/project', disabled: true }]
+        return [{ name: '我的实验', path: '/#/main/user', disabled: this.pointerEvent }, { name: this.projectName, path: '/#/main/user/project', disabled: true }]
       } else {
         let projectName = sessionStorage.getItem('projectName')
         if (projectName === null) {
@@ -325,11 +311,24 @@ export default {
         this.$store.commit('saveLoginInfo', { username: newVal })
       }
     },
-    templateDefine() {
-      return this.$store.state.templateDefine
+    templateDefine: {
+      get() {
+        return this.$store.state.templateDefine
+      },
+      set(newVal) {
+        this.$store.commit('saveTemplateDefine', newVal)
+      }
     },
     templateBuiltin() {
       return this.$store.state.templateBuiltin
+    },
+    templateName: {
+      get() {
+        return this.$store.state.templateName
+      },
+      set(newVal) {
+        this.$store.commit('saveTemplateName', newVal)
+      }
     },
     projectName() {
       return this.$store.state.projectInfo.name
@@ -347,6 +346,20 @@ export default {
     },
     state() {
       return this.$store.state.slotType
+    },
+    showDropdown: {
+      get() {
+        return this.$store.state.shareProjectInfo.showDropdown
+      },
+      set(newVal) {
+        this.$store.commit('saveShareProjectInfo', { showDropdown: newVal })
+      }
+    },
+    dropdownTitle() {
+      return this.$store.state.shareProjectInfo.dropdownTitle
+    },
+    pointerEvent() {
+      return this.$store.state.pointerEvent
     }
   },
   mounted() {
@@ -545,6 +558,7 @@ export default {
     position: relative;
 
     .share-dropdown {
+      padding: 0 10px;
       border-top: none;
       font-size: 16px;
       line-height: 30px;

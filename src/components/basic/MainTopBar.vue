@@ -1,13 +1,13 @@
 <template>
   <div class="top-bar">
     <div class="left">
-      <img :src="topBarLeftImg">
-      <a class="word-wrap" :style="`pointer-events: ${item.disabled ? 'none' : 'auto'}`"
+      <img draggable="false" :src="topBarLeftImg">
+      <a draggable="false" class="word-wrap" :style="`pointer-events: ${item.disabled ? 'none' : 'auto'}`"
         v-for="(item, index) in navPath" :key="index" :href="item.path">{{ item.name }}</a>
     </div>
     <div class="right">
       <main-drop-list :src="topBarSettingImg"></main-drop-list>
-      <img class="logout" @click="logout" :src="topBarLogoutImg">
+      <img draggable="false" class="logout" @click="logout" :src="topBarLogoutImg">
     </div>
   </div>
 </template>

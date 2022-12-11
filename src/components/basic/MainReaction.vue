@@ -1,12 +1,12 @@
 <template>
   <div class="main-reaction">
-    <div class="wrapper" v-for="(item, i) in reactionList" :key="i" @click="toReaction(item.id)">
+    <div class="wrapper" v-for="(item, i) in $store.state.projectInfo.reactions" :key="i" @click="toReaction(item.id)">
       <p class="word-wrap">{{ item.name }}</p>
       <p>{{ item.updateDate }}</p>
       <p>
         <span class="word-wrap" v-for="(tag, j) in item.tags" :key="j">{{ tag }}</span>
       </p>
-      <main-check-box v-if="show" @change="selection" :ReactionId="item.id"></main-check-box>
+      <main-check-box v-if="show" @change="(checked) => { selection(checked, item.id) }"></main-check-box>
     </div>
   </div>
 </template>
@@ -24,27 +24,22 @@ export default {
   emits: ['change'],
   data() {
     return {
-      reactionIdList: []
-    }
-  },
-  computed: {
-    reactionList() {
-      return this.$store.state.projectInfo.reactions
+      selectedReactions: []
     }
   },
   methods: {
-    selection(reactionId, checked) {
+    selection(checked, id) {
       if (checked) {
-        this.reactionIdList.push(reactionId)
+        this.selectedReactions.push(id)
       } else {
         // 遍历数组，找到该 id 对应的下标，然后进行删除
-        this.reactionIdList.forEach((item, index) => {
-          if (item === reactionId) {
-            this.reactionIdList.splice(index, 1)
+        this.selectedReactions.forEach((item, index) => {
+          if (item === id) {
+            this.selectedReactions.splice(index, 1)
           }
         })
       }
-      this.$emit('change', this.reactionIdList)
+      this.$emit('change', this.selectedReactions)
     },
     toReaction(id) {
       sessionStorage.setItem('reactionId', id)
@@ -112,6 +107,10 @@ export default {
         background-color: #8080FF;
       }
     }
+  }
+
+  .wrapper:hover {
+    background-color: rgb(236, 235, 235);
   }
 }
 </style>

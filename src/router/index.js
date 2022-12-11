@@ -125,14 +125,12 @@ router.beforeEach((to, from) => {
     // 计算 hash 值，相同则放行，不同则弹窗提醒
     const lastHash = store.state.lastReactionHash
     const thisHash = md5(JSON.stringify(store.state.reactionInfo))
-    console.log(lastHash)
-    console.log(thisHash)
-    if (!store.state.leaveFromReaction && lastHash !== thisHash) {
+    if (store.state.uncheckLeaveReaction && lastHash !== thisHash) {
       // 弹窗
       store.dispatch('modal', { text: '是否丢弃尚未保存的实验数据？', title: '退出实验页面提醒', slotType: 0 })
       // 绑定点击确认按钮事件
       store.dispatch('bindOkEvent', () => {
-        store.dispatch('saveLeaveFromReaction', true)
+        store.dispatch('saveUncheckLeaveReaction', false)
         router.push(to)
       })
       return false

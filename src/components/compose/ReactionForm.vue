@@ -45,7 +45,7 @@ export default {
     this.init()
     // 用户点击刷新按钮时，检测页面内容是否修改，若修改则触发系统默认的弹窗
     window.onbeforeunload = () => {
-      const thisReactionHash = this.$md5(JSON.stringify(this.$store.state.reactionInfo))
+      const thisReactionHash = this.$md5(JSON.stringify(this.reactionInfo))
       if (thisReactionHash !== this.$store.state.lastReactionHash) {
         return ''
       }
@@ -128,7 +128,7 @@ export default {
         data.unSaveReactionName = data.name
         this.$store.dispatch('saveReactionInfo', data)
         // 计算本次获取的实验内容的 hash 值
-        this.$store.dispatch('saveLastReactionHash', this.$md5(JSON.stringify(this.$store.state.reactionInfo)))
+        this.$store.dispatch('saveLastReactionHash', this.$md5(JSON.stringify(this.reactionInfo)))
         this.$store.dispatch('saveUncheckLeaveReaction', true)
       }).catch((resp) => {
         this.$store.dispatch('toast', { text: resp.msg })
@@ -167,7 +167,7 @@ export default {
     },
     saveReaction() {
       // 计算与上一次保存的 hash 值，没有改变则提醒用户不需要保存
-      const thisReactionHash = this.$md5(JSON.stringify(this.$store.state.reactionInfo))
+      const thisReactionHash = this.$md5(JSON.stringify(this.reactionInfo))
       console.log(thisReactionHash)
       if (thisReactionHash === this.$store.state.lastReactionHash) {
         this.$store.commit('modal', { text: '您的数据没有修改，仍然要保存吗?', title: '无需保存提醒', slotType: 0 })
@@ -207,11 +207,11 @@ export default {
       //   // 将实验名称更改为保存后的名称
       //   this.$store.dispatch('saveReactionInfo', { name: reactionName })
       //   // 保存成功，更新上次实验内容的 hash 值
-      //   this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.$store.state.reactionInfo)))
+      //   this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.reactionInfo)))
       //   // 后端传回更新后的版本
       //   if (data.id) {
       //     // 获取后端传回来的数据，并对数组最后一个版本进行删除，在数组头部添加最新的版本
-      //     const versions = this.$store.state.reactionInfo.versions
+      //     const versions = this.reactionInfo.versions
       //     // 删除最后一个版本
       //     versions.splice(versions.length - 1, 1)
       //     // 在数组头部添加最新的版本
@@ -224,12 +224,40 @@ export default {
       // })
     },
     async serialize() {
-      // const isTitlevalid = this.serializeFormTitle()
-      // const isTagsValid = this.serializeTags()
+      const isTitlevalid = this.serializeFormTitle()
+      const isTagsValid = this.serializeTags()
       const isImgUploaded = await this.uploadImgs()
       const isFileUploaded = await this.uploadFiles()
-      console.log('imgupload' + isImgUploaded)
-      console.log('fileupload' + isFileUploaded)
+      if (isTitlevalid && isTagsValid && isImgUploaded && isFileUploaded) {
+        const reactionId = JSON.parse(sessionStorage.getItem('reactionId'))
+        // 用户没有传入名字，默认为未命名
+        const reactionName = !this.unSaveName ? '未命名' : this.unSaveName
+        this.axios.post('/reaction', {
+          id: reactionId,
+          name: reactionName,
+          // 如果用户没传入日期，默认为当天日期
+          date: !this.reactionInfo.date ? this.dateFormat('YYYY-mm-dd', new Date()) : this.reactionInfo.date,
+          tags: this.reactionInfo.tags,
+          data: this.modules,
+          isGroup: this.isGroup
+        }).then((data) => {
+          // 将实验名称更改为保存后的名称
+          this.$store.dispatch('saveReactionInfo', { name: reactionName })
+          // 后端传回更新后的版本
+          const versions = this.reactionInfo.versions
+          if (versions.length >= 10) {
+            // 删除最后一个版本
+            versions.pop()
+            // 在数组头部添加最新的版本
+            versions.unshift(data)
+          }
+          // 保存成功，更新上次实验内容的 hash 值
+          this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.reactionInfo)))
+          this.$store.commit('toast', { text: '保存成功', state: 0 })
+        }).catch((resp) => {
+          this.$store.dispatch('toast', { text: resp.msg })
+        })
+      }
     },
     serializeFormTitle() {
       let isValid = true
@@ -339,8 +367,8 @@ export default {
     },
     confirmSaveTemplate() {
       const templateName = this.$store.state.templateName
-      if (!/^.{1,30}$/.test(templateName)) {
-        this.$store.commit('toast', { text: '模版名限制在1-30个字符', state: 2 })
+      if (!/^.{1,20}$/.test(templateName)) {
+        this.$store.commit('toast', { text: '模版名限制在1-20个字符', state: 2 })
         return
       }
       const data = []
@@ -385,11 +413,14 @@ export default {
     reactionInfo() {
       return this.$store.state.reactionInfo
     },
-    modules() {
-      return this.$store.state.reactionInfo.data
+    modules: {
+      get() { return this.reactionInfo.data },
+      set(newVal) {
+        this.$store.commit('saveReactionInfo', { data: newVal })
+      }
     },
     unSaveName() {
-      return this.$store.state.reactionInfo.unSaveReactionName
+      return this.reactionInfo.unSaveReactionName
     }
   }
 }

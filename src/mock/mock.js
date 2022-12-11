@@ -431,7 +431,10 @@ Mock.mock('/false/api/reaction', 'put', {
 // 更新反应接口-成功
 Mock.mock('/true/api/reaction', 'post', {
   status: 200,
-  data: {},
+  data: {
+    id: 10,
+    updateDate: '1111-11-11 11:11:11'
+  },
   msg: '保存成功'
 })
 
@@ -538,18 +541,28 @@ Mock.mock('/true/api/template', 'get', {
   data: [
     {
       id: 1,
-      name: '模版1',
-      data: ['scheme']
+      name: '模版少',
+      data: ['table']
     },
     {
-      id: 1,
-      name: '模版2',
-      data: ['scheme', 'text']
+      id: 2,
+      name: '模版多',
+      data: ['scheme', 'scheme', 'scheme', 'table', 'data', 'text']
     },
     {
-      id: 1,
-      name: '模版3',
-      data: ['scheme', 'text', 'table']
+      id: 3,
+      name: '一样多，顺序相同',
+      data: ['scheme', 'text', 'table', 'data', 'reference']
+    },
+    {
+      id: 4,
+      name: '一样多，顺序不同',
+      data: ['reference', 'text', 'table', 'data', 'scheme']
+    },
+    {
+      id: 5,
+      name: '超过15个',
+      data: ['scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme', 'scheme']
     }
   ],
   msg: '获取成功'

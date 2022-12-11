@@ -163,26 +163,79 @@ export default {
       }
     },
     // 根据输入的模块名称，输入空白模块数组
-    moduleNameToContent(moduleNameArr = []) {
-      const retArr = []
-      moduleNameArr.forEach(item => {
-        if (item === 'scheme' || item === 'text') {
-          retArr.push({ type: item, title: '', content: [] })
+    moduleNameToContent(moduleName = '', retArr = []) {
+      if (moduleName === 'scheme' || moduleName === 'text') {
+        retArr.push({ type: moduleName, title: '', content: [] })
+      } else if (moduleName === 'table') {
+        retArr.push({ type: moduleName, title: '', content: [['1120'], ['默认'], []] })
+      } else if (moduleName === 'data' || moduleName === 'reference') {
+        retArr.push({ type: moduleName, title: '', content: [[], []] })
+      } else {
+        throw new Error('no such module name!')
+      }
+      return retArr
+    },
+    countTemplateType(templateArr = []) {
+      // 5 个元素分别代表图片、文字、表格、数据、引用模块数量
+      const arr = [0, 0, 0, 0, 0]
+      templateArr.forEach(item => {
+        if (item === 'scheme') {
+          arr[0]++
+        } else if (item === 'text') {
+          arr[1]++
         } else if (item === 'table') {
-          retArr.push({ type: item, title: '', content: [['1120'], ['默认'], []] })
-        } else if (item === 'data' || item === 'reference') {
-          retArr.push({ type: item, title: '', content: [[], []] })
+          arr[2]++
+        } else if (item === 'data') {
+          arr[3]++
+        } else if (item === 'reference') {
+          arr[4]++
         }
       })
+      return arr
+    },
+    combineTemplateAndReaction(template = [], modules = []) {
+      const retArr = []
+      template.forEach(item => {
+        let isExist = false
+        for (let i = 0; i < modules.length; i++) {
+          if (modules[i] && modules[i].type === item) {
+            isExist = true
+            retArr.push(modules[i])
+            modules[i] = null
+            break
+          }
+        }
+        if (!isExist) {
+          this.moduleNameToContent(item, retArr)
+        }
+      })
+      let leftCount = 15 - retArr.length
+      for (let i = 0; i < modules.length; i++) {
+        if (leftCount <= 0) {
+          break
+        }
+        if (modules[i]) {
+          retArr.push(modules[i])
+          leftCount--
+        }
+      }
+      console.log(retArr)
       return retArr
     },
     toTemplate(data) {
       this.data = data
-      // 用户点击选择模版时，计算 hash 值，若 hash 值和上一次保存的值不同，则提醒用户应该先进行保存，否则直接进行模版跳转
-      const thisReactionHash = this.$md5(JSON.stringify(this.$store.state.reactionInfo))
-      // 有实验内容还没保存，弹窗提醒用户先进行保存
-      if (thisReactionHash !== this.$store.state.lastReactionHash) {
-        this.$store.commit('modal', { text: '是否丢弃尚未保存的实验数据', title: '选择模版提醒', slotType: 0 })
+      const templateArr = this.countTemplateType(data)
+      const module = []
+      this.modules.forEach((item) => {
+        module.push(item.type)
+      })
+      const moduleArr = this.countTemplateType(module)
+      let totalModule = 0
+      for (let i = 0; i < moduleArr.length; i++) {
+        totalModule += Math.max(templateArr[i], moduleArr[i])
+      }
+      if (totalModule > 15) {
+        this.$store.commit('modal', { text: '切换该模版将舍弃部分数据，是否继续?', title: '切换模版提醒', slotType: 0 })
         // 绑定点击确认按钮事件
         this.$store.commit('bindOkEvent', this.confirmToTemplate)
       } else {
@@ -190,15 +243,16 @@ export default {
       }
     },
     confirmToTemplate() {
-      const retArr = this.moduleNameToContent(this.data)
+      const retArr = this.combineTemplateAndReaction(this.data, this.modules)
+      console.log(retArr)
       this.$store.commit('saveReactionInfo', { data: retArr })
       // 重新计算 hash 值
-      this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.$store.state.reactionInfo)))
+      this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.reactionInfo)))
       this.$store.commit('modal', { showModal: false })
     },
     flushTemplate() {
       // 用户点击添加模版时，计算 hash 值，若 hash 值和上一次保存的值不同，则提醒用户应该先进行保存，否则直接进行模版跳转
-      const thisReactionHash = this.$md5(JSON.stringify(this.$store.state.reactionInfo))
+      const thisReactionHash = this.$md5(JSON.stringify(this.reactionInfo))
       // 有实验内容还没保存，弹窗提醒用户先进行保存
       if (thisReactionHash !== this.$store.state.lastReactionHash) {
         this.$store.commit('modal', { text: '是否丢弃尚未保存的实验数据', title: '新建模版提醒', slotType: 0 })
@@ -208,7 +262,7 @@ export default {
         })
       } else {
         this.$store.commit('saveReactionInfo', { data: [] })
-        this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.$store.state.reactionInfo)))
+        this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.reactionInfo)))
         this.$store.commit('modal', { showModal: false })
       }
     },
@@ -262,14 +316,14 @@ export default {
       } else {
         let projectName = sessionStorage.getItem('projectName')
         if (projectName === null) {
-          projectName = '嗯哼？想干嘛?'
+          projectName = '下次不敢这样了哦'
         }
         if (path === '/main/group/project/reaction') {
           return [{ name: `${this.name}`, path: '/#/main/group', disabled: false }, { name: `${projectName}`, path: '/#/main/group/project', disabled: false }, { name: `${this.reactionName}`, path: '/#/main/group/project/reaction', disabled: true }]
         } else if (path === '/main/user/project/reaction') {
           return [{ name: '我的实验', path: '/#/main/user', disabled: false }, { name: `${projectName}`, path: '/#/main/user/project', disabled: false }, { name: `${this.reactionName}`, path: '/#/main/user/project/reaction', disabled: true }]
         } else {
-          return [{ name: '不可能，肯定有 BUG !!!' }]
+          throw new Error('no such router')
         }
       }
     },
@@ -360,6 +414,15 @@ export default {
     },
     pointerEvent() {
       return this.$store.state.pointerEvent
+    },
+    reactionInfo() {
+      return this.$store.state.reactionInfo
+    },
+    modules: {
+      get() { return this.$store.state.reactionInfo.data },
+      set(newVal) {
+        this.$store.commit('saveReactionInfo', { data: newVal })
+      }
     }
   },
   mounted() {
@@ -487,10 +550,11 @@ export default {
     margin: 0 70px;
 
     button {
-      width: 120px;
-      height: 50px;
-      line-height: 50px;
+      width: 150px;
+      height: 70px;
       border: none;
+      font-size: 16px;
+      padding: 10px;
     }
 
     .builtin {
@@ -506,7 +570,7 @@ export default {
 
       .define {
         background-color: #ede9ec;
-        margin-bottom: 30px;
+        margin-bottom: 70px;
       }
 
       img {

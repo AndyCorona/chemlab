@@ -1,8 +1,9 @@
 <template>
   <div class="reaction-text">
-    <reaction-module-title placeholder="文字" :moduleOrder="moduleOrder" :showBlock="showBlock" :showTitle="showTitle"></reaction-module-title>
+    <reaction-module-title placeholder="文字" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-module-title>
     <div class="container">
-      <textarea :readonly="isGroup" v-model="text"></textarea>
+      <textarea :readonly="isGroup" v-model="text" @change="validateText"></textarea>
     </div>
   </div>
 </template>
@@ -17,6 +18,13 @@ export default {
     moduleOrder: Number,
     showBlock: Boolean,
     showTitle: Boolean
+  },
+  methods: {
+    validateText() {
+      if (!/^.{0,10000}$/.test(this.text)) {
+        this.$store.commit('toast', { text: '不超过 10000 个字', state: 2, durationTime: 3000 })
+      }
+    }
   },
   computed: {
     text: {

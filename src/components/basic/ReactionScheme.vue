@@ -1,12 +1,13 @@
 <template>
   <div class="reaction-scheme">
-    <reaction-module-title placeholder="图片" :moduleOrder="moduleOrder" :showBlock="showBlock" :showTitle="showTitle"></reaction-module-title>
+    <reaction-module-title placeholder="图片" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-module-title>
     <div class="container" v-show="!imgPath">
       <label :for="`img${randomNum}`">+</label>
       <input ref="inputRef" :id="`img${randomNum}`" type="file" @change="previewImg($event)">
     </div>
-    <div class="container" v-if="imgPath">
-      <img draggable="false" :src="imgPath" @click="changeImg($event)">
+    <div class="container" v-if="imgPath" @click="changeImg($event)">
+      <img draggable="false" :src="imgPath">
     </div>
   </div>
 </template>

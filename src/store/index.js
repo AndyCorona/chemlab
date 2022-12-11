@@ -65,7 +65,7 @@ export default createStore({
     templateDefine: [],
     // 内置的模版信息
     templateBuiltin: [
-      { id: 1, name: '模版1', data: ['scheme', 'table'] }, { id: 2, name: '模版2', data: ['scheme', 'table'] }, { id: 3, name: '模版3', data: ['scheme', 'table'] }, { id: 4, name: '模版4', data: ['scheme', 'table'] }, { id: 5, name: '模版5', data: ['scheme', 'table'] }
+      { id: 1, name: '最全的', data: ['scheme', 'table', 'text', 'data', 'reference'] }, { id: 2, name: '全图', data: ['scheme', 'scheme', 'scheme', 'scheme'] }, { id: 3, name: '个人汇报', data: ['scheme', 'table', 'text'] }, { id: 4, name: '论文', data: ['text', 'scheme', 'text', 'reference'] }, { id: 5, name: '保存数据', data: ['scheme', 'text', 'data'] }
     ],
     templateName: '',
     // toast 默认值

@@ -69,3 +69,10 @@
 * img {
   cursor: pointer;
 }
+
+html,
+body,
+#app,
+.app {
+  height: 100%;
+}

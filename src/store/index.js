@@ -3,6 +3,8 @@ import { createStore } from 'vuex'
 export default createStore({
 
   state: {
+    // 用户是否切换为晚上主题
+    isNight: false,
     isGroup: false,
     // 登录页面信息
     loginInfo: {
@@ -92,6 +94,9 @@ export default createStore({
   getters: {
   },
   mutations: {
+    saveIsNight(state, payload) {
+      state.isNight = payload
+    },
     saveLoginInfo(state, payload) {
       if (payload.username) {
         state.loginInfo.username = payload.username
@@ -294,6 +299,9 @@ export default createStore({
     }
   },
   actions: {
+    saveIsNight(context, payload) {
+      context.commit('saveIsNight', payload)
+    },
     saveLoginInfo(context, payload) {
       context.commit('saveLoginInfo', payload)
     },

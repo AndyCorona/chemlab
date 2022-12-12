@@ -1,7 +1,7 @@
 
 const config = {
   // 登录页的背景图片
-  backgroundImage: '/imgs/登录页/化学试管.jpg',
+  backgroundImage: '/imgs/登录页/背景图片.png',
   // 产品 icon
   productIcon: '/imgs/登录页/产品图标.png',
   // 登录页欢迎标语

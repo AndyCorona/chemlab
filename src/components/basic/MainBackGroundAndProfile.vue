@@ -1,7 +1,9 @@
 <template>
   <div class="main-background-and-profile">
-    <img draggable="false" class="background" :src="background">
-    <img draggable="false" class="logo" :src="logo">
+    <img draggable="false" class="background" :src="background"
+      :style="`filter: ${$store.state.isNight ? 'invert(1)contrast(0.5)' : ''}`">
+    <img draggable="false" class="logo" :src="logo"
+      :style="`filter: ${$store.state.isNight ? 'invert(1)contrast(0.5)' : ''}`">
   </div>
 </template>
 

@@ -21,10 +21,9 @@ export default {
   },
   methods: {
     rename() {
-      if (this.name === this.$store.state.projectInfo.name) {
-        return
+      if (this.name !== this.$store.state.projectInfo.name) {
+        this.$emit('focusout', this.name)
       }
-      this.$emit('focusout', this.name)
       this.$store.commit('savePointerEvent', false)
     }
   },

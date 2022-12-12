@@ -3,8 +3,9 @@
     <toast-props :show="this.$store.state.showToast" :text="this.$store.state.toastText"
       :state="this.$store.state.toastState" :durationTime="this.$store.state.toastDurationTime" @close="closeToast">
     </toast-props>
-    <div class="container" :style="`background-image: url(${backgroundImage})`">
-      <main>
+    <div class="container"
+      :style="`background-image: url(${backgroundImage});filter: ${$store.state.isNight ? 'invert(1)' : ''}`">
+      <main :style="`filter: ${$store.state.isNight ? 'invert(1)' : ''}`">
         <home-header :welcomeText="welcomeText" :productIcon="productIcon"></home-header>
         <home-slot :name="this.$route.fullPath.split('/')[1]">
           <template v-slot:login>
@@ -19,7 +20,8 @@
               </div>
               <home-button @btnClick="toUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="greenButton">
               </home-button>
-              <home-button @btnClick="this.$router.push('/signup')" buttonText="注册" buttonStyle="whiteButton"></home-button>
+              <home-button @btnClick="this.$router.push('/signup')" buttonText="注册"
+                buttonStyle="whiteButton"></home-button>
               <home-button @btnClick="this.$router.push('/error')" buttonText="出错了（测试）"
                 buttonStyle="grayButton"></home-button>
             </div>
@@ -33,7 +35,8 @@
                 label="密码"></home-input>
               <home-input :state="3" type="password" placeholder="请再次确认密码" label="二次确认"></home-input>
               <home-button @btnClick="signup" buttonText="注册" buttonStyle="whiteButton"></home-button>
-              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录" buttonStyle="grayButton"></home-button>
+              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录"
+                buttonStyle="grayButton"></home-button>
             </div>
           </template>
           <template v-slot:update-password>
@@ -59,7 +62,8 @@
                 buttonStyle="whiteButton">
               </home-button>
               <home-button @btnClick="toUpdatePassword" buttonText="下一步" buttonStyle="greenButton"></home-button>
-              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录" buttonStyle="grayButton"></home-button>
+              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录"
+                buttonStyle="grayButton"></home-button>
             </div>
           </template>
           <template v-slot:register-success>
@@ -326,14 +330,12 @@ export default {
 
 .home-view {
   position: relative;
-  width: $min-width;
-  margin: 0 auto;
+  height: 100%;
 
   .container {
     // 放在页面的内联样式中，可以通过 js 动态替换背景图片
     background-size: cover;
-    height: 1080px;
-    margin: 0 auto;
+    height: 100%;
     position: relative;
 
     main {

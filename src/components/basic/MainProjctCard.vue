@@ -1,7 +1,8 @@
 <template>
   <div class="main-project-card">
     <div @click="toProject(item.id)" class="wrapper" v-for="(item, index) in projectList" :key="index">
-      <img draggable="false" class="project-img" src="/imgs/用户主页/项目图片3.png">
+      <img draggable="false" class="project-img" src="/imgs/用户主页/项目图片3.png"
+        :style="`filter: ${$store.state.isNight ? 'grayscale(1)' : ''}`">
       <div class="project-text">
         <p class="project-title word-wrap">{{ item.name }}</p>
         <img draggable="false" v-if="(!isGroup || (isGroup && this.$store.state.groupInfo.isAdmin))"
@@ -95,6 +96,7 @@ export default {
 <style lang="scss">
 .main-project-card {
   margin: 20px 140px 0 140px;
+  padding-bottom: 200px;
 
   .wrapper {
     vertical-align: middle;

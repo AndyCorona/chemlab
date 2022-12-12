@@ -7,7 +7,7 @@
       <input ref="inputRef" :id="`img${randomNum}`" type="file" @change="previewImg($event)">
     </div>
     <div class="container" v-if="imgPath" @click="changeImg($event)">
-      <img draggable="false" :src="imgPath">
+      <img draggable="false" :src="imgPath" :style="`filter: ${$store.state.isNight ? 'invert(1)' : ''}`">
     </div>
   </div>
 </template>

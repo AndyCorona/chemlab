@@ -1,6 +1,7 @@
 <template>
   <div class="reaction-data">
-    <reaction-module-title placeholder="数据" :moduleOrder="moduleOrder" :showBlock="showBlock" :showTitle="showTitle"></reaction-module-title>
+    <reaction-module-title placeholder="数据" :moduleOrder="moduleOrder" :showBlock="showBlock"
+      :showTitle="showTitle"></reaction-module-title>
     <div class="container">
       <div class="thead">
         <div class="wrapper" :style="`width:${tWidth[index]}px`" v-for="(item, index) in thead " :key="index">

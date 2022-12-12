@@ -666,10 +666,13 @@ export default {
   }
 
   .right-container {
-    border-left: 1px solid #D7D7D7;
     z-index: 100;
     position: relative;
     width: 1620px;
+
+    .main-slot {
+      border-left: 1px solid #D7D7D7;
+    }
 
     .reaction-wrapper {
       display: flex;

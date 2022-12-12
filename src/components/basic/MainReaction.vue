@@ -53,6 +53,7 @@ export default {
 @import '../../assets/scss/base.scss';
 
 .main-reaction {
+  padding-bottom: 200px;
   margin-top: 20px;
 
   .wrapper {

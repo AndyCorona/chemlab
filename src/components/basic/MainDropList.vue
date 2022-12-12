@@ -9,7 +9,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'MainDropList',
   props: {
@@ -51,7 +50,7 @@ export default {
 
   #drop {
     display: none;
-    top: -100px;
+    top: -200px;
   }
 
   .child {

@@ -3,7 +3,7 @@
     <reaction-module-title placeholder="文字" :moduleOrder="moduleOrder" :showBlock="showBlock"
       :showTitle="showTitle"></reaction-module-title>
     <div class="container">
-      <textarea :readonly="isGroup" v-model="text" @change="validateText"></textarea>
+      <textarea :readonly="isGroup" v-model="text" @change="validateText" @input="autoResize"></textarea>
     </div>
   </div>
 </template>
@@ -24,6 +24,14 @@ export default {
       if (!/^.{0,10000}$/.test(this.text)) {
         this.$store.commit('toast', { text: '不超过 10000 个字', state: 2, durationTime: 3000 })
       }
+    },
+    autoResize(event) {
+      if (event.target.scrollHeight < 150) {
+        return
+      }
+      event.target.style.height = '150px'
+      // textarea 框自动适应高度，当前高度 + 50 px
+      event.target.style.height = event.target.scrollHeight + 50 + 'px'
     }
   },
   computed: {

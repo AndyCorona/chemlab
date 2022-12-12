@@ -432,7 +432,6 @@ export default {
   display: inline-block;
   width: 1320px;
   min-height: 1080px;
-  border-left: 1px solid #D7D7D7;
   border-right: 1px solid #D7D7D7;
   // 为了方便用户将模块放置在实验的最下方
   padding-bottom: 200px;

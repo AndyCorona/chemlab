@@ -23,10 +23,6 @@ export default {
   mounted() {
     this.init()
   },
-  updated() {
-    const height = document.body.clientHeight
-    this.$store.dispatch('saveHeight', height)
-  },
   methods: {
     init() {
       this.axios.get('/group').then((data) => {

@@ -64,7 +64,7 @@ export default {
     drop(event, index) {
       // 每个实验模块数量不超过 15 个
       if (this.modules.length >= 15) {
-        this.$store.commit('toast', { text: '每个实验最多只能放置 15 个模块', state: 2, durationTime: 3000 })
+        this.$store.commit('toast', { text: '每个实验最多只能放置 15 个模块', state: 2 })
         this.showBlock = []
         return
       }
@@ -262,7 +262,7 @@ export default {
     serializeFormTitle() {
       let isValid = true
       if (!/^.{0,30}$/.test(this.unSaveName)) {
-        this.$store.commit('toast', { text: '保存失败：实验标题超过30个字', durationTime: 3000 })
+        this.$store.commit('toast', { text: '保存失败：实验标题超过30个字' })
         isValid = false
       }
       return isValid
@@ -271,7 +271,7 @@ export default {
       let isAllValidate = true
       for (let i = 0; i < this.reactionInfo.tags.length; i++) {
         if (!/^.{0,10}$/.test(this.reactionInfo.tags[i])) {
-          this.$store.commit('toast', { text: `保存失败：标签${i + 1}的字数超过 10 个`, durationTime: 3000 })
+          this.$store.commit('toast', { text: `保存失败：标签${i + 1}的字数超过 10 个` })
           isAllValidate = false
           break
         }
@@ -306,7 +306,7 @@ export default {
         })
         if (response.status !== 200) {
           isUploaded = false
-          this.$store.commit('toast', { text: response.msg, durationTime: 3000 })
+          this.$store.commit('toast', { text: response.msg })
         } else {
           // 将所有上传了文件的数据模块的 file 清空，填写 fileId
           let count = 0
@@ -347,7 +347,7 @@ export default {
         })
         if (response.status !== 200) {
           isUploaded = false
-          this.$store.commit('toast', { text: response.msg, durationTime: 3000 })
+          this.$store.commit('toast', { text: response.msg })
         } else {
           let count = 0
           // 将所有上传了图片的模块的 file 清空，url 进行替换

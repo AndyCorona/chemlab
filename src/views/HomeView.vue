@@ -1,7 +1,7 @@
 <template>
   <div class="home-view">
     <toast-props :show="this.$store.state.showToast" :text="this.$store.state.toastText"
-      :state="this.$store.state.toastState" :durationTime="this.$store.state.toastDurationTime" @close="closeToast">
+      :state="this.$store.state.toastState" :durationTime="this.$store.state.toastDurationTime">
     </toast-props>
     <div class="container"
       :style="`background-image: url(${backgroundImage});filter: ${$store.state.isNight ? 'invert(1)' : ''}`">
@@ -300,12 +300,6 @@ export default {
           this.$store.dispatch('toast', { text: resp.msg })
         })
       }
-    },
-    closeToast() {
-      setTimeout(() => {
-        this.$store.dispatch('toast', { showModal: false })
-        // 魔数
-      }, 300)
     }
   },
   // 监听计时器，当计时器数字为 0 时重置计时器

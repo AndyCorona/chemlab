@@ -22,7 +22,7 @@ export default {
   methods: {
     validateText() {
       if (!/^.{0,10000}$/.test(this.text)) {
-        this.$store.commit('toast', { text: '不超过 10000 个字', state: 2, durationTime: 3000 })
+        this.$store.commit('toast', { text: '不超过 10000 个字', state: 2 })
       }
     },
     autoResize(event) {
@@ -30,8 +30,8 @@ export default {
         return
       }
       event.target.style.height = '150px'
-      // textarea 框自动适应高度，当前高度 + 50 px
-      event.target.style.height = event.target.scrollHeight + 50 + 'px'
+      // textarea 框自动适应高度，当前高度 + 20 px
+      event.target.style.height = event.target.scrollHeight + 20 + 'px'
     }
   },
   computed: {
@@ -58,7 +58,7 @@ export default {
       font-size: 16px;
       width: 1200px;
       min-height: 150px;
-      resize: vertical;
+      resize: none;
     }
   }
 }

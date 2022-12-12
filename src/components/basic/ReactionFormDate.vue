@@ -41,10 +41,10 @@ export default {
     },
     validateTag(event, index) {
       if (!/^.{0,10}$/.test(event.target.innerHTML)) {
-        this.$store.commit('toast', { text: `标签${index + 1}的字数超过 10 个`, state: 2, durationTime: 3000 })
+        this.$store.commit('toast', { text: `标签${index + 1}的字数超过 10 个`, state: 2 })
       }
       if (event.target.innerHTML.trim() === '') {
-        this.$store.commit('toast', { text: '没有内容的标签将不会被保存', state: 2, durationTime: 3000 })
+        this.$store.commit('toast', { text: '没有内容的标签将不会被保存', state: 2 })
       }
     }
   },

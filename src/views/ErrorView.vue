@@ -1,12 +1,12 @@
 <template>
   <div class="error-view">
-    <toast-props :show="this.showModal" :text="this.randomTitle[this.count % 3]" :state="this.count % 3"
-      :durationTime="1000" @close="this.showModal = false"></toast-props>
+    <toast-props :show="showModal" :text="randomTitle[count % 3]" :state="count % 3"
+      :durationTime="1500" @close="showModal = false"></toast-props>
     <div class="title">{{ title }}</div>
     <div class="subtitle">{{ subtitle }}</div>
     <div class="container">
-      <button class="whiteButton " @click.prevent="this.count++; this.showModal = true">刷新试试</button>
-      <button class="whiteButton" @click.prevent="this.$router.push('/')">返回首页</button>
+      <button class="whiteButton " @click.prevent="count++; showModal = true">刷新试试</button>
+      <button class="whiteButton" @click.prevent="$router.push('/')">返回首页</button>
     </div>
   </div>
 </template>

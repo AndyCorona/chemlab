@@ -1,6 +1,6 @@
 <template>
   <div class="toast-props" :class="open"
-    :style="`top:${this.open ==='open' ? this.$store.state.scrollTop + 200 :-100}px`">
+    :style="`top:${open ==='open' ? $store.state.scrollTop + 200 : $store.state.scrollTop-100}px`">
     <div class="toast-container" :id="classState">
       <img draggable="false" :src="icon">
       <span>{{ text }}</span>
@@ -11,7 +11,6 @@
 
 export default {
   name: 'ToastProps',
-  emits: ['close'],
   props: {
     // 是否显示
     show: Boolean,
@@ -24,7 +23,7 @@ export default {
   },
   data() {
     return {
-      open: this.show,
+      open: 'close',
       toastSuccess: this.$config.toastSuccess,
       toastFail: this.$config.toastFail,
       toastForbid: this.$config.toastForbid
@@ -39,7 +38,7 @@ export default {
       } else if (this.state === 2) {
         return 'forbid'
       } else {
-        return ''
+        throw new Error('no such state')
       }
     },
     icon() {
@@ -50,7 +49,7 @@ export default {
       } else if (this.state === 2) {
         return this.toastForbid
       } else {
-        return ''
+        throw new Error('no such state')
       }
     }
 
@@ -62,7 +61,7 @@ export default {
           this.open = 'open'
           setTimeout(() => {
             this.open = 'close'
-            this.$emit('close')
+            this.$store.dispatch('toast', { showModal: false })
           }, this.durationTime)
         }
       },
@@ -125,10 +124,11 @@ export default {
 }
 
 .close {
-  transition: top .5s;
+  opacity: 0;
 }
 
 .open {
+  opacity: 100%;
   transition: top .5s;
 }
 </style>

@@ -85,7 +85,6 @@ export default createStore({
     slotType: 0,
     // toast 和 modal 自适应参数
     scrollTop: 0,
-    height: 1080,
     // 监听右边栏是否有拖动事件发生
     isDragging: false,
     // 是否启用模块的拖拽行为
@@ -243,13 +242,15 @@ export default createStore({
     saveLastReactionHash(state, payload) {
       state.lastReactionHash = payload
     },
-    saveScrollTop(state, payload) {
-      state.scrollTop = payload
-    },
-    saveHeight(state, payload) {
-      state.height = payload
-    },
     toast(state, payload) {
+      if (payload.showModal || payload.showModal === undefined) {
+        state.pointerEvent = true
+        const scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop
+        state.scrollTop = scrollTop
+      } else {
+        state.pointerEvent = false
+        state.scrollTop = 0
+      }
       state.showToast = payload.showModal === undefined ? true : payload.showModal
       state.toastText = !payload.text ? '未知错误' : payload.text
       state.toastState = payload.state === undefined ? 1 : payload.state
@@ -260,11 +261,17 @@ export default createStore({
       state.modalTitle = !payload.title ? '默认标题' : payload.title
       state.showModal = payload.showModal === undefined ? true : payload.showModal
       state.slotType = payload.slotType
+      if (state.showModal) {
+        const scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop
+        state.scrollTop = scrollTop
+      }
     },
     modalStateChange(state, payload) {
       // 点击确认按钮时，自动执行绑定的事件
       if (payload) {
         state.okEvent()
+      } else {
+        state.scrollTop = 0
       }
     },
     bindOkEvent(state, payload) {
@@ -346,12 +353,6 @@ export default createStore({
     },
     saveUncheckLeaveReaction(context, payload) {
       context.commit('saveUncheckLeaveReaction', payload)
-    },
-    saveScrollTop(context, payload) {
-      context.commit('saveScrollTop', payload)
-    },
-    saveHeight(context, payload) {
-      context.commit('saveHeight', payload)
     },
     toast(context, payload) {
       context.commit('toast', payload)

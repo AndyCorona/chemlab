@@ -1,8 +1,8 @@
 <template>
   <div class="home-button">
     <div class="wrapper">
-      <button :style="`cursor:${this.disabled ? 'not-allowed' : 'pointer'}`" :disabled="disabled" :class="buttonStyle"
-        @click="this.$emit('btnClick')">{{ buttonText }}</button>
+      <button :style="`cursor:${disabled ? 'not-allowed' : 'pointer'}`" :disabled="disabled" :class="buttonStyle"
+        @click="$emit('btnClick')">{{ buttonText }}</button>
     </div>
   </div>
 </template>

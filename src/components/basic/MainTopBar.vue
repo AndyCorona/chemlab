@@ -31,7 +31,7 @@ export default {
   },
   data() {
     return {
-      toggleStyle: 'showSun'
+      toggleStyle: this.$store.state.isNight ? 'sunToMoon' : 'showSun'
     }
   },
   methods: {

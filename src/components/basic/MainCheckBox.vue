@@ -2,7 +2,7 @@
   <div class="main-check-box">
     <!-- 防止点击复选框之后跳转页面 -->
     <div class="active" @click.stop="">
-      <input :checked="this.checked" type="checkbox" :id="`checkbox${randomNum}`" @change="changeFunc">
+      <input :checked="checked" type="checkbox" :id="`checkbox${randomNum}`" @change="changeFunc">
       <label :for="`checkbox${randomNum}`"></label>
     </div>
   </div>

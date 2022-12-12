@@ -1,7 +1,7 @@
 <template>
   <div class="main-view" :style="`pointer-events:${pointerEvent ? 'none' : 'all'}`">
     <toast-props :show="$store.state.showToast" :text="$store.state.toastText" :state="$store.state.toastState"
-      :durationTime="$store.state.toastDurationTime" @close="closeToast">
+      :durationTime="$store.state.toastDurationTime">
     </toast-props>
     <common-modal @ok="$store.commit('modalStateChange', true)" @no="$store.commit('modalStateChange', false)"
       :hasImg='hasImg[state]' :imgPath='imgPath[state]' :name='slotName[state]'
@@ -110,7 +110,7 @@ import MainBackgroundAndProfile from '../components/basic/MainBackGroundAndProfi
 import ReactionForm from '../components/compose/ReactionForm.vue'
 import ReactionRightBar from '../components/compose/ReactionRightBar.vue'
 import MainSlot from '../components/basic/MainSlot.vue'
-import CommonModal from '@/components/basic/CommonModal.vue'
+import CommonModal from '../components/basic/CommonModal.vue'
 export default {
   name: 'MainView',
   components: {
@@ -148,12 +148,6 @@ export default {
     }
   },
   methods: {
-    closeToast() {
-      setTimeout(() => {
-        this.$store.dispatch('toast', { showModal: false })
-        // 魔数
-      }, 300)
-    },
     checkIsGroup() {
       const path = this.$route.fullPath
       if (path.startsWith('/main/group')) {
@@ -426,24 +420,15 @@ export default {
     }
   },
   mounted() {
-    window.addEventListener('scroll', () => {
-      const scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop
-      this.$store.dispatch('saveScrollTop', scrollTop)
-    })
-    window.addEventListener('resize', () => {
-      const height = document.body.clientHeight
-      this.$store.dispatch('saveHeight', height)
-    })
     window.addEventListener('keyup', () => {
       if (event.keyCode === 27) {
+        this.$store.dispatch('modalStateChange', false)
         this.$store.dispatch('modal', { showModal: false })
       }
     })
     this.checkIsGroup()
   },
   updated() {
-    const height = document.body.clientHeight
-    this.$store.dispatch('saveHeight', height)
     this.checkIsGroup()
   }
 }

@@ -1,10 +1,8 @@
 <template>
   <div class="common-modal" @wheel="preventWheel($event, prevent)">
-    <div class="mask" :class="open" @keyup.enter="closeAndEmitNo" @click="closeAndEmitNo" :style="
-    `height:${this.$store.state.height}px`">
+    <div class="mask" :class="open" @click="closeAndEmitNo">
     </div>
-    <div class="modal" :class="open"
-      :style="`top:${this.open === 'open' ? this.$store.state.scrollTop + 350 : -100}px`">
+    <div class="modal" :class="open" :style="`top:${open === 'open' ? $store.state.scrollTop + 350 : -100}px`">
       <div class="modal-header" :style="`box-shadow: ${!hasBorder ? 'none' : '0 4px 4px 0 rgba(0, 0, 0, 0.35)'}`">
         <img draggable="false" v-if="hasImg" :src="imgPath">
         <span>{{ showTitle }}</span>
@@ -79,6 +77,7 @@ export default {
 <style lang="scss">
 .common-modal {
   .mask {
+    height: 100%;
     width: 1920px;
     margin: 0 auto;
     backdrop-filter: blur(5px);

@@ -25,7 +25,7 @@ export default {
     },
     validateModuleTitle() {
       if (!/^.{0,60}$/.test(this.title)) {
-        this.$store.commit('toast', { text: '模块标题不超过60个字', state: 2, durationTime: 3000 })
+        this.$store.commit('toast', { text: '模块标题不超过60个字', state: 2 })
       }
     }
   },

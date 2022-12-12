@@ -11,7 +11,7 @@ export default {
   methods: {
     valiDateTitle() {
       if (!/^.{0,30}$/.test(this.title)) {
-        this.$store.commit('toast', { text: '实验标题不超过30个字', state: 2, durationTime: 3000 })
+        this.$store.commit('toast', { text: '实验标题不超过30个字', state: 2 })
         return false
       }
       return true

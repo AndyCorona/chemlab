@@ -1,13 +1,13 @@
 <template>
   <div class="home-view">
-    <toast-props :show="this.$store.state.showToast" :text="this.$store.state.toastText"
-      :state="this.$store.state.toastState" :durationTime="this.$store.state.toastDurationTime">
+    <toast-props :show="$store.state.showToast" :text="$store.state.toastText" :state="$store.state.toastState"
+      :durationTime="$store.state.toastDurationTime">
     </toast-props>
     <div class="container"
       :style="`background-image: url(${backgroundImage});filter: ${$store.state.isNight ? 'invert(1)' : ''}`">
       <main :style="`filter: ${$store.state.isNight ? 'invert(1)' : ''}`">
         <home-header :welcomeText="welcomeText" :productIcon="productIcon"></home-header>
-        <home-slot :name="this.$route.fullPath.split('/')[1]">
+        <home-slot :name="$route.fullPath.split('/')[1]">
           <template v-slot:login>
             <div class="home-login">
               <home-input :state="0" type="text" placeholder="请输入用户名" label="用户名">
@@ -20,9 +20,8 @@
               </div>
               <home-button @btnClick="toUserSpace" :style="'margin-top:20px'" buttonText="登录" buttonStyle="greenButton">
               </home-button>
-              <home-button @btnClick="this.$router.push('/signup')" buttonText="注册"
-                buttonStyle="whiteButton"></home-button>
-              <home-button @btnClick="this.$router.push('/error')" buttonText="出错了（测试）"
+              <home-button @btnClick="$router.push('/signup')" buttonText="注册" buttonStyle="whiteButton"></home-button>
+              <home-button @btnClick="$router.push('/error')" buttonText="出错了（测试）"
                 buttonStyle="grayButton"></home-button>
             </div>
           </template>
@@ -35,8 +34,7 @@
                 label="密码"></home-input>
               <home-input :state="3" type="password" placeholder="请再次确认密码" label="二次确认"></home-input>
               <home-button @btnClick="signup" buttonText="注册" buttonStyle="whiteButton"></home-button>
-              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录"
-                buttonStyle="grayButton"></home-button>
+              <home-button @btnClick="$router.push('/login')" buttonText="返回登录" buttonStyle="grayButton"></home-button>
             </div>
           </template>
           <template v-slot:update-password>
@@ -62,15 +60,14 @@
                 buttonStyle="whiteButton">
               </home-button>
               <home-button @btnClick="toUpdatePassword" buttonText="下一步" buttonStyle="greenButton"></home-button>
-              <home-button @btnClick="this.$router.push('/login')" buttonText="返回登录"
-                buttonStyle="grayButton"></home-button>
+              <home-button @btnClick="$router.push('/login')" buttonText="返回登录" buttonStyle="grayButton"></home-button>
             </div>
           </template>
           <template v-slot:register-success>
             <div class="home-register-success">
               <p>注册成功！</p>
               <p>请前往邮箱激活账号！</p>
-              <home-button @click.prevent="this.$router.push('/login')" buttonText="返回登录"
+              <home-button @click.prevent="$router.push('/login')" buttonText="返回登录"
                 buttonStyle="grayButton"></home-button>
             </div>
           </template>
@@ -78,7 +75,7 @@
             <div class="home-activate-success">
               <p>激活成功！</p>
               <p>请使用用户名和密码登录！</p>
-              <home-button @click.prevent="this.$router.push('/login')" buttonText="返回登录"
+              <home-button @click.prevent="$router.push('/login')" buttonText="返回登录"
                 buttonStyle="grayButton"></home-button>
             </div>
           </template>
@@ -117,8 +114,7 @@ export default {
       buttonText: '获取验证码',
       isSent: false,
       productIcon: this.$config.productIcon,
-      welcomeText: this.$config.welcomeText,
-      backgroundImage: this.$config.backgroundImage
+      welcomeText: this.$config.welcomeText
     }
   },
   computed: {
@@ -161,6 +157,9 @@ export default {
       set(newVal) {
         this.$store.comit('saveLoginInfo', { code: newVal })
       }
+    },
+    backgroundImage() {
+      return this.$store.state.isNight ? '/imgs/登录页/化学公式.jpg' : '/imgs/登录页/背景图片.png'
     }
   },
   methods: {

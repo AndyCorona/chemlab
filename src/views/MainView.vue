@@ -213,7 +213,6 @@ export default {
           leftCount--
         }
       }
-      console.log(retArr)
       return retArr
     },
     toTemplate(data) {
@@ -238,7 +237,6 @@ export default {
     },
     confirmToTemplate() {
       const retArr = this.combineTemplateAndReaction(this.data, this.modules)
-      console.log(retArr)
       this.$store.commit('saveReactionInfo', { data: retArr })
       // 重新计算 hash 值
       this.$store.commit('saveLastReactionHash', this.$md5(JSON.stringify(this.reactionInfo)))

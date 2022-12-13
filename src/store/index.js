@@ -90,8 +90,6 @@ export default createStore({
     // 是否启用模块的拖拽行为
     draggable: false
   },
-  getters: {
-  },
   mutations: {
     saveIsNight(state, payload) {
       state.isNight = payload
@@ -306,9 +304,6 @@ export default createStore({
     }
   },
   actions: {
-    saveIsNight(context, payload) {
-      context.commit('saveIsNight', payload)
-    },
     saveLoginInfo(context, payload) {
       context.commit('saveLoginInfo', payload)
     },
@@ -389,11 +384,6 @@ export default createStore({
     },
     saveVersoinId(context, payload) {
       context.commit('saveVersoinId', payload)
-    },
-    savePointerEvent(context, payload) {
-      context.commit('savePointerEvent', payload)
     }
-  },
-  modules: {
   }
 })

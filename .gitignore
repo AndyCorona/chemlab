@@ -1,8 +1,8 @@
 .DS_Store
 node_modules
 /dist
-/Axure原型
-/文档
+Axure原型
+文档
 
 # local env files
 .env.local

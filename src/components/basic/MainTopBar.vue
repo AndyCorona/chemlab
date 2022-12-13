@@ -49,13 +49,13 @@ export default {
     },
     toDark() {
       this.$store.commit('saveIsNight', true)
-      this.$config.backgroundImage = '/imgs/登录页/化学公式.jpg'
+      sessionStorage.setItem('isNight', true)
       this.toggleStyle = 'sunToMoon'
       document.documentElement.style.filter = 'invert(1)'
     },
     toLight() {
       this.$store.commit('saveIsNight', false)
-      this.$config.backgroundImage = '/imgs/登录页/背景图片.png'
+      sessionStorage.setItem('isNight', false)
       this.toggleStyle = 'moonToSun'
       document.documentElement.style.filter = ''
     }

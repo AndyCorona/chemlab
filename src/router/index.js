@@ -114,8 +114,6 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from) => {
-  console.log(from.fullPath)
-  console.log(to.fullPath)
   // 更新密码页面需要从 sessionStorage 中获取用户名和邮箱
   if (to.fullPath === '/update-password') {
     store.dispatch('saveLoginInfo', { username: sessionStorage.getItem('username'), email: sessionStorage.getItem('email') })

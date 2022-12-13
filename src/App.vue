@@ -6,7 +6,21 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  methods: {
+    init() {
+      const isNight = JSON.parse(sessionStorage.getItem('isNight'))
+      this.$store.commit('saveIsNight', isNight)
+      if (isNight) {
+        document.documentElement.style.filter = 'invert(1)'
+      } else {
+        document.documentElement.style.filter = ''
+      }
+    }
+  },
+  mounted() {
+    this.init()
+  }
 }
 </script>
 

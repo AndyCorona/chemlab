@@ -21,7 +21,8 @@
         <img draggable="false" src="/imgs/左边栏/组长.svg" v-if="item.isAdmin" title="这是组长">
         <img draggable="false" src="/imgs/左边栏/成员.svg" v-if="!item.isAdmin" title="这是成员">
         <!-- 群主不能删除自己 -->
-        <img draggable="false" @click="deleteMember(item.name, index)" src="/imgs/左边栏/删除成员.svg" v-if="isAdmin && !item.isAdmin">
+        <img draggable="false" @click="deleteMember(item.name, index)" src="/imgs/左边栏/删除成员.svg"
+          v-if="isAdmin && !item.isAdmin">
       </div>
     </div>
     <div class="wrapper" v-if="(!!members.length && isAdmin && members.length < 20)">

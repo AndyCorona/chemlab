@@ -83,7 +83,6 @@ export default {
       this.axios.post('/download', { fileId: item[1] }, { responseType: 'blob' })
         .then((res) => {
           const { data, headers } = res
-          console.log(res)
           const blob = new Blob([data], { type: headers['content-type'] })
           const downloadElement = document.createElement('a')
           // 创建下载的链接

@@ -13,12 +13,12 @@
         </div>
         <div class="wrapper" :class="basitStyle">
           <label>密码：</label>
-          <input @change="validate(1)" type="password" :readonly="basicToggle" v-model="password"
+          <input @change="validate(1)" @input="modify = true" type="password" :readonly="basicToggle" v-model="password"
             :placeholder="password">
         </div>
         <div class="wrapper" :class="basitStyle" :style="`opacity:${basicToggle ? '0' : '100%'}`">
           <label>确认密码：</label>
-          <input @change="validate(2)" type="password" :readonly="basicToggle" v-model="confirmPassword"
+          <input @change="checkConfirmPassword" type="password" :readonly="basicToggle" v-model="confirmPassword"
             :placeholder="confirmPassword">
         </div>
         <div class="wrapper">
@@ -52,18 +52,20 @@
 
 </template>
 <script>
-
+import JSEncrypt from 'jsencrypt'
 export default {
   name: 'MainDetails',
   data() {
     return {
       usernameExp: /^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/,
       emailExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
-      passwordExp: /^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/,
+      passwordExp: /^.{0,30}$/,
       personalExp: /^[A-Za-z\u4e00-\u9fa5]{0,20}$/,
       username: '',
       email: '',
-      password: '111111',
+      password: '',
+      passwordLength: '',
+      modify: false,
       confirmPassword: '',
       school: '',
       major: '',
@@ -79,6 +81,11 @@ export default {
       // 获取基本信息和个人信息
       this.axios.get('/main/info').then((data) => {
         this.username = data.username
+        const length = JSON.parse(localStorage.getItem('p_length'))
+        this.passwordLength = length
+        for (let i = 0; i < length; i++) {
+          this.password += '1'
+        }
         this.email = data.email
         this.school = data.school
         this.major = data.major
@@ -134,15 +141,42 @@ export default {
           return false
         }
         return true
+      } else if (type === 6) {
+        if (this.passwordLength !== this.confirmPassword.length) {
+          this.$store.commit('toast', { text: '两次输入密码不一致' })
+          return false
+        }
+        if (!this.passwordExp.test(this.confirmPassword)) {
+          this.$store.commit('toast', { text: '请输入有效的密码' })
+          return false
+        }
+        return true
       } else {
-        throw new Error('the type is between 0 - 5')
+        throw new Error('the type is between 0 - 6')
+      }
+    },
+    checkConfirmPassword() {
+      if (this.modify) {
+        this.validate(2)
+      } else {
+        this.validate(6)
       }
     },
     saveBasic() {
-      if (this.validate(0) && this.validate(1) && this.validate(2)) {
+      // 确认密码和密码只需要长度相同即可，将确认密码传给后端即可
+      if (this.validate(0) && this.validate(1)) {
+        let valid
+        if (this.modify) {
+          valid = this.validate(2)
+        } else {
+          valid = this.validate(6)
+        }
+        if (!valid) {
+          return
+        }
         this.axios.post('/main/basic', {
           username: this.username,
-          password: this.password
+          password: this.encodePassword(this.confirmPassword)
         }).then(() => {
           this.$store.dispatch('toast', { text: '修改成功', state: 0 })
           this.basicToggle = !this.basicToggle
@@ -167,6 +201,11 @@ export default {
           this.$store.dispatch('toast', { text: resp.msg })
         })
       }
+    },
+    encodePassword() {
+      const jse = new JSEncrypt()
+      jse.setPublicKey(this.$publickey)
+      return jse.encrypt(this.password)
     }
   },
   mounted() {

@@ -92,6 +92,7 @@ import HomeFooter from '../components/basic/HomeFooter.vue'
 import HomeSlot from '../components/basic/HomeSlot.vue'
 import HomeInput from '../components/basic/HomeInput.vue'
 import HomeButton from '../components/basic/HomeButton.vue'
+import JSEncrypt from 'jsencrypt'
 export default {
   name: 'HomeView',
   components: {
@@ -105,7 +106,7 @@ export default {
     return {
       usernameExp: /^[A-Za-z0-9\u4e00-\u9fa5]{2,20}$/,
       emailExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
-      passwordExp: /^[A-Za-z0-9\u4e00-\u9fa5@#$%^&*]{6,20}$/,
+      passwordExp: /^.{0,30}$/,
       codeExp: /^\d{6}$/,
       // 计时器的句柄
       handler: null,
@@ -248,14 +249,15 @@ export default {
         this.axios.post('/home/update', {
           username: this.username,
           email: this.email,
-          password: this.password
+          password: this.encodePassword(this.password)
         }).then(() => {
+          localStorage.setItem('p_length', this.password.length)
           // 清空留在 vuex  的信息，跳转到登录页
           this.$store.dispatch('toast', { text: '修改成功', state: 0 })
           setTimeout(() => {
             this.$router.push('/login')
             this.$store.dispatch('clearLoginInfo')
-          }, 500)
+          }, 300)
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })
@@ -265,8 +267,10 @@ export default {
       if (this.validate(0) && this.validate(2)) {
         this.axios.post('/home/login', {
           username: this.username,
-          password: this.password
+          password: this.encodePassword(this.password)
         }).then((data) => {
+          // 保存密码长度，用于在帮助页面显示
+          localStorage.setItem('p_length', this.password.length)
           // 清空之前注册留在 vuex  的信息
           this.$store.dispatch('clearLoginInfo')
           // 首次登录跳转到个人中心
@@ -291,14 +295,20 @@ export default {
         this.axios.post('/home/register', {
           username: this.username,
           email: this.email,
-          password: this.password
+          password: this.encodePassword(this.password)
         }).then(() => {
           this.$store.dispatch('clearLoginInfo')
+          localStorage.setItem('p_length', this.password.length)
           this.$router.push('/register-success')
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })
       }
+    },
+    encodePassword() {
+      const jse = new JSEncrypt()
+      jse.setPublicKey(this.$publickey)
+      return jse.encrypt(this.password)
     }
   },
   // 监听计时器，当计时器数字为 0 时重置计时器
@@ -313,6 +323,9 @@ export default {
         }
       }
     }
+  },
+  mounted() {
+
   }
 }
 </script>

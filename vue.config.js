@@ -4,5 +4,6 @@ module.exports = defineConfig({
   devServer: {
     allowedHosts: 'all',
     port: 8080
-  }
+  },
+  // lintOnSave: false
 })

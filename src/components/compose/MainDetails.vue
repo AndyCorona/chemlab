@@ -163,7 +163,6 @@ export default {
       }
     },
     saveBasic() {
-      // 确认密码和密码只需要长度相同即可，将确认密码传给后端即可
       if (this.validate(0) && this.validate(1)) {
         let valid
         if (this.modify) {
@@ -178,8 +177,9 @@ export default {
           username: this.username,
           password: this.encodePassword(this.confirmPassword)
         }).then(() => {
-          this.$store.dispatch('toast', { text: '修改成功', state: 0 })
           this.basicToggle = !this.basicToggle
+          localStorage.setItem('p_length', this.confirmPassword.length)
+          this.$store.dispatch('toast', { text: '修改成功', state: 0 })
         }).catch((resp) => {
           this.$store.dispatch('toast', { text: resp.msg })
         })

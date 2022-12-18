@@ -308,6 +308,8 @@ export default {
     encodePassword() {
       const jse = new JSEncrypt()
       jse.setPublicKey(this.$publickey)
+      console.log(this.password)
+      console.log(jse.encrypt(this.password))
       return jse.encrypt(this.password)
     }
   },
@@ -323,9 +325,6 @@ export default {
         }
       }
     }
-  },
-  mounted() {
-
   }
 }
 </script>
